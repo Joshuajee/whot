@@ -1,22 +1,7 @@
-const GamePlay = require("./gameplay")
+const GameStart = require("./gameStart")
 
-require("./gameplay")
+let game = new GameStart()
 
-gamePlay = new GamePlay("Jee", "Jee1")
-
-gamePlay.play(gamePlay.playerOne, "Jee")
-
-console.log(gamePlay.playerNames)
-console.log(gamePlay.playerOne)
-console.log(gamePlay.actions)
-
-
-
-gamePlay.play(gamePlay.playerTwo, "Jee1")
-
-console.log(gamePlay.playerNames)
-console.log(gamePlay.playerTwo)
-console.log(gamePlay.actions)
 
 /*
 while (gamePlay.playerOne.length > 0 && gamePlay.playerTwo.length > 0 && gamePlay.marketCards.length > 0) {

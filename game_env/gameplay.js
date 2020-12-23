@@ -1,5 +1,7 @@
 GameEngine = require("./gameEngine")
 
+const agents = require("../models/agents")
+
 const cards = require("../cards").cards
 
 
@@ -81,28 +83,19 @@ class GamePlay extends GameEngine
             let shape = player[i].slice(0, index)
             
             if(number === number_in){
-                //console.log("Play")
-                //this.PlayGame(player, player[i], i)
+
                 this.action.push(player[i])
-                //console.log(this.inPlay)
-                //break
+
             }else if(shape === shape_in){
-                //console.log("Play")
-                //this.PlayGame(player, player[i], i)
+               
                 this.action.push(player[i])
-                //console.log(this.inPlay)
-               // break
-            }else if(i + 1 == player.length){
-                //this.GoMarket(player)
-                //console.log("Go Market")
-                //break
+
             }
 
         }
 
+        
         super.stateFinder(this.playerName, this.action, this.inPlay, this.market.length)
-
-
 
     }
 
@@ -129,7 +122,6 @@ class GamePlay extends GameEngine
         }
     }
 
-  
 }
 
 
