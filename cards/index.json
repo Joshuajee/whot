@@ -1,0 +1,15 @@
+{
+
+"cards":[
+        "whot:20", "whot:20", "whot:20", "whot:20", "whot:20", "star:1", "star:2",
+        "star:3", "star:4", "star:5", "star:7", "star:8", "circle:1", "circle:2",
+        "circle:3", "circle:4", "circle:5", "circle:7", "circle:8", "circle:10", 
+        "circle:11", "circle:12", "circle:13", "circle:14", "triangle:1", "triangle:2", 
+        "triangle:3", "triangle:4", "triangle:5", "triangle:7", "triangle:8", "triangle:10",
+        "triangle:11", "triangle:12", "triangle:13", "triangle:14", "cross:1", "cross:2", 
+        "cross:3", "cross:4", "cross:5", "cross:7", "cross:10", "cross:11", "cross:13", 
+        "cross:14", "square:1", "square:2", "square:3", "square:4", "square:5", "square:7", 
+        "square:10", "square:11", "square:13", "square:14"]
+}
+
+
