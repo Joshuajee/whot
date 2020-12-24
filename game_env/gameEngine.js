@@ -1,6 +1,5 @@
 require("../configs/dbConnections")
 
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require("constants")
 const { EventEmitter } = require("events")
 const agents = require("../models/agents")
 
@@ -43,11 +42,16 @@ class GameEngine extends EventEmitter{
     }
 
 
+
+
+
     
 
-    stateFinder(playerName, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules){
+    stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
 
-        //console.log(playerName)
+
+        //This method finds all the relevant states an angent has
+
         switch (playerName) {
             
             case this.agentOne.agentName:
@@ -63,54 +67,92 @@ class GameEngine extends EventEmitter{
 
         switch(this.player.states.length){
             case 0:
-                this.stateCreater(this.player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules)
-                break
+                return this.stateCreater(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
             default:
-                console.log("searching")
-                this.stateSearch(this.player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules)
+                //console.log("searching")
+                return this.stateSearch(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
         }
 
 
     }
 
-    stateCreater(player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules){
-        console.log("state created")
+    stateCreater(player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
+        
+        //This method finds creates a state and save it to an angent
+
+        let actions = this.actionCreater(availableMove, player.states)
+
         player.states.push({"cardAtHand":cardAtHand, 
+                            "noOfCardsWithOpponent": noOfCardsWithOpponent,
                             "cardInPlay":inPlayCards,
                             "cardPlayed": cardPlayed, 
                             "noOfCardsInMarket":noOfCardsInMarket,
+                            "availableMove":availableMove.sort(),
                             "actions":actions,
                             "rules":rules
                         })
+
         player.save(function (err) {
             if (err) return handleError(err);
-            console.log('the subdocs were removed');
+            //console.log('the subdocs were removed');
           })
 
-        console.log("modifief")
-        console.log(player)
+        //console.log("modifief")
+        //console.log(player)
+        return actions
     }
 
 
-    stateSearch(player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules){
-        console.log("state search")
+    stateSearch(player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
+        
+        //This method search for existing states within an angent 
 
-                        let states = player.states
-                        for(let i = 0; i < states.length; i++){
-                            let condition = states[i].cardAtHand.sort() === cardAtHand.sort()    &&
-                                            states[i].cardInPlay === inPlayCards                 &&
-                                            states[i].cardPlayed.sort() === cardPlayed.sort()    &&
-                                            states[i].noOfCardsInMarket === noOfCardsInMarket    &&
-                                            states[i].actions  === actions                       &&
-                                            states.rules === rules
+            let states = player.states
+            for(let i = 0; i < states.length; i++){
+                let condition = states[i].cardAtHand.sort() === cardAtHand.sort()           &&
+                                states[i].cardInPlay === inPlayCards                        &&
+                                states[i].cardPlayed === cardPlayed                         &&
+                                states[i].noOfCardsInMarket === noOfCardsInMarket           &&
+                                states[i].availableMove.sort()  === availableMove.sort()    &&
+                                states.rules === rules
 
-                            if(condition){
-                                return states[i]
-                            }
-                        }
+                if(condition) return states[i].actions
+            }
 
-        return this.stateCreater(this.player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules)
+        return this.stateCreater(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
               
+    }
+
+    actionCreater(availableMove, playerStates){
+
+        let output = []
+
+        for(let i = 0; i < availableMove.length; i++){
+            output.push(0)
+        }
+
+        for(let i = 0; i < playerStates.length; i++){
+            if(availableMove.sort() === playerStates[i].availableMove.sort()){
+
+                output = this.sumArray(output, playerStates[i].actions)
+
+            }
+        }
+
+ 
+
+        return output
+    }
+
+    sumArray(array1, array2){
+
+        let result = []
+
+        for(let i = 0; i < array1.length; i++){
+            result.push(array1[i] + array2[i])
+        }
+
+        return result
     }
 
 }
