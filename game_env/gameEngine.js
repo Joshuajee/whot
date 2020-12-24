@@ -1,5 +1,6 @@
 require("../configs/dbConnections")
 
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require("constants")
 const { EventEmitter } = require("events")
 const agents = require("../models/agents")
 
@@ -44,7 +45,7 @@ class GameEngine extends EventEmitter{
 
     
 
-    stateFinder(playerName, actionCards, inPlayCards, noOfCardsInMarket){
+    stateFinder(playerName, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules){
 
         //console.log(playerName)
         switch (playerName) {
@@ -59,26 +60,57 @@ class GameEngine extends EventEmitter{
             default:
                 break;
         }
-/*
-        console.log(this.player)
-        console.log(actionCards)
-        console.log(inPlayCards)
-        console.log(noOfCardsInMarket)
-        console.log(this.player.states)
-*/
+
         switch(this.player.states.length){
             case 0:
-                this.stateCreater(this.player, actionCards, inPlayCards, noOfCardsInMarket)
+                this.stateCreater(this.player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules)
                 break
             default:
                 console.log("searching")
+                this.stateSearch(this.player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules)
         }
 
 
     }
 
-    stateCreater(player, actionCards, inPlayCards, noOfCardsInMarket){
+    stateCreater(player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules){
         console.log("state created")
+        player.states.push({"cardAtHand":cardAtHand, 
+                            "cardInPlay":inPlayCards,
+                            "cardPlayed": cardPlayed, 
+                            "noOfCardsInMarket":noOfCardsInMarket,
+                            "actions":actions,
+                            "rules":rules
+                        })
+        player.save(function (err) {
+            if (err) return handleError(err);
+            console.log('the subdocs were removed');
+          })
+
+        console.log("modifief")
+        console.log(player)
+    }
+
+
+    stateSearch(player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules){
+        console.log("state search")
+
+                        let states = player.states
+                        for(let i = 0; i < states.length; i++){
+                            let condition = states[i].cardAtHand.sort() === cardAtHand.sort()    &&
+                                            states[i].cardInPlay === inPlayCards                 &&
+                                            states[i].cardPlayed.sort() === cardPlayed.sort()    &&
+                                            states[i].noOfCardsInMarket === noOfCardsInMarket    &&
+                                            states[i].actions  === actions                       &&
+                                            states.rules === rules
+
+                            if(condition){
+                                return states[i]
+                            }
+                        }
+
+        return this.stateCreater(this.player, cardPlayed, cardAtHand, actions, inPlayCards, noOfCardsInMarket, rules)
+              
     }
 
 }

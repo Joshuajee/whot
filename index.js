@@ -28,6 +28,14 @@ app.get('/agents', (req, res) =>{
 
 })
 
+app.get('/add_agents', (req, res) =>{
+
+    let age = new agents()
+    age.agentName = "Jee"
+    age.save()
+
+})
+
 app.post('/add_agents', (req, res) =>{
 
     let age = new agents()

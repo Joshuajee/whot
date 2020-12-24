@@ -10,7 +10,7 @@ const cards = require("../cards").cards
 class GamePlay extends GameEngine
 {
     
-    constructor(playerOneName, playerTwoName){
+    constructor(playerOneName, playerTwoName, rules){
         
         super(playerOneName, playerTwoName)
 
@@ -20,6 +20,7 @@ class GamePlay extends GameEngine
         this.player2 = []
         this.inPlay = []
         this.action = []
+        this.rules = rules
 
         this.market = shuffle(inGameCards)
 
@@ -76,6 +77,8 @@ class GamePlay extends GameEngine
         let shape_in = this.inPlay[inPlayIndex].slice(0, index_in)
         this.action = ["go:market"]
         this.playerName = name
+        this.cardAtHand = player
+        this.cardPlayed = this.inPlay
 
         for(let i = 0; i < player.length; i++){
             let index = player[i].indexOf(":") + 1
@@ -95,7 +98,7 @@ class GamePlay extends GameEngine
         }
 
         
-        super.stateFinder(this.playerName, this.action, this.inPlay, this.market.length)
+        super.stateFinder(this.playerName, this.cardPlayed, this.cardAtHand, this.action, this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
 
     }
 
