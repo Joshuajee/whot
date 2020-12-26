@@ -69,7 +69,6 @@ class GameEngine extends EventEmitter{
             case 0:
                 return this.stateCreater(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
             default:
-                //console.log("searching")
                 return this.stateSearch(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
         }
 
@@ -82,21 +81,23 @@ class GameEngine extends EventEmitter{
 
         let actions = this.actionCreater(availableMove, player.states)
 
+        //console.log(player)
+
         player.states.push({"cardAtHand":cardAtHand, 
                             "noOfCardsWithOpponent": noOfCardsWithOpponent,
                             "cardInPlay":inPlayCards,
                             "cardPlayed": cardPlayed, 
                             "noOfCardsInMarket":noOfCardsInMarket,
-                            "availableMove":availableMove.sort(),
+                            "availableMove":availableMove,
                             "actions":actions,
                             "rules":rules
                         })
 
-        player.save(function (err) {
-            if (err) return handleError(err);
-            //console.log('the subdocs were removed');
-          })
-
+            player.save(function (err) {
+            //if (err) return handleError(err);
+                //console.log('the subdocs were removed');
+            })
+        
         //console.log("modifief")
         //console.log(player)
         return actions

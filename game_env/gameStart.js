@@ -4,30 +4,45 @@ class GameStart extends GamePlay{
 
     constructor(){
 
-        let rules = {"holdOn":true, "pickTwo":true, "pickThree":true, "suspension":true, "generalMarket":true, "need":true, "endGame":false}
+        let rules = {"holdOn":true, "pickTwo":true, "pickThree":true, "suspension":true, "generalMarket":true, "need":true, "endGame":true}
 
         super("Jee", "Angella", rules)
 
 
         super.on("start", ()=>{
 
-            super.play(super.playerOne, "Jee", this.playerTwo.length)
+            setInterval(() => {
 
-            console.log(super.playerNames)
-            console.log(super.playerOne)
-            console.log(super.actions)
+                if (this.marketCards.length > 0 && this.playerOne.length > 0 && this.playerTwo.length > 0) {
+                    super.play(super.playerOne, "Jee", this.playerTwo)
+    
+    
+                    super.play(super.playerTwo, "Angella", this.playerOne)
+                    console.log(this.playerOne.length)
+                }
+                
+            }, 2000);
 
 
-            super.play(super.playerTwo, "Angella", this.playerOne.length)
+            super.play(super.playerOne, "Jee", this.playerTwo)
+    
+    
+            super.play(super.playerTwo, "Angella", this.playerOne)
 
-            console.log(super.playerNames)
-            console.log(super.playerTwo)
-            console.log(super.actions)
+            /*
+            while (this.marketCards.length > 0 && this.playerOne.length > 0 && this.playerTwo.length > 0) {
+                super.play(super.playerOne, "Jee", this.playerTwo)
+
+
+                super.play(super.playerTwo, "Angella", this.playerOne)
+                console.log(this.playerOne.length)
+            }
+           */
+
             
         })
 
     }
-
 
 }
 
