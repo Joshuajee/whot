@@ -10,9 +10,9 @@ const cards = require("../cards").cards
 class GamePlay extends GameEngine
 {
     
-    constructor(playerOneName, playerTwoName, rules){
+    constructor(agentOne, agentTwo, rules){
         
-        super(playerOneName, playerTwoName)
+        super(agentOne, agentTwo)
 
         const inGameCards = cards
 
@@ -59,21 +59,21 @@ class GamePlay extends GameEngine
 
 
 
-    referee(action, rules, avialableMove, player, playerName, opponent){
+    referee(action, rules, avialableMove, playerCardAtHand, agent, opponentsCardAtHand){
         
         let card = this.chooseAction(action, avialableMove)
         
         let index = card[0].indexOf(":") + 1
         let number = card[0].slice(index, card[0].length)
 
-        this.playGame(player, card)
+        this.playGame(playerCardAtHand, card)
             
 
         if(rules.holdOn && number == 1){
 
             console.log("hold On")
 
-            this.play(player, playerName, opponent.length)
+            this.play(playerCardAtHand, agent, opponentsCardAtHand)
             
         }
 
@@ -81,8 +81,8 @@ class GamePlay extends GameEngine
 
             console.log("pick 2")
 
-            this.goMarket(opponent, 2)
-            this.play(player, playerName, opponent.length)
+            this.goMarket(opponentsCardAtHand, 2)
+            this.play(playerCardAtHand, agent, opponentsCardAtHand)
 
         }
 
@@ -90,8 +90,9 @@ class GamePlay extends GameEngine
 
             console.log("pick 3")
 
-            this.goMarket(opponent, 3)
-            this.play(player, playerName, opponent.length)
+            this.goMarket(opponentsCardAtHand, 3)
+            this.play(playerCardAtHand, agent, opponentsCardAtHand)
+   
 
         }
 
@@ -99,15 +100,14 @@ class GamePlay extends GameEngine
 
             console.log("suspension")
 
-            this.play(player, playerName, opponent.length)
+            this.play(playerCardAtHand, agent, opponentsCardAtHand)
         }
 
         if(rules.generalMarket && number == 14){
 
             console.log("general market")
 
-            this.goMarket(opponent)
-            this.play(player, playerName, opponent.length)
+            this.goMarket(opponentsCardAtHand)
 
         }
 
@@ -116,7 +116,11 @@ class GamePlay extends GameEngine
             this.need = true
 
             this.needOption = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
-            this.neededAction =  super.stateFinder(this.playerName, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.needOption, this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
+            this.neededAction =  super.stateFinder(agent, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.needOption, this.inPlay[this.inPlay.length - 1], this.market.length, rules)
+            this.neededCard = this.chooseAction(this.neededAction, this.needOption)
+            
+            
+            this.play(playerCardAtHand, agent, opponentsCardAtHand)
 
         }
 
@@ -130,35 +134,38 @@ class GamePlay extends GameEngine
 
 
 
-    play(player, name, opponent){
+    play(playerCardAtHand, agent, opponentsCardAtHand){
 
         let inPlayIndex = this.inPlay.length - 1
         let index_in = this.inPlay[inPlayIndex].indexOf(":") + 1
         let number_in = this.inPlay[inPlayIndex].slice(index_in, this.inPlay[inPlayIndex].length)
         let shape_in = this.inPlay[inPlayIndex].slice(0, index_in)
         this.availableMove = ["z:goMarket"]
-        this.playerName = name
-        this.cardAtHand = player
+        this.playerAgent = agent
+        this.cardAtHand = playerCardAtHand
         this.cardPlayed = this.inPlay
-        this.noOfCardsWithOpponent = opponent.length
-        this.opponent  = opponent
+        this.noOfCardsWithOpponent = opponentsCardAtHand.length
+        this.opponent = opponentsCardAtHand
+
+        console.log(this.playerAgent.agentName)
 
 
         if(this.need){
 
-            for(let i = 0; i < player.length; i++){
+            console.log("need  " + this.neededCard)
 
+            for(let i = 0; i < playerCardAtHand.length; i++){
 
-                let index_in = this.neededAction.indexOf(":") + 1
-                let shape_in = this.neededAction.slice(0, index_in)
+                let index_in = this.neededCard[0].indexOf(":") + 1
+                let shape_in = this.neededCard[0].slice(0, index_in)
 
-                let index = player[i].indexOf(":") + 1
-                let number = player[i].slice(index, player[0].length)
-                let shape = player[i].slice(0, index)
+                let index = playerCardAtHand[i].indexOf(":") + 1
+                let number = playerCardAtHand[i].slice(index, playerCardAtHand[0].length)
+                let shape = playerCardAtHand[i].slice(0, index)
                 
                 if(shape == shape_in){
                 
-                    this.availableMove.push(player[i])
+                    this.availableMove.push(playerCardAtHand[i])
 
                 }else if(number == 20){
 
@@ -167,21 +174,23 @@ class GamePlay extends GameEngine
                 }
 
             }
+
+            console.log("ava " + this.availableMove)
 
         }else{
 
-            for(let i = 0; i < player.length; i++){
-                let index = player[i].indexOf(":") + 1
-                let number = player[i].slice(index, player[0].length)
-                let shape = player[i].slice(0, index)
+            for(let i = 0; i < playerCardAtHand.length; i++){
+                let index = playerCardAtHand[i].indexOf(":") + 1
+                let number = playerCardAtHand[i].slice(index, playerCardAtHand[0].length)
+                let shape = playerCardAtHand[i].slice(0, index)
                 
                 if(number == number_in){
 
-                    this.availableMove.push(player[i])
+                    this.availableMove.push(playerCardAtHand[i])
 
                 }else if(shape == shape_in){
                 
-                    this.availableMove.push(player[i])
+                    this.availableMove.push(playerCardAtHand[i])
 
                 }else if(number == 20){
 
@@ -189,32 +198,45 @@ class GamePlay extends GameEngine
 
                 }
 
-
             }
 
-            
         }
 
+        let action =  super.stateFinder(this.playerAgent, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove.sort(), this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
 
-
-        console.log(name)
-
-        let action =  super.stateFinder(this.playerName, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove.sort(), this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
-
-        this.referee(action, this.rules, this.availableMove, this.cardAtHand, name, this.opponent)
+        this.referee(action, this.rules, this.availableMove, this.cardAtHand, this.playerAgent, this.opponent)
 
     }
 
     chooseAction(action, availableMove){
 
+        //+---------------------------------------------------------------------------+
+        //|  This method receive action a vector of numbers and the availableMoves,   |
+        //|  and return the available move with highest corresponding action value    |
+        //|  or a random value of the maximums move if there is move than one maximum | 
+        //+---------------------------------------------------------------------------+
 
         let maxAction = Math.max(action)
 
+        let actionPicked = []
+        let pickedAction = []
+
+        let maxFound = false
+
         for(let i = 0; i < action.length; i++){
-            if(maxAction === action[i]) return [availableMove[i], i]
+
+            if(maxAction === action[i]){
+                actionPicked.push([availableMove[i], i])
+                maxFound = true
+            } 
+
+            pickedAction.push([availableMove[i], i])
+
         }
 
-        return [availableMove[0], 0]
+        if(maxFound) return actionPicked[Math.floor(Math.random() * (actionPicked.length))]
+
+        return pickedAction[Math.floor(Math.random() * (pickedAction.length))]
 
     }
 
@@ -250,7 +272,6 @@ class GamePlay extends GameEngine
 
         }
 
-        
         console.log("in Play " + this.inPlay[this.inPlay.length - 1])
         console.log("cards after play " + player)
 
@@ -271,7 +292,6 @@ class GamePlay extends GameEngine
         }
 
     }
-
 
 
 }
@@ -297,4 +317,4 @@ function shuffle(array){
     return array
 }
 
-module.exports = GamePlay
+module.exports = {GamePlay, shuffle}

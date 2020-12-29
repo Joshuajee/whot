@@ -1,25 +1,19 @@
 const GameStart = require("./gameStart")
+const agents = require("../models/agents")
 
 
-let game = new GameStart()
+agents.find((err, data)=>{
+    if(err){
+        console.log("Failed to retrieve data " + err)
+
+    }else{
+        console.log(data)
+
+        new GameStart(data[0], data[1])
+
+    }
+})
 
 
-/*
-while (gamePlay.playerOne.length > 0 && gamePlay.playerTwo.length > 0 && gamePlay.marketCards.length > 0) {
 
-    console.log("player One ")
-    gamePlay.play(gamePlay.playerOne)
-    
-    console.log("In Play " + gamePlay.inPlayCards[gamePlay.inPlayCards.length - 1])
-
-    console.log("player Two")
-    gamePlay.play(gamePlay.playerTwo)
-
-    console.log("In Play " +gamePlay.inPlayCards[gamePlay.inPlayCards.length - 1])
-
-    //break
-}
-*/
-
-
-//console.log(gamePlay.marketCards)
+//let game = new GameStart()

@@ -5,40 +5,19 @@ const agents = require("../models/agents")
 
 class GameEngine extends EventEmitter{
 
-    constructor(playerOneName, playerTwoName){
+    constructor(playerOne, playerTwo){
 
         super()
 
+        this.playerOneState = []
+        this.playerTwoState = []
+
+        this.agentOneName = playerOne.agentName
+        this.agentTwoName = playerTwo.agentName
+
+        console.log(this.agentOneName)
         
-            agents.findOne({agentName:playerOneName}, (err, data)=>{
-                if(err){
-                    console.log("Failed to retrieve data " + err)
-
-                }else{
-                    //console.log(data)
-                    this.agentOne = data
-                    super.emit("agent_one")
-                    
-                }
-            })
-        
-
-        super.on("agent_one", ()=>{
-
-            agents.findOne({agentName:playerTwoName}, (err, data)=>{
-                if(err){
-                    console.log("Failed to retrieve data " + err)
-
-                }else{
-                    //console.log(data)
-                    this.agentTwo = data
-                    super.emit("start")
-
-                }
-            })
-
-        })
-
+    
     }
 
 
@@ -47,23 +26,18 @@ class GameEngine extends EventEmitter{
 
     
 
-    stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
+    stateFinder(playerAgent, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
 
 
-        //This method finds all the relevant states an angent has
+        //+---------------------------------------------------------------------------+
+        //|  This method finds all the relevant states an angent has                  |
+        //+---------------------------------------------------------------------------+
 
-        switch (playerName) {
-            
-            case this.agentOne.agentName:
-                this.player = this.agentOne
-                break;
+        
 
-            case this.agentTwo.agentName:
-                this.player = this.agentTwo
-                break;
-            default:
-                break;
-        }
+        this.player = playerAgent
+
+        //console.log(this.player.agentName)
 
         switch(this.player.states.length){
             case 0:
@@ -77,36 +51,48 @@ class GameEngine extends EventEmitter{
 
     stateCreater(player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
         
-        //This method finds creates a state and save it to an angent
 
-        let actions = this.actionCreater(availableMove, player.states)
+        //+---------------------------------------------------------------------------+
+        //|  This method creates a state and save it to an angent in the database     |
+        //|  it also save it to the correspondingn state array                        |
+        //+---------------------------------------------------------------------------+
 
-        //console.log(player)
 
-        player.states.push({"cardAtHand":cardAtHand, 
-                            "noOfCardsWithOpponent": noOfCardsWithOpponent,
-                            "cardInPlay":inPlayCards,
-                            "cardPlayed": cardPlayed, 
-                            "noOfCardsInMarket":noOfCardsInMarket,
-                            "availableMove":availableMove,
-                            "actions":actions,
-                            "rules":rules
-                        })
+        let actions = this.actionCreater(availableMove, player)
 
-            player.save(function (err) {
-            //if (err) return handleError(err);
-                //console.log('the subdocs were removed');
-            })
-        
-        //console.log("modifief")
-        //console.log(player)
+        let currState = {"cardAtHand":cardAtHand, 
+                        "noOfCardsWithOpponent": noOfCardsWithOpponent,
+                        "cardInPlay":inPlayCards,
+                        "cardPlayed": cardPlayed, 
+                        "noOfCardsInMarket":noOfCardsInMarket,
+                        "availableMove":availableMove,
+                        "actions":actions,
+                        "rules":rules
+                    }
+
+        player.states.push(currState)
+
+        player.save(function (err) {
+            if (err) return 0
+
+            //if(this.agentOneName == player.agentName) this.playerOneState.push(currState)
+            //if(this.agentTwoName == player.agentName) this.playerTwoState.push(currState)
+        })
+
+ 
+
         return actions
     }
 
 
     stateSearch(player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
         
-        //This method search for existing states within an angent 
+
+        //+---------------------------------------------------------------------------+
+        //|  This method search for existing states within an angent and returns      |
+        //|  it's action value if no state is found it returns the stateCreater       |
+        //|  method                                                                   |
+        //+---------------------------------------------------------------------------+
 
             let states = player.states
             for(let i = 0; i < states.length; i++){
@@ -126,6 +112,10 @@ class GameEngine extends EventEmitter{
 
     actionCreater(availableMove, playerStates){
 
+        //+---------------------------------------------------------------------------+
+        //|  This method initialise actions for newly created states                  |
+        //+---------------------------------------------------------------------------+
+
         let output = []
 
         for(let i = 0; i < availableMove.length; i++){
@@ -134,9 +124,7 @@ class GameEngine extends EventEmitter{
 
         for(let i = 0; i < playerStates.length; i++){
             if(availableMove.sort() === playerStates[i].availableMove.sort()){
-
                 output = this.sumArray(output, playerStates[i].actions)
-
             }
         }
 
