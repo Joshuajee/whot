@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "game" : "npm run start --prefix game_ui"
   },
   "author": "Joshua Evuetapha",
   "license": "ISC",

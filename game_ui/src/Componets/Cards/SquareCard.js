@@ -1,0 +1,51 @@
+import Square from "../Shapes/Square";
+
+function SquareCard(props) {
+
+    let size = props.size
+
+    let width = size
+    let height = size * 1.5
+    let cWidth = width * 0.7
+    let cHeight = height * 0.4
+    let marginLeft = (width - cWidth) / 2
+    let marginTop = (height - cHeight) / 2
+
+    let firstCWidth = marginLeft * 0.8
+    let firstCHeight = marginLeft * 0.8
+    let firstMarginLeft = marginLeft * 0.2
+    let firstMarginTop = marginLeft * 1.6
+
+    let lastCWidth = marginLeft * 0.8
+    let lastCHeight = marginLeft * 0.8
+    let lastMarginLeft = cWidth + marginLeft
+    let lastMarginTop = height - marginLeft * 2.4
+
+    
+
+    return(
+        <svg className="card" width={width} height={height}>
+
+            <Square 
+                width={firstCWidth} 
+                height={firstCHeight} 
+                marginLeft={firstMarginLeft} 
+                marginTop={firstMarginTop} />
+
+            <Square 
+                width={cWidth} 
+                height={cHeight} 
+                marginLeft={marginLeft} 
+                marginTop={marginTop} />
+
+            <Square 
+                width={lastCWidth} 
+                height={lastCHeight} 
+                marginLeft={lastMarginLeft} 
+                marginTop={lastMarginTop} />
+        
+        </svg>
+        )
+}
+
+export default SquareCard
