@@ -8,16 +8,21 @@ import CircleCard from "./Componets/Cards/CircleCard";
 import CrossCard from "./Componets/Cards/CrossCard";
 import TriangleCard from "./Componets/Cards/TriangleCard";
 import StarCard from "./Componets/Cards/StarCard";
+import WhotCard from "./Componets/Cards/WhotCard";
+import CardCover from "./Componets/Cards/CardCover";
 
 
 ReactDOM.render(
   <React.StrictMode>
       <center className="center" height={100} width={100}>
-        <SquareCard size={200}/>
-        <CircleCard size={200}/>
-        <CrossCard size={200}/>
-        <TriangleCard size={200}/>
-        <StarCard size={200}/>
+        <SquareCard size={100} number={1}/>
+        <CircleCard size={100}/>
+        <CrossCard size={100}/>
+        <TriangleCard size={100}/>
+        <StarCard size={100}/>
+        <WhotCard size={100} number={20} />
+        <CardCover size={100}  />
+        
       </center>
   </React.StrictMode>,
   document.getElementById('root')

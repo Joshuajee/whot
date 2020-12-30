@@ -5,4 +5,15 @@
 .card{
     border: 1px solid brown;
     background-color: whitesmoke;
+    margin: 10px;
+    border-radius: 4%;
+    box-shadow: dimgrey 333;
+}
+
+.rotate{
+    transform: rotate(90deg);
+}
+
+.card-cover{
+    background-color: brown;
 }
