@@ -23,6 +23,11 @@ class GamePlay extends GameEngine
         this.rules = rules
         this.need = false
 
+        this.agentOne = agentOne
+        this.agentTwo = agentTwo
+        this.action1 = []
+        this.action2 = []
+
         this.market = shuffle(inGameCards)
 
         this.goMarket(this.player1, 3)
@@ -49,29 +54,39 @@ class GamePlay extends GameEngine
         return this.inPlay
     }
 
-    get actions(){
-        return this.availableMove
+    get actionOne(){
+        return this.action1
     }
 
-    get playerNames(){
-        return this.playerName
+    get actionTwo(){
+        return this.action2
     }
-
 
 
     referee(action, rules, avialableMove, playerCardAtHand, agent, opponentsCardAtHand){
-        
+     
         let card = this.chooseAction(action, avialableMove)
         
         let index = card[0].indexOf(":") + 1
         let number = card[0].slice(index, card[0].length)
 
+        if(agent.agentName == this.agentOne.agentName){
+            this.action1.push(card)
+        }else{
+            this.action2.push(card)
+        }
+
         this.playGame(playerCardAtHand, card)
+
+        if(this.marketCards.length <= 0 && this.player1.length <= 0 && this.player2.length <= 0)
+            return super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
+
+        //console.log(this.playerAgent.agentName)
             
 
         if(rules.holdOn && number == 1){
 
-            console.log("hold On")
+            //console.log("hold On")
 
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
             
@@ -79,7 +94,7 @@ class GamePlay extends GameEngine
 
         if(rules.pickTwo && number == 2){
 
-            console.log("pick 2")
+            //console.log("pick 2")
 
             this.goMarket(opponentsCardAtHand, 2)
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
@@ -88,7 +103,7 @@ class GamePlay extends GameEngine
 
         if(rules.pickThree && number == 5){
 
-            console.log("pick 3")
+            //console.log("pick 3")
 
             this.goMarket(opponentsCardAtHand, 3)
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
@@ -98,14 +113,14 @@ class GamePlay extends GameEngine
 
         if(rules.suspension && number == 8){
 
-            console.log("suspension")
+            //console.log("suspension")
 
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
         }
 
         if(rules.generalMarket && number == 14){
 
-            console.log("general market")
+            //console.log("general market")
 
             this.goMarket(opponentsCardAtHand)
 
@@ -118,6 +133,12 @@ class GamePlay extends GameEngine
             this.needOption = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
             this.neededAction =  super.stateFinder(agent, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.needOption, this.inPlay[this.inPlay.length - 1], this.market.length, rules)
             this.neededCard = this.chooseAction(this.neededAction, this.needOption)
+
+            if(agent.agentName == this.agentOne.agentName){
+                this.action1.push(this.neededCard)
+            }else{
+                this.action2.push(this.neededCard)
+            }
             
             
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
@@ -147,12 +168,13 @@ class GamePlay extends GameEngine
         this.noOfCardsWithOpponent = opponentsCardAtHand.length
         this.opponent = opponentsCardAtHand
 
-        console.log(this.playerAgent.agentName)
+
+        
 
 
         if(this.need){
 
-            console.log("need  " + this.neededCard)
+            //console.log("need  " + this.neededCard)
 
             for(let i = 0; i < playerCardAtHand.length; i++){
 
@@ -174,9 +196,7 @@ class GamePlay extends GameEngine
                 }
 
             }
-
-            console.log("ava " + this.availableMove)
-
+            
         }else{
 
             for(let i = 0; i < playerCardAtHand.length; i++){
@@ -202,10 +222,16 @@ class GamePlay extends GameEngine
 
         }
 
-        let action =  super.stateFinder(this.playerAgent, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove.sort(), this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
+        if(this.availableMove.length == 1){
+            this.goMarket(this.cardAtHand)
+        }else{
 
-        this.referee(action, this.rules, this.availableMove, this.cardAtHand, this.playerAgent, this.opponent)
+            let action =  super.stateFinder(this.playerAgent, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove.sort(), this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
 
+            this.referee(action, this.rules, this.availableMove, this.cardAtHand, this.playerAgent, this.opponent)
+        
+        }
+    
     }
 
     chooseAction(action, availableMove){
@@ -242,7 +268,12 @@ class GamePlay extends GameEngine
 
     playGame(player, card){
 
-        console.log("cards " + player)
+
+        //+---------------------------------------------------------------------------+
+        //|     |
+        //+---------------------------------------------------------------------------+
+
+        //console.log("cards " + player)
 
         if(card[0] === "z:goMarket"){
 
@@ -272,10 +303,10 @@ class GamePlay extends GameEngine
 
         }
 
-        console.log("in Play " + this.inPlay[this.inPlay.length - 1])
-        console.log("cards after play " + player)
+        //console.log("in Play " + this.inPlay[this.inPlay.length - 1])
+        //console.log("cards after play " + player)
 
-        console.log("-----------------------------------")
+        //console.log("-----------------------------------")
 
     }
 
@@ -288,7 +319,7 @@ class GamePlay extends GameEngine
 
             this.market.pop()
 
-            console.log("market "+ player)
+            //console.log("market "+ player)
         }
 
     }

@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "game" : "npm run start --prefix game_ui"
+    "game": "npm run start --prefix game_ui"
   },
   "author": "Joshua Evuetapha",
   "license": "ISC",
@@ -19,6 +19,6 @@
     "express": "^4.17.1",
     "mongoose": "^5.10.5",
     "node-cron": "^2.0.3",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.6"
   }
 }

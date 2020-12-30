@@ -24,6 +24,72 @@ class GameEngine extends EventEmitter{
 
 
 
+    rewards(playerOneAgent, playerTwoAgent, playerOneCardAtHand, playerTwoCardAtHand, playerOneActions, playerTwoAction){
+
+        //+---------------------------------------------------------------------------+
+        //|  This method is called when the game ends it reward the agents according  |
+        //|  to the reward policy                                                     |    
+        //+---------------------------------------------------------------------------+
+        console.log("Reward")
+
+        console.log(playerOneActions)
+
+        if(playerOneCardAtHand.length > 0){
+
+            let playerOneNumber = 0
+
+            for(let i = 0; i < playerOneCardAtHand.length; i++)
+            {
+
+                let index_in = playerOneCardAtHand[i].indexOf(":") + 1
+                let number_in = playerOneCardAtHand[i].slice(index_in, playerOneCardAtHand[i].length)
+                let shape_in = playerOneCardAtHand[i].slice(0, index_in)
+
+                if(shape_in == "star"){
+                    playerOneNumber += number_in * 2
+                }else{
+                    playerOneNumber += number_in 
+                }
+                
+            }
+            
+        }else{
+
+        }
+
+        if(playerOneCardAtHand.length > 0){
+
+            let playerOneNumber = 0
+
+            for(let i = 0; i < playerOneCardAtHand.length; i++)
+            {
+
+                let index_in = playerOneCardAtHand[i].indexOf(":") + 1
+                let number_in = playerOneCardAtHand[i].slice(index_in, playerOneCardAtHand[i].length)
+                let shape_in = playerOneCardAtHand[i].slice(0, index_in)
+
+                if(shape_in == "star"){
+                    playerOneNumber += number_in * 2
+                }else{
+                    playerOneNumber += number_in 
+                }
+                
+            }
+            
+        }else{
+            
+        } 
+       
+
+
+
+
+
+
+
+        
+
+    }
     
 
     stateFinder(playerAgent, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
@@ -75,12 +141,13 @@ class GameEngine extends EventEmitter{
         player.save(function (err) {
             if (err) return 0
 
-            //if(this.agentOneName == player.agentName) this.playerOneState.push(currState)
-            //if(this.agentTwoName == player.agentName) this.playerTwoState.push(currState)
         })
 
- 
 
+ 
+        if(this.agentOneName == player.agentName) this.playerOneState.push(currState)
+        if(this.agentTwoName == player.agentName) this.playerTwoState.push(currState)
+ 
         return actions
     }
 

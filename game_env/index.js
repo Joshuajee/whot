@@ -15,5 +15,3 @@ agents.find((err, data)=>{
 })
 
 
-
-//let game = new GameStart()

@@ -1,5 +1,3 @@
-//const mongoose = require("mongoose")
-
 require("./configs/dbConnections")
 
 const express = require('express')

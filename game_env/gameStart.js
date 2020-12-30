@@ -1,5 +1,6 @@
 const {GamePlay, shuffle} = require("./gamePlay")
 
+
 class GameStart extends GamePlay{
 
     constructor(agentOne, agentTwo){
@@ -9,33 +10,20 @@ class GameStart extends GamePlay{
         super(agentOne, agentTwo, rules)
 
        
-        setInterval(() => {
-            if (this.marketCards.length > 0 && super.playerOne.length > 0 && super.playerTwo.length > 0) {
+        var interval = setInterval(() => {
+            if (super.marketCards.length > 0 && super.playerOne.length > 0 && super.playerTwo.length > 0) {
                         
                 super.play(super.playerOne, agentOne, super.playerTwo)
         
                 super.play(super.playerTwo, agentTwo, super.playerOne)
 
             }
-        })
+            if(super.marketCards.length < 1 || super.playerOne.length < 1 || super.playerTwo.length < 1){
 
-
-        //super.on("start", ()=>{
-        /*
-            setInterval(() => {
-
-                if (this.marketCards.length > 0 && super.playerOne.length > 0 && super.playerTwo.length > 0) {
-                    
-                    super.play(super.playerOne, "Jee", super.playerTwo)
-    
-                    super.play(super.playerTwo, "Angella", super.playerOne)
-
-                }
-                
-            }, 2000);
-
-            */
-        //})
+                super.rewards(super.agentOne, super.agentTwo, super.playerOne, super.playerTwo, super.actionOne, super.actionTwo)
+                clearInterval(interval)
+            }
+        }, 1000)
 
     }
 
