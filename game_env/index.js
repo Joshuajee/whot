@@ -7,7 +7,6 @@ agents.find((err, data)=>{
         console.log("Failed to retrieve data " + err)
 
     }else{
-        console.log(data)
 
         new GameStart(data[0], data[1])
 

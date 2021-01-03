@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const states = require("./states");
 
 
-
 var agentSchema = new mongoose.Schema({ 
     agentName: {type: String, default: "unknown"},
     createdBy:{type: String, default: "Guest"}, 

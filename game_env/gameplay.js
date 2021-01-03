@@ -36,34 +36,39 @@ class GamePlay extends GameEngine
 
         this.goMarket(this.inPlay)
 
+        console.log("player 1 " + this.player1)
+
+        console.log("player 2 " + this.player2)
+        
+        console.log("player 2 " + this.inPlay)
+
+
+        this.interval = setInterval(() => {
+            
+            if (this.market.length > 0 && this.player1.length > 0 && this.player2.length > 0) {
+                        
+                this.play(this.player1, agentOne, this.player2)
+        
+                this.play(this.player2, agentTwo, this.player1)
+
+            }
+            if(this.market.length < 1 || this.player1.length < 1 || this.player2.length < 1){
+
+                super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
+                clearInterval(this.interval)
+            }
+        }, 500)
+
     }
 
-    get playerOne(){
-         return this.player1
-    }
-
-    get playerTwo(){
-        return this.player2
-    }
-
-    get marketCards(){
-        return this.market
-    }
-
-    get inPlayCards(){
-        return this.inPlay
-    }
-
-    get actionOne(){
-        return this.action1
-    }
-
-    get actionTwo(){
-        return this.action2
-    }
 
 
     referee(action, rules, avialableMove, playerCardAtHand, agent, opponentsCardAtHand){
+
+        console.log(agent.agentName) 
+        console.log(playerCardAtHand)
+        console.log(" in play " + this.inPlay[this.inPlay.length - 1])
+        
      
         let card = this.chooseAction(action, avialableMove)
         
@@ -78,15 +83,13 @@ class GamePlay extends GameEngine
 
         this.playGame(playerCardAtHand, card)
 
-        if(this.marketCards.length <= 0 && this.player1.length <= 0 && this.player2.length <= 0)
+        if(this.market.length <= 0 && this.player1.length <= 0 && this.player2.length <= 0)
             return super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
-
-        //console.log(this.playerAgent.agentName)
             
 
         if(rules.holdOn && number == 1){
 
-            //console.log("hold On")
+            console.log("hold On")
 
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
             
@@ -94,7 +97,7 @@ class GamePlay extends GameEngine
 
         if(rules.pickTwo && number == 2){
 
-            //console.log("pick 2")
+            console.log("pick 2")
 
             this.goMarket(opponentsCardAtHand, 2)
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
@@ -103,7 +106,7 @@ class GamePlay extends GameEngine
 
         if(rules.pickThree && number == 5){
 
-            //console.log("pick 3")
+            console.log("pick 3")
 
             this.goMarket(opponentsCardAtHand, 3)
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
@@ -113,14 +116,14 @@ class GamePlay extends GameEngine
 
         if(rules.suspension && number == 8){
 
-            //console.log("suspension")
+            console.log("suspension")
 
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
         }
 
         if(rules.generalMarket && number == 14){
 
-            //console.log("general market")
+            console.log("general market")
 
             this.goMarket(opponentsCardAtHand)
 
@@ -139,9 +142,10 @@ class GamePlay extends GameEngine
             }else{
                 this.action2.push(this.neededCard)
             }
+
+            console.log("needed card " + this.neededCard[0])
             
-            
-            this.play(playerCardAtHand, agent, opponentsCardAtHand)
+            //this.play(playerCardAtHand, agent, opponentsCardAtHand)
 
         }
 
@@ -150,6 +154,7 @@ class GamePlay extends GameEngine
             
         }
 
+        console.log("---------------------------------")
 
     }
 
@@ -169,12 +174,15 @@ class GamePlay extends GameEngine
         this.opponent = opponentsCardAtHand
 
 
-        
+        if(this.market.length < 1 || this.player1.length < 1 || this.player2.length < 1){
+
+            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
+            clearInterval(this.interval)
+
+        }
 
 
         if(this.need){
-
-            //console.log("need  " + this.neededCard)
 
             for(let i = 0; i < playerCardAtHand.length; i++){
 
@@ -223,12 +231,16 @@ class GamePlay extends GameEngine
         }
 
         if(this.availableMove.length == 1){
+            console.log(agent.agentName) 
+            console.log(playerCardAtHand)
+            console.log(" in play " + this.inPlay[this.inPlay.length - 1])
             this.goMarket(this.cardAtHand)
+            
         }else{
 
             let action =  super.stateFinder(this.playerAgent, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove.sort(), this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
 
-            this.referee(action, this.rules, this.availableMove, this.cardAtHand, this.playerAgent, this.opponent)
+            this.referee(action, this.rules, this.availableMove.sort(), this.cardAtHand.sort(), this.playerAgent, this.opponent)
         
         }
     
@@ -273,7 +285,7 @@ class GamePlay extends GameEngine
         //|     |
         //+---------------------------------------------------------------------------+
 
-        //console.log("cards " + player)
+        console.log("game played " + card[0])
 
         if(card[0] === "z:goMarket"){
 
@@ -303,11 +315,6 @@ class GamePlay extends GameEngine
 
         }
 
-        //console.log("in Play " + this.inPlay[this.inPlay.length - 1])
-        //console.log("cards after play " + player)
-
-        //console.log("-----------------------------------")
-
     }
 
     goMarket(player, times = 1){
@@ -315,11 +322,14 @@ class GamePlay extends GameEngine
         //method adds card to player and remove that same card from market for n number of times
         for(let i = 0; i < times; i ++){
 
-            player.push(this.market[this.market.length - 1])
+            if(this.market.length > 0){
 
-            this.market.pop()
+                player.push(this.market[this.market.length - 1])
 
-            //console.log("market "+ player)
+                this.market.pop()
+
+            }
+
         }
 
     }

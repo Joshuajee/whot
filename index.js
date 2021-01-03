@@ -32,6 +32,8 @@ app.get('/add_agents', (req, res) =>{
     age.agentName = "Jee"
     age.save()
 
+    res.send("Jee")
+
 })
 
 app.post('/add_agents', (req, res) =>{
@@ -44,6 +46,6 @@ app.post('/add_agents', (req, res) =>{
 
 
 
-const PORT = process.env.PORT || 6000
+const PORT = process.env.PORT || 10000
 
 app.listen(PORT)
