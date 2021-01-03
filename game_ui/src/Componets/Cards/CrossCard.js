@@ -1,4 +1,5 @@
-import Cross from "../Shapes/Cross";
+import Cross from "../Shapes/Cross"
+import Text from "../Shapes/Text"
 
 function CrossCard(props) {
 
@@ -21,8 +22,24 @@ function CrossCard(props) {
     let lastMarginLeft = (width - cWidth) * 5.5 / 2
     let lastMarginTop = (height - cHeight) * 2.5 / 2
 
+    let topNumberMarginLeft = width * 0.01
+    let topNumberMarginTop = height * 0.12
+
+    let bottomNumberMarginLeft = width * 0.01
+    let bottomNumberMarginTop = height * 0.18
+
+    let fontSizeNumber = size / 5
+
     return(
         <svg className="card" width={width} height={height}>
+
+            <Text 
+                x={0} y={0} z={0}
+                marginLeft={topNumberMarginLeft} 
+                marginTop={topNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"} />   
 
             <Cross 
                 width={firstCWidth} 
@@ -41,6 +58,14 @@ function CrossCard(props) {
                 height={lastCHeight} 
                 marginLeft={lastMarginLeft} 
                 marginTop={lastMarginTop} />
+
+            <Text 
+                x={180} y={50} z={80}
+                marginLeft={bottomNumberMarginLeft} 
+                marginTop={bottomNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"}/>   
             
         
         </svg>

@@ -1,4 +1,5 @@
-import Square from "../Shapes/Square";
+import Square from "../Shapes/Square"
+import Text from "../Shapes/Text";
 
 function SquareCard(props) {
 
@@ -21,10 +22,24 @@ function SquareCard(props) {
     let lastMarginLeft = cWidth + marginLeft
     let lastMarginTop = height - marginLeft * 2.4
 
-    
+    let topNumberMarginLeft = width * 0.01
+    let topNumberMarginTop = height * 0.12
+
+    let bottomNumberMarginLeft = width * 0.01
+    let bottomNumberMarginTop = height * 0.18
+
+    let fontSizeNumber = size / 5
 
     return(
         <svg className="card" width={width} height={height}>
+
+            <Text 
+                x={0} y={0} z={0}
+                marginLeft={topNumberMarginLeft} 
+                marginTop={topNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"}/>
 
             <Square 
                 width={firstCWidth} 
@@ -43,6 +58,14 @@ function SquareCard(props) {
                 height={lastCHeight} 
                 marginLeft={lastMarginLeft} 
                 marginTop={lastMarginTop} />
+
+            <Text 
+                x={180} y={50} z={80}
+                marginLeft={bottomNumberMarginLeft} 
+                marginTop={bottomNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"}/>
         
         </svg>
         )

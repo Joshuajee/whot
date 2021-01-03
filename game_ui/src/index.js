@@ -15,11 +15,11 @@ import CardCover from "./Componets/Cards/CardCover";
 ReactDOM.render(
   <React.StrictMode>
       <center className="center" height={100} width={100}>
-        <SquareCard size={100} number={1}/>
-        <CircleCard size={100}/>
-        <CrossCard size={100}/>
-        <TriangleCard size={100}/>
-        <StarCard size={100}/>
+        <SquareCard size={100} number={1} />
+        <CircleCard size={100} number={2} />
+        <CrossCard size={100} number={5} />
+        <TriangleCard size={100} number={14} />
+        <StarCard size={100} number={8} />
         <WhotCard size={100} number={20} />
         <CardCover size={100}  />
         

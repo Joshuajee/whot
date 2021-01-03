@@ -1,4 +1,5 @@
-import Star from "../Shapes/Star";
+import Star from "../Shapes/Star"
+import Text from "../Shapes/Text";
 
 function StarCard(props) {
 
@@ -33,11 +34,41 @@ function StarCard(props) {
     let lastBottom = height * 0.72
     let lastXBottomLeft = width * 0.88
     let lastXBottomRight = width * 0.72
- 
 
+    let topNumberMarginLeft = width * 0.01
+    let topNumberMarginTop = height * 0.12
+
+    let bottomNumberMarginLeft = width * 0.01
+    let bottomNumberMarginTop = height * 0.18
+
+    let topStarNumberMarginLeft = width * 0.16
+    let topStarNumberMarginTop = height * 0.24
+
+    let bottomStarNumberMarginLeft = width * 0.16
+    let bottomStarNumberMarginTop = height * 0.3
+
+    let fontSizeNumber = size / 5
+    let fontSizeNumberStar = size / 8
+ 
 
     return(
         <svg className="card" width={width} height={height}>
+
+            <Text 
+                x={0} y={0} z={0}
+                marginLeft={topNumberMarginLeft} 
+                marginTop={topNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"} />
+
+            <Text
+                x={0} y={0} z={0}
+                marginLeft={topStarNumberMarginLeft} 
+                marginTop={topStarNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumberStar} 
+                color={"black"} />
 
             <Star 
                 XCenter={firstXCenter} 
@@ -75,6 +106,22 @@ function StarCard(props) {
                 XBottomRight={lastXBottomRight}
 
                 />
+
+            <Text 
+                x={180} y={50} z={80}
+                marginLeft={bottomStarNumberMarginLeft} 
+                marginTop={bottomStarNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumberStar} 
+                color={"brown"}/>
+
+            <Text 
+                x={180} y={50} z={80}
+                marginLeft={bottomNumberMarginLeft} 
+                marginTop={bottomNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"}/>
         
         </svg>
         )

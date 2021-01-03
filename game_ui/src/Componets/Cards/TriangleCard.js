@@ -1,5 +1,5 @@
-import Square from "../Shapes/Square";
-import Triangle from "../Shapes/Triangle";
+import Triangle from "../Shapes/Triangle"
+import Text from "../Shapes/Text"
 
 function TriangleCard(props) {
 
@@ -29,8 +29,24 @@ function TriangleCard(props) {
     let lastXC = width * 0.85 * 1.15
     let lastYC = height * 0.7 * 1.08
 
+    let topNumberMarginLeft = width * 0.01
+    let topNumberMarginTop = height * 0.12
+
+    let bottomNumberMarginLeft = width * 0.01
+    let bottomNumberMarginTop = height * 0.18
+
+    let fontSizeNumber = size / 5
+
     return(
         <svg className="card" width={width} height={height}>
+
+            <Text 
+                x={0} y={0} z={0}
+                marginLeft={topNumberMarginLeft} 
+                marginTop={topNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"} />
 
             <Triangle 
                 XA={firstXA} 
@@ -55,6 +71,14 @@ function TriangleCard(props) {
                 YB={lastYB} 
                 XC={lastXC} 
                 YC={lastYC} />
+
+            <Text 
+                x={180} y={50} z={80}
+                marginLeft={bottomNumberMarginLeft} 
+                marginTop={bottomNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSizeNumber} 
+                color={"brown"}/>
         
         </svg>
         )

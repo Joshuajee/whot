@@ -1,4 +1,5 @@
-import Circle from "../Shapes/Circle";
+import Circle from "../Shapes/Circle"
+import Text from "../Shapes/Text"
 
 function CircleCard(props) {
 
@@ -17,8 +18,24 @@ function CircleCard(props) {
     let lastMarginTop = height * 1.6 / 2
     let lastRadius = width * 0.2 / 3
 
+    let topNumberMarginLeft = width * 0.01
+    let topNumberMarginTop = height * 0.12
+
+    let bottomNumberMarginLeft = width * 0.01
+    let bottomNumberMarginTop = height * 0.18
+ 
+    let fontSize = size / 5
+
     return(
         <svg className="card" width={width} height={height}>
+
+            <Text 
+                x={0} y={0} z={0}
+                marginLeft={topNumberMarginLeft} 
+                marginTop={topNumberMarginTop} 
+                text={props.number}
+                fontSize={fontSize} 
+                color={"brown"}/>
 
             <Circle 
                 marginLeft={firstMarginLeft} 
@@ -34,6 +51,14 @@ function CircleCard(props) {
                 marginLeft={lastMarginLeft} 
                 marginTop={lastMarginTop} 
                 radius={lastRadius} />
+
+            <Text 
+                x={180} y={50} z={80}
+                marginLeft={bottomNumberMarginLeft} 
+                marginTop={bottomNumberMarginTop} 
+                text={props.number}
+                fontSize={18} 
+                color={"brown"}/>
         
         </svg>
         )
