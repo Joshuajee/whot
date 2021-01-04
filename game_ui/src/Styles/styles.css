@@ -5,9 +5,10 @@
 .card{
     border: 1px solid brown;
     background-color: whitesmoke;
-    margin: 10px;
+    margin: 40px;
     border-radius: 4%;
     box-shadow: dimgrey 333;
+    animation: rotates 3s linear infinite;
 }
 
 .rotate{
@@ -17,3 +18,14 @@
 .card-cover{
     background-color: brown;
 }
+
+
+
+@keyframes rotates {
+    0%{
+      transform: rotate(0deg);
+    }
+    100%{
+      transform: rotate(360deg);
+    }
+  }
