@@ -19,58 +19,35 @@ class GameEngine extends EventEmitter{
 
 
     
-    addReward(agent, point, states){
+    addReward(agent, point, states, action){
 
-        agents.findOne({agentName:agent.agentName},(err, data)=>{
+        for(let x = 0; x < states.length; x++){
 
-            if(err){
+            for(let y = 0; y < agent.states.length; y++){
 
-                console.log("Failed to retrieve data " + err)
+                let agStates = agent.states[y]
 
-            }else{
+                let condition = this.compareArray(agStates.cardAtHand, states[x].cardAtHand)           && 
+                                this.compareArray(agStates.cardPlayed, states[x].cardPlayed)           && 
+                                this.compareArray(agStates.availableMove, states[x].availableMove)     &&
+                                agStates.cardInPlay == states[x].cardInPlay                            &&
+                                agStates.noOfCardsInMarket == states[x].noOfCardsInMarket              &&
+                                agStates.noOfCardsWithOpponent == states[x].noOfCardsWithOpponent         
 
-                let count = 0
+                if(condition){
 
-                console.log(agent.agentName + " found ")
+                    agent.states[y].actions[action[x][1]] = agent.states[y].actions[action[x][1]] + point
 
-                console.log("move " + states.length)
-
-                for(let x = 0; x < states.length; x++){
-
-                    for(let y = 0; y < data.states.length; y++){
-
-                        let dbStates = data.states[y]
-
-                        let condition = this.compareArray(dbStates.cardAtHand, states[x].cardAtHand)           && 
-                                        //this.compareArray(dbStates.cardPlayed, states[x].cardPlayed)           && 
-                                        this.compareArray(dbStates.availableMove, states[x].availableMove)     &&
-                                        dbStates.cardInPlay == states[x].cardInPlay                            &&
-                                        dbStates.noOfCardsInMarket == states[x].noOfCardsInMarket              &&
-                                        dbStates.noOfCardsWithOpponent == states[x].noOfCardsWithOpponent         
-
-                        if(condition){
-
-                            console.log(agent.agentName + " found ")
-                            //console.log(this.compareArray(dbStates.cardAtHand, states[x].cardAtHand))
-                            console.log(dbStates.cardAtHand)
-                            console.log(dbStates.cardAtHand.length)
-                            console.log(states[x].cardAtHand)
-                            console.log(states[x].cardAtHand.length)
-                            count++
-                            break;
-
-                        }
-
-                    }
-                
+                    break;
                 }
 
-                console.log(count)
-
             }
+        
+        }
+
+        agent.save((err) => {
 
         })
-        
 
     }
 
@@ -85,25 +62,6 @@ class GameEngine extends EventEmitter{
         let playerOneNumber = 0
         let playerTwoNumber = 0
 
-        console.log("Reward")
-
-        console.log(playerOneActions)
-
-        console.log(playerTwoActions)
-
-        console.log(playerOneCardAtHand.length)
-
-        console.log(playerTwoCardAtHand.length)
-
-        console.log(playerOneCardAtHand)
-
-        console.log(playerTwoCardAtHand)
-
-        console.log(this.playerOneState)
-
-        console.log(this.playerTwoState)
-
-
         if(playerOneCardAtHand.length > 0){
 
             
@@ -111,7 +69,7 @@ class GameEngine extends EventEmitter{
             {
 
                 let index_in = playerOneCardAtHand[i].indexOf(":") + 1
-                let number_in = playerOneCardAtHand[i].slice(index_in, playerOneCardAtHand[i].length)
+                let number_in = parseInt(playerOneCardAtHand[i].slice(index_in, playerOneCardAtHand[i].length))
                 let shape_in = playerOneCardAtHand[i].slice(0, index_in)
 
                 if(shape_in == "star"){
@@ -131,7 +89,7 @@ class GameEngine extends EventEmitter{
             {
 
                 let index_in = playerTwoCardAtHand[i].indexOf(":") + 1
-                let number_in = playerTwoCardAtHand[i].slice(index_in, playerTwoCardAtHand[i].length)
+                let number_in = parseInt(playerTwoCardAtHand[i].slice(index_in, playerTwoCardAtHand[i].length))
                 let shape_in = playerTwoCardAtHand[i].slice(0, index_in)
 
                 if(shape_in == "star"){
@@ -146,19 +104,19 @@ class GameEngine extends EventEmitter{
 
         if(playerOneNumber > playerTwoNumber){
             //agent One Wins
-            this.addReward(playerOneAgent, 5 - playerOneNumber / 10, this.playerOneState)
-            this.addReward(playerTwoAgent, -1 * 2 - playerTwoNumber / 10, this.playerTwoState)
+            this.addReward(playerOneAgent, 5 - playerOneNumber / 10, this.playerOneState, playerOneActions)
+            this.addReward(playerTwoAgent, -1 * 2 - playerTwoNumber / 10, this.playerTwoState, playerTwoActions)
             console.log("agent one wins")
         }else if(playerOneNumber < playerTwoNumber){
             //agent Two Wins
-            this.addReward(playerOneAgent, -1 * 2 - playerOneNumber / 10, this.playerOneState)
-            this.addReward(playerTwoAgent, 5 - playerTwoNumber / 10, this.playerTwoState)
+            this.addReward(playerOneAgent, -1 * 2 - playerOneNumber / 10, this.playerOneState, playerOneActions)
+            this.addReward(playerTwoAgent, 5 - playerTwoNumber / 10, this.playerTwoState, playerTwoActions)
             console.log("agent two wins")
         }else{
             //agent draws
-            this.addReward(playerOneAgent, -1 * 2 - playerOneNumber / 10, this.playerOneState)
-            this.addReward(playerTwoAgent, -1 * 2 - playerTwoNumber / 10, this.playerTwoState)
-            console.log("agent two wins")
+            this.addReward(playerOneAgent, -1 * 2 - playerOneNumber / 10, this.playerOneState, playerOneActions)
+            this.addReward(playerTwoAgent, -1 * 2 - playerTwoNumber / 10, this.playerTwoState, playerTwoActions)
+            console.log("draw")
         }
        
     }
@@ -170,6 +128,8 @@ class GameEngine extends EventEmitter{
         //+---------------------------------------------------------------------------+
         //|  This method finds all the relevant states an angent has                  |
         //+---------------------------------------------------------------------------+
+
+        this.cardAtHand = cardAtHand
 
 
         this.player = playerAgent
@@ -205,16 +165,13 @@ class GameEngine extends EventEmitter{
                         "actions":actions,
                         "rules":rules
                     }
-
+                    
         player.states.push(currState)
-        
-        player.save(function (err) {
-            if (err) return 0
-        })
 
- 
-        if(this.agentOneName == player.agentName) this.playerOneState.push(currState)
-        if(this.agentTwoName == player.agentName) this.playerTwoState.push(currState)
+        let stateLength = player.states.length - 1
+
+        if(this.agentOneName == player.agentName) this.playerOneState.push(player.states[stateLength])
+        if(this.agentTwoName == player.agentName) this.playerTwoState.push(player.states[stateLength])
  
         return actions
     }
@@ -242,10 +199,13 @@ class GameEngine extends EventEmitter{
 
 
 
-                if(condition) return states[i].actions
+                if(condition){ 
+                    console("YRRR") 
+                    return states[i].actions
+                }
             }
 
-        return this.stateCreater(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
+        return this.stateCreater(this.player, cardPlayed, cardAtHand, noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
               
     }
 
@@ -263,7 +223,7 @@ class GameEngine extends EventEmitter{
         }
 
         for(let i = 0; i < playerStates.length; i++){
-            if(availableMove.sort() === playerStates[i].availableMove.sort()){
+            if(availableMove === playerStates[i].availableMove){
                 output = this.sumArray(output, playerStates[i].actions)
             }
         }
