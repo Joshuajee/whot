@@ -272,7 +272,9 @@ class GamePlay extends GameEngine
 
 
         //+---------------------------------------------------------------------------+
-        //|     |
+        //|     This method takes in the player cards at hand an the action to be     |
+        //|     taken it takes it, if a card is played it adds it to gamePlayed and   |
+        //|     subracts it from the player card at hand                              |
         //+---------------------------------------------------------------------------+
 
         console.log("game played " + card[0])
@@ -309,7 +311,11 @@ class GamePlay extends GameEngine
 
     goMarket(player, times = 1){
 
-        //method adds card to player and remove that same card from market for n number of times
+        //+---------------------------------------------------------------------------+
+        //|      This method adds card to player and remove that same card from       |  
+        //|      market for n number of times                                         |
+        //+---------------------------------------------------------------------------+
+
         for(let i = 0; i < times; i ++){
 
             if(this.market.length > 0){
@@ -325,11 +331,28 @@ class GamePlay extends GameEngine
     }
 
     checkGame(){
-        if(this.market.length < 1 || this.player1.length < 1 || this.player2.length < 1){
+
+        //+---------------------------------------------------------------------------+
+        //|      This method checks if any of the player cards or market is less      |  
+        //|      than one then it calls the reward method in GameEngine, if  any      |
+        //|      of the player cards is finished that player wins the game and the    |
+        //|      game is over but if market is finished, it adds all cards from       |
+        //|      card Played to market and shuffle them while calling the reward      |
+        //|      method in GameEngine, but the game continues                         |
+        //+---------------------------------------------------------------------------+
+
+        if(this.player1.length < 1 || this.player2.length < 1){
 
             super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
             clearInterval(this.interval)
 
+        }else if(this.market.length < 1){
+            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
+
+            //adds all the card played to market except the last one
+            this.market = this.inPlay[this.inPlay.length - 2]
+            //shuffles the cards
+            this.market = shuffle(this.market)
         }
     }
 
