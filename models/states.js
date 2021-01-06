@@ -14,9 +14,8 @@ var stateSchema = new mongoose.Schema({
                                     "pickTwo":{"active":true, "card":2, "defend":false},
                                     "pickThree":{"active":true, "card":5, "defend":false}, 
                                     "suspension":{"active":true, "card":8, "defend":false},
-                                    "generalMarket":{"active":true, "card":14, "defend":false}, 
-                                    "need":true, 
-                                    "endGame":true}}, 
+                                    "generalMarket":{"active":true, "card":14, "defend":false}
+                                }, 
     createdOn: {type: Date, default: Date.now}, 
     lastUpdatedOn: {type: Date, default: Date.now}, 
 });
