@@ -52,11 +52,7 @@ class GamePlay extends GameEngine
                 this.play(this.player2, agentTwo, this.player1)
 
             }
-            if(this.market.length < 1 || this.player1.length < 1 || this.player2.length < 1){
-
-                super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
-                clearInterval(this.interval)
-            }
+            this.checkGame()
         }, 500)
 
     }
@@ -64,6 +60,8 @@ class GamePlay extends GameEngine
 
 
     referee(action, rules, avialableMove, playerCardAtHand, agent, opponentsCardAtHand){
+
+        this.checkGame()
 
         console.log(agent.agentName) 
         console.log(playerCardAtHand)
@@ -87,7 +85,7 @@ class GamePlay extends GameEngine
             return super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
             
 
-        if(rules.holdOn && number == 1){
+        if(rules.holdOn.active && number == rules.holdOn.card){
 
             console.log("hold On")
 
@@ -95,7 +93,7 @@ class GamePlay extends GameEngine
             
         }
 
-        if(rules.pickTwo && number == 2){
+        if(rules.pickTwo.active && number == rules.pickTwo.card){
 
             console.log("pick 2")
 
@@ -104,7 +102,7 @@ class GamePlay extends GameEngine
 
         }
 
-        if(rules.pickThree && number == 5){
+        if(rules.pickThree.active && number == rules.pickThree.card){
 
             console.log("pick 3")
 
@@ -114,14 +112,14 @@ class GamePlay extends GameEngine
 
         }
 
-        if(rules.suspension && number == 8){
+        if(rules.suspension.active && number == rules.suspension.card){
 
             console.log("suspension")
 
             this.play(playerCardAtHand, agent, opponentsCardAtHand)
         }
 
-        if(rules.generalMarket && number == 14){
+        if(rules.generalMarket.active && number == rules.generalMarket.card){
 
             console.log("general market")
 
@@ -129,7 +127,7 @@ class GamePlay extends GameEngine
 
         }
 
-        if(rules.need && number == 20){
+        if(number == 20){
 
             this.need = true
 
@@ -149,11 +147,6 @@ class GamePlay extends GameEngine
 
         }
 
-        if(this.rules.endGame && this.market.length == 0){
-            
-            
-        }
-
         console.log("---------------------------------")
 
     }
@@ -161,6 +154,8 @@ class GamePlay extends GameEngine
 
 
     play(playerCardAtHand, agent, opponentsCardAtHand){
+
+        this.checkGame();
 
         let inPlayIndex = this.inPlay.length - 1
         let index_in = this.inPlay[inPlayIndex].indexOf(":") + 1
@@ -174,12 +169,7 @@ class GamePlay extends GameEngine
         this.opponent = opponentsCardAtHand
 
 
-        if(this.market.length < 1 || this.player1.length < 1 || this.player2.length < 1){
-
-            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
-            clearInterval(this.interval)
-
-        }
+       
 
 
         if(this.need){
@@ -332,6 +322,15 @@ class GamePlay extends GameEngine
 
         }
 
+    }
+
+    checkGame(){
+        if(this.market.length < 1 || this.player1.length < 1 || this.player2.length < 1){
+
+            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
+            clearInterval(this.interval)
+
+        }
     }
 
 

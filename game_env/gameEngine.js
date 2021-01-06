@@ -35,7 +35,7 @@ class GameEngine extends EventEmitter{
                                 agStates.noOfCardsWithOpponent == states[x].noOfCardsWithOpponent         
 
                 if(condition){
-
+                    console.log(action)
                     agent.states[y].actions[action[x][1]] = agent.states[y].actions[action[x][1]] + point
 
                     break;
@@ -124,13 +124,11 @@ class GameEngine extends EventEmitter{
 
     stateFinder(playerAgent, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
 
-
         //+---------------------------------------------------------------------------+
         //|  This method finds all the relevant states an angent has                  |
         //+---------------------------------------------------------------------------+
 
         this.cardAtHand = cardAtHand
-
 
         this.player = playerAgent
 
@@ -147,12 +145,10 @@ class GameEngine extends EventEmitter{
 
     stateCreater(player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
         
-
         //+---------------------------------------------------------------------------+
         //|  This method creates a state and save it to an angent in the database     |
         //|  it also save it to the correspondingn state array                        |
         //+---------------------------------------------------------------------------+
-
 
         let actions = this.actionCreater(availableMove, player)
 
@@ -200,7 +196,9 @@ class GameEngine extends EventEmitter{
 
 
                 if(condition){ 
-                    console("YRRR") 
+                    //console("YRRR") 
+                    if(this.agentOneName == player.agentName) this.playerOneState.push(states[i])
+                    if(this.agentTwoName == player.agentName) this.playerTwoState.push(states[i])
                     return states[i].actions
                 }
             }

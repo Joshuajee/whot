@@ -5,7 +5,12 @@ class GameStart extends GamePlay{
 
     constructor(agentOne, agentTwo){
 
-        let rules = {"holdOn":true, "pickTwo":true, "pickThree":true, "suspension":true, "generalMarket":true, "need":true, "endGame":true}
+        let rules = {"holdOn":{"active":true, "card":1, "defend":false},
+                     "pickTwo":{"active":true, "card":2, "defend":false},
+                     "pickThree":{"active":true, "card":5, "defend":false}, 
+                     "suspension":{"active":true, "card":8, "defend":false},
+                     "generalMarket":{"active":true, "card":14, "defend":false}
+                    } 
 
         super(agentOne, agentTwo, rules)
 
