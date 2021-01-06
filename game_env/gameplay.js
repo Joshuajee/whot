@@ -349,10 +349,13 @@ class GamePlay extends GameEngine
         }else if(this.market.length < 1){
             super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
 
-            //adds all the card played to market except the last one
-            this.market = this.inPlay[this.inPlay.length - 2]
+            //adds all the card played to market
+            this.market = this.inPlay
+            //removed the last card from market
+            this.market.pop()
             //shuffles the cards
             this.market = shuffle(this.market)
+            console.log("YYYYYYYYYYYYyy")
         }
     }
 
