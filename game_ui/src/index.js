@@ -10,20 +10,47 @@ import TriangleCard from "./Componets/Cards/TriangleCard";
 import StarCard from "./Componets/Cards/StarCard";
 import WhotCard from "./Componets/Cards/WhotCard";
 import CardCover from "./Componets/Cards/CardCover";
+import Start from "./Componets/Background/Start";
+import Button from "./Componets/Button";
 
+///<Start 
+//width={window.screen.width}
+//height={window.screen.height}
+///>
 
-ReactDOM.render(
-  <React.StrictMode>
-      <center className="center" height={100} width={100}>
-        <SquareCard size={100} number={1} />
+/*
+      <SquareCard size={100} number={1} />
         <CircleCard size={100} number={2} />
         <CrossCard size={100} number={5} />
         <TriangleCard size={100} number={14} />
         <StarCard size={100} number={8} />
         <WhotCard size={100} number={20} />
         <CardCover size={100}  />
+*/
+ReactDOM.render(
+  <React.StrictMode>
+ 
+
+
+  
+  
+  <center>
+
+    <Start />
+
+    <div className="start-button">
+
+      <Button text={"Start Game"} class={"btn-start"}/>
+
+      <Button text={"Options"} class={"btn-options"}/>
+
+      <Button text={"Settings"} class={"btn-settings"}/>
+      
+    </div>
+  
+  </center>
         
-      </center>
+ 
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -9,11 +9,11 @@ function Text(props) {
 
     return(
         <svg >
-            <g fill={color} className="center" transform={"rotate("+ x +" " + y + " " + z + ")"}>
-                <text 
+            <g fill={color} transform={"rotate("+ x +" " + y + " " + z + ")"}>
+                <text color={color}
                     x={props.marginLeft} 
                     y={props.marginTop}
-                    font-size={fontSize}>
+                    fontSize={fontSize}>
                     {text}
                 </text>
             </g>

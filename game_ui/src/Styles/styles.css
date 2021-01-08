@@ -1,5 +1,57 @@
+body{
+  background-color: coral;
+}
+
+.start-button{
+  margin-top: 30vh;
+}
+
+.btn-start{
+  color: white;
+  background-color: greenyellow;
+  border-radius: 5%;
+  width: 250px;
+  height: 50px;
+  font-size: large;
+  border: greenyellow;
+  margin-bottom: 4%;
+}
+
+.btn-options{
+  color: white;
+  background-color: gold;
+  border-radius: 5%;
+  width: 250px;
+  height: 50px;
+  font-size: large;
+  border: gold;
+  margin-bottom: 4%;
+}
+
+.btn-settings{
+  color: white;
+  background-color: blueviolet;
+  border-radius: 5%;
+  width: 250px;
+  height: 50px;
+  font-size: large;
+  border:blueviolet;
+  margin-bottom: 4%;
+}
+
+.start-page{
+  z-index: -10;
+  position: fixed;
+  top: 0px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .center{
-    margin-top: 150px;
+  width: 100px;
+  margin-left:auto;
+  margin-right: auto;
+  display: block;
 }
 
 .card{
@@ -8,7 +60,7 @@
     margin: 40px;
     border-radius: 4%;
     box-shadow: dimgrey 333;
-    animation: rotates 3s linear infinite;
+  
 }
 
 .rotate{

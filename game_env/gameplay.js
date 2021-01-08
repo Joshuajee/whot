@@ -175,7 +175,7 @@ class GamePlay extends GameEngine
                 let shape_in = this.neededCard[0].slice(0, index_in)
 
                 let index = playerCardAtHand[i].indexOf(":") + 1
-                let number = playerCardAtHand[i].slice(index, playerCardAtHand[0].length)
+                let number = playerCardAtHand[i].slice(index, playerCardAtHand[i].length)
                 let shape = playerCardAtHand[i].slice(0, index)
                 
                 if(shape == shape_in){
@@ -194,7 +194,7 @@ class GamePlay extends GameEngine
 
             for(let i = 0; i < playerCardAtHand.length; i++){
                 let index = playerCardAtHand[i].indexOf(":") + 1
-                let number = playerCardAtHand[i].slice(index, playerCardAtHand[0].length)
+                let number = playerCardAtHand[i].slice(index, playerCardAtHand[i].length)
                 let shape = playerCardAtHand[i].slice(0, index)
                 
                 if(number == number_in){
@@ -357,8 +357,6 @@ class GamePlay extends GameEngine
 
             //shuffles the cards
             this.market = shuffle(this.market)
-
-            console.log("***********************")
         }
 
     }
