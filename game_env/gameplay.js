@@ -1,6 +1,4 @@
-GameEngine = require("./gameEngine")
-
-const agents = require("../models/agents")
+const GameEngine = require("./gameEngine")
 
 const cards = require("../cards").cards
 
@@ -40,7 +38,7 @@ class GamePlay extends GameEngine
 
         console.log("player 2 " + this.player2)
         
-        console.log("player 2 " + this.inPlay)
+        console.log("in play " + this.inPlay)
 
 
         this.interval = setInterval(() => {
@@ -53,7 +51,7 @@ class GamePlay extends GameEngine
 
             }
             this.checkGame()
-        }, 500)
+        }, 1)
 
     }
 
@@ -62,6 +60,8 @@ class GamePlay extends GameEngine
     referee(action, rules, avialableMove, playerCardAtHand, agent, opponentsCardAtHand){
 
         this.checkGame()
+
+        console.log(this.market.length)
 
         console.log(agent.agentName) 
         console.log(playerCardAtHand)
@@ -142,11 +142,10 @@ class GamePlay extends GameEngine
             }
 
             console.log("needed card " + this.neededCard[0])
-            
-            //this.play(playerCardAtHand, agent, opponentsCardAtHand)
 
         }
 
+        console.log("round : " + super.roundVal)
         console.log("---------------------------------")
 
     }
@@ -167,10 +166,6 @@ class GamePlay extends GameEngine
         this.cardPlayed = this.inPlay
         this.noOfCardsWithOpponent = opponentsCardAtHand.length
         this.opponent = opponentsCardAtHand
-
-
-       
-
 
         if(this.need){
 
@@ -253,7 +248,7 @@ class GamePlay extends GameEngine
 
         for(let i = 0; i < action.length; i++){
 
-            if(maxAction === action[i]){
+            if(maxAction == action[i]){
                 actionPicked.push([availableMove[i], i])
                 maxFound = true
             } 
@@ -261,7 +256,7 @@ class GamePlay extends GameEngine
             pickedAction.push([availableMove[i], i])
 
         }
-
+        if(maxFound) console
         if(maxFound) return actionPicked[Math.floor(Math.random() * (actionPicked.length))]
 
         return pickedAction[Math.floor(Math.random() * (pickedAction.length))]
@@ -285,7 +280,7 @@ class GamePlay extends GameEngine
 
         }else if(!this.need){
 
-            this.inPlay[this.inPlay.length] = card[0]
+            this.inPlay.push(card[0])
 
             for(let i = 0; i < player.length; i++){
                 if(player[i] == card[0]){
@@ -296,7 +291,7 @@ class GamePlay extends GameEngine
 
         }else if(this.need){
 
-            this.inPlay[this.inPlay.length] = card[0]
+            this.inPlay.push(card[0])
 
             for(let i = 0; i < player.length; i++){
                 if(player[i] == card[0]){
@@ -348,15 +343,24 @@ class GamePlay extends GameEngine
 
         }else if(this.market.length < 1){
             super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.action1, this.action2)
+            
+            let inPlay = copyArray(this.inPlay)
 
             //adds all the card played to market
-            this.market = this.inPlay
+            this.market = inPlay
+            
+            //reasign inplay giving it just its last value
+            this.inPlay = [inPlay[inPlay.length - 1]]
+
             //removed the last card from market
             this.market.pop()
+
             //shuffles the cards
             this.market = shuffle(this.market)
-            console.log("YYYYYYYYYYYYyy")
+
+            console.log("***********************")
         }
+
     }
 
 
@@ -381,6 +385,17 @@ function shuffle(array){
     }
 
     return array
+}
+
+function copyArray(array){
+
+
+
+    let result = []
+    for(let i = 0; i < array.length; i++){
+        result.push(array[i])
+    }
+    return result
 }
 
 module.exports = {GamePlay, shuffle}
