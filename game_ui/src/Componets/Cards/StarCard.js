@@ -1,6 +1,7 @@
 import Star from "../Shapes/Star"
 import Text from "../Shapes/Text";
 
+
 function StarCard(props) {
 
     let size = props.size
@@ -17,23 +18,23 @@ function StarCard(props) {
     let XBottomLeft = width * 0.2
     let XBottomRight = width * 0.8
 
-    let firstXCenter = width * 0.2
-    let firstTop = height * 0.14
-    let firstXTop = height * 0.19
+    let firstXCenter = width * 0.24
+    let firstTop = height * 0.12
+    let firstXTop = height * 0.195
     let firstXTopLeft = width * 0.08
-    let firstXTopRight = width * 0.32 
-    let firstBottom = height * 0.28 
+    let firstXTopRight = width * 0.382
+    let firstBottom = height * 0.32
     let firstXBottomLeft = width * 0.12
-    let firstXBottomRight = width * 0.28
+    let firstXBottomRight = width * 0.34
 
     let lastXCenter = width  * 0.8
-    let lastTop = height * 0.86
-    let lastXTop = height * 0.81
-    let lastXTopLeft = width * 0.92
-    let lastXTopRight = width * 0.68
+    let lastTop = height * 0.9
+    let lastXTop = height * 0.83
+    let lastXTopLeft = width * 0.94
+    let lastXTopRight = width * 0.66
     let lastBottom = height * 0.72
-    let lastXBottomLeft = width * 0.88
-    let lastXBottomRight = width * 0.72
+    let lastXBottomLeft = width * 0.9
+    let lastXBottomRight = width * 0.7
 
     let topNumberMarginLeft = width * 0.01
     let topNumberMarginTop = height * 0.12
@@ -41,18 +42,20 @@ function StarCard(props) {
     let bottomNumberMarginLeft = width * 0.01
     let bottomNumberMarginTop = height * 0.18
 
-    let topStarNumberMarginLeft = width * 0.16
-    let topStarNumberMarginTop = height * 0.24
+    let topStarNumberMarginLeft = width * 0.17
+    let topStarNumberMarginTop = height * 0.25
 
-    let bottomStarNumberMarginLeft = width * 0.16
-    let bottomStarNumberMarginTop = height * 0.3
+    let bottomStarNumberMarginLeft = width * 0.14
+    let bottomStarNumberMarginTop = height * 0.295
 
     let fontSizeNumber = size / 5
-    let fontSizeNumberStar = size / 8
+    let fontSizeNumberStar = size / 10
  
 
     return(
         <svg className="card" width={width} height={height}>
+
+
 
             <Text 
                 x={0} y={0} z={0}
@@ -61,14 +64,6 @@ function StarCard(props) {
                 text={props.number}
                 fontSize={fontSizeNumber} 
                 color={"brown"} />
-
-            <Text
-                x={0} y={0} z={0}
-                marginLeft={topStarNumberMarginLeft} 
-                marginTop={topStarNumberMarginTop} 
-                text={props.number}
-                fontSize={fontSizeNumberStar} 
-                color={"black"} />
 
             <Star 
                 XCenter={firstXCenter} 
@@ -81,8 +76,15 @@ function StarCard(props) {
                 XBottomRight={firstXBottomRight}
 
                 />
-        
 
+            <Text
+                x={0} y={0} z={0}
+                marginLeft={topStarNumberMarginLeft} 
+                marginTop={topStarNumberMarginTop} 
+                text={props.number * 2}
+                fontSize={fontSizeNumberStar} 
+                color={"white"} />
+        
             <Star 
                 XCenter={XCenter} 
                 top={top} 
@@ -109,19 +111,21 @@ function StarCard(props) {
 
             <Text 
                 x={180} y={50} z={80}
-                marginLeft={bottomStarNumberMarginLeft} 
-                marginTop={bottomStarNumberMarginTop} 
-                text={props.number}
-                fontSize={fontSizeNumberStar} 
-                color={"brown"}/>
-
-            <Text 
-                x={180} y={50} z={80}
                 marginLeft={bottomNumberMarginLeft} 
                 marginTop={bottomNumberMarginTop} 
                 text={props.number}
                 fontSize={fontSizeNumber} 
                 color={"brown"}/>
+
+            <Text 
+                x={180} y={50} z={80}
+                marginLeft={bottomStarNumberMarginLeft} 
+                marginTop={bottomStarNumberMarginTop} 
+                text={props.number * 2}
+                fontSize={fontSizeNumberStar} 
+                color={"white"}/>
+
+       
         
         </svg>
         )
