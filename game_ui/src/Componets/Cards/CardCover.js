@@ -12,6 +12,12 @@ function CardCover(props) {
     let marginLeftTwo = width / 5
     let marginTopTwo = height / 1.9
 
+    let fontSize = size / 4
+
+    let rotateY = width * 0.5
+    let rotateZ = width * 0.8
+
+
     return(
         <svg className="card card-cover" width={width} height={height}>
 
@@ -20,15 +26,15 @@ function CardCover(props) {
                 marginLeft={marginLeftOne} 
                 marginTop={marginTopOne} 
                 text={"Whot"}
-                fontSize={25}
+                fontSize={fontSize}
                 color={"white"} />
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={marginLeftTwo} 
                 marginTop={marginTopTwo} 
                 text={"Whot"}
-                fontSize={25}
+                fontSize={fontSize}
                 color={"white"} />
 
 

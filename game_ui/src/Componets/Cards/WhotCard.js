@@ -28,6 +28,8 @@ function WhotCard(props) {
     let fontSizeSymbol = size / 6
     let fontSizeNumber = size / 5
 
+    let rotateY = width * 0.5
+    let rotateZ = width * 0.8
 
     return(
         <svg className="card" width={width} height={height}>
@@ -58,7 +60,7 @@ function WhotCard(props) {
                 color={"brown"}/>
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={marginLeftTwo} 
                 marginTop={marginTopTwo} 
                 text={"Whot"}
@@ -67,7 +69,7 @@ function WhotCard(props) {
 
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={lastMarginLeft} 
                 marginTop={lastMarginTop} 
                 text={"W"}
@@ -75,7 +77,7 @@ function WhotCard(props) {
                 color={"brown"}/>
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={bottomNumberMarginLeft} 
                 marginTop={bottomNumberMarginTop} 
                 text={20}

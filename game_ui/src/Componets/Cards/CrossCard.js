@@ -30,6 +30,10 @@ function CrossCard(props) {
 
     let fontSizeNumber = size / 5
 
+    let rotateY = width * 0.5
+    let rotateZ = width * 0.8
+
+
     return(
         <svg className="card" width={width} height={height}>
 
@@ -60,7 +64,7 @@ function CrossCard(props) {
                 marginTop={lastMarginTop} />
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={bottomNumberMarginLeft} 
                 marginTop={bottomNumberMarginTop} 
                 text={props.number}

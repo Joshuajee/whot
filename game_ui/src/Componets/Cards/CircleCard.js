@@ -26,6 +26,10 @@ function CircleCard(props) {
  
     let fontSize = size / 5
 
+    let rotateY = width * 0.5
+    let rotateZ = width * 0.8
+
+
     return(
         <svg className="card" width={width} height={height}>
 
@@ -53,11 +57,11 @@ function CircleCard(props) {
                 radius={lastRadius} />
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={bottomNumberMarginLeft} 
                 marginTop={bottomNumberMarginTop} 
                 text={props.number}
-                fontSize={18} 
+                fontSize={fontSize} 
                 color={"brown"}/>
         
         </svg>

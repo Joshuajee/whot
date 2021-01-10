@@ -50,6 +50,9 @@ function StarCard(props) {
 
     let fontSizeNumber = size / 5
     let fontSizeNumberStar = size / 10
+
+    let rotateY = width * 0.5
+    let rotateZ = width * 0.8 
  
 
     return(
@@ -110,7 +113,7 @@ function StarCard(props) {
                 />
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={bottomNumberMarginLeft} 
                 marginTop={bottomNumberMarginTop} 
                 text={props.number}
@@ -118,7 +121,7 @@ function StarCard(props) {
                 color={"brown"}/>
 
             <Text 
-                x={180} y={50} z={80}
+                x={180} y={rotateY} z={rotateZ}
                 marginLeft={bottomStarNumberMarginLeft} 
                 marginTop={bottomStarNumberMarginTop} 
                 text={props.number * 2}
