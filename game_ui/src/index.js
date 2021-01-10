@@ -3,27 +3,28 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import  "./Styles/styles.css";
 import reportWebVitals from './reportWebVitals';
-import Start from "./Componets/Background/Start";
-import Button from "./Componets/Button";
+import {BrowserRouter, Route} from 'react-router-dom'
+
+import Home from "./Routes/Home";
+import Options from "./Routes/Options";
+import Leaderboard from "./Routes/Leaderboard";
+import Settings from "./Routes/Settings";
+
+const home =  () => <Home />
+const options =  () => <Options />
+const leaderboard = () => <Leaderboard />
+const settings = () => <Settings />
+
 
 ReactDOM.render(
   <React.StrictMode>
-  
-    <center>
 
-      <Start />
-
-      <div className="start-button">
-
-        <Button text={"Start Game"} class={"btn-start"}/>
-
-        <Button text={"Options"} class={"btn-options"}/>
-
-        <Button text={"Settings"} class={"btn-settings"}/>
-        
-      </div>
-    
-    </center>
+    <BrowserRouter>
+      <Route path="/" exact={true} component={home} />
+      <Route path="/home" exact={true} component={home} />
+      <Route path="/leaderboard" exact={true} component={leaderboard} />
+      <Route path="/settings" exact={true} component={settings} />
+    </BrowserRouter>
         
   </React.StrictMode>,
   document.getElementById('root')
