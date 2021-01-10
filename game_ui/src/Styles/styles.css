@@ -28,6 +28,17 @@ body{
   margin-bottom: 4%;
 }
 
+.btn-leader{
+  color: white;
+  background-color: blue;
+  border-radius: 5%;
+  width: 250px;
+  height: 50px;
+  font-size: large;
+  border:blue;
+  margin-bottom: 4%;
+}
+
 .btn-settings{
   color: white;
   background-color: blueviolet;
@@ -38,6 +49,8 @@ body{
   border:blueviolet;
   margin-bottom: 4%;
 }
+
+
 
 .start-page{
   z-index: -10;
@@ -57,7 +70,7 @@ body{
 .card{
     border: 1px solid brown;
     background-color: whitesmoke;
-    margin: 40px;
+    margin: 2%;
     border-radius: 4%;
     box-shadow: dimgrey 333;
     animation: rotates 3s linear infinite;

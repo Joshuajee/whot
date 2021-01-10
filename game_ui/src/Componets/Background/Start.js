@@ -7,11 +7,23 @@ import WhotCard from "../Cards/WhotCard";
 import CardCover from "../Cards/CardCover";
 import Cards from "../../GameEnv/cards";
 
+var cards = Cards.cards
+cards.push("cover:20")
+
 function Start(props) {
 
-    let cards =  shuffle(Cards.cards)
-    let componet = []
+    let width = window.screen.availWidth
+    let height = window.screen.availHeight
 
+    let area = width * height
+
+    let cardSize = area/(56 * 56 * 6)
+
+    console.log("height " + height + " width " + width + " area " + area + " space " + cardSize)
+
+    cards =  shuffle(cards)
+
+    let componet = []
 
     for (let i = 0; i < cards.length; i++) {
         
@@ -19,35 +31,33 @@ function Start(props) {
         let number = parseInt(cards[i].slice(index + 1, cards[i].length))
         let shape = cards[i].slice(0, index)
 
-        console.log(shape)
-
         switch(shape){
 
             case "star":
-                componet.push(<StarCard size={100} number={number} />)
+                componet.push(<StarCard size={cardSize} number={number} />)
             break
 
             case "circle":
-                componet.push(<CircleCard size={100} number={number} />)
+                componet.push(<CircleCard size={cardSize} number={number} />)
             break
 
             case "square":
-                componet.push(<SquareCard size={100} number={number} />)
+                componet.push(<SquareCard size={cardSize} number={number} />)
             break
 
             case "cross":
-                componet.push(<CrossCard size={100} number={number} />)
+                componet.push(<CrossCard size={cardSize} number={number} />)
             break
 
             case "triangle":
-                componet.push(<TriangleCard size={100} number={number} />)
+                componet.push(<TriangleCard size={cardSize} number={number} />)
             break
 
             case "whot":
-                componet.push(<WhotCard size={100} number={number} />)
+                componet.push(<WhotCard size={cardSize} number={number} />)
             break
             default:
-                componet.push(<CardCover size={100}  />)
+                componet.push(<CardCover size={cardSize}  />)
 
         }
         

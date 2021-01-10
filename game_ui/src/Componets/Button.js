@@ -1,10 +1,14 @@
+import {Link} from 'react-router-dom'
+
 function Button(props) {
 
     return(
         <div>
-            <button className={props.class} >
-                {props.text}
-            </button>
+            <Link to={props.link}>
+                <button className={props.class} >
+                    {props.text}
+                </button>
+            </Link>
         </div>
         )
 }
