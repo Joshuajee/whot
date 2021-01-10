@@ -73,7 +73,7 @@ body{
     margin: 2%;
     border-radius: 4%;
     box-shadow: dimgrey 333;
-    animation: rotates 3s linear infinite;
+    /*animation: rotates 3s linear infinite;*/
 }
 
 .rotate{
