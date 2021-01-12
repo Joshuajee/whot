@@ -6,8 +6,8 @@ class GameEngine{
 
     constructor(playerOne, playerTwo){
 
-        this.playerOneState = []
-        this.playerTwoState = []
+        //this.playerOneState = []
+        //this.playerTwoState = []
 
         this.agentOneName = playerOne.agentName
         this.agentTwoName = playerTwo.agentName      
@@ -116,11 +116,11 @@ class GameEngine{
         }
 
         if(playerOneNumber == 0){
-            this.addReward(playerOneAgent, 5,  this.playerOneState, playerOneActions)
-            this.addReward(playerTwoAgent, -2 -1 * playerTwoNumber / 10, this.playerTwoState, playerTwoActions)
+            this.addReward(playerOneAgent, 5,  this.playerOneStateRound, playerOneActions)
+            this.addReward(playerTwoAgent, -2 -1 * playerTwoNumber / 10, this.playerTwoStateRound, playerTwoActions)
         }else if(playerTwoNumber == 0){
-            this.addReward(playerOneAgent, -2 -1 * playerTwoNumber / 10,  this.playerOneState, playerOneActions)
-            this.addReward(playerTwoAgent, 5, this.playerTwoState, playerTwoActions)
+            this.addReward(playerOneAgent, -2 -1 * playerTwoNumber / 10,  this.playerOneStateRound, playerOneActions)
+            this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions)
         }
 
         //Empty the StateRound array after one round
@@ -158,7 +158,7 @@ class GameEngine{
         //|  it also save it to the correspondingn state array                        |
         //+---------------------------------------------------------------------------+
 
-        let actions = this.actionCreater(availableMove, player)
+        let actions = this.actionCreater(availableMove, player.states)
 
         let currState = {"cardAtHand":cardAtHand, 
                         "noOfCardsWithOpponent": noOfCardsWithOpponent,
@@ -174,23 +174,12 @@ class GameEngine{
 
         let stateLength = player.states.length - 1
 
-        if(this.agentOneName == player.agentName) this.playerOneState.push(player.states[stateLength])
-        if(this.agentTwoName == player.agentName) this.playerTwoState.push(player.states[stateLength])
-                    
-        if(this.agentOneName == player.agentName) {
+        //add this state to the right player
+        if(this.agentOneName == player.agentName) this.playerOneStateRound.push(player.states[stateLength])
 
-            this.playerOneState.push(player.states[stateLength])
-            this.playerOneStateRound.push(player.states[stateLength])
+        if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(player.states[stateLength])
 
-        }
-
-        if(this.agentTwoName == player.agentName){
-
-            this.playerTwoState.push(player.states[stateLength])
-            this.playerTwoStateRound.push(player.states[stateLength])
-
-        } 
-
+        //return the state action
         return actions
     }
 
@@ -218,24 +207,18 @@ class GameEngine{
 
                 if(condition){ 
 
-                    if(this.agentOneName == player.agentName) {
+                    //add to state
 
-                        this.playerOneState.push(states[i])
-                        this.playerOneStateRound.push(states[i])
+                    if(this.agentOneName == player.agentName) this.playerOneStateRound.push(states[i])
 
-                    }
+                    if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(states[i])
 
-                    if(this.agentTwoName == player.agentName){
-
-                        this.playerTwoState.push(states[i])
-                        this.playerTwoStateRound.push(states[i])
-
-                    } 
-
+                    //return the action of the selected state
                     return states[i].actions
                 }
             }
 
+        //create a new state if a state doesn't exist and return it's actions
         return this.stateCreater(this.player, cardPlayed, cardAtHand, noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
               
     }
@@ -249,18 +232,21 @@ class GameEngine{
 
         let output = []
 
+        //set inital values of zeros for output
         for(let i = 0; i < availableMove.length; i++){
             output.push(0)
         }
 
         for(let i = 0; i < playerStates.length; i++){
-            if(compareArray(availableMove, playerStates[i].availableMove)){
+            if(this.compareArray(availableMove, playerStates[i].availableMove)){
+
+                //get an aggregated sum of similar actions
                 output = this.sumArray(output, playerStates[i].actions)
-                console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-                console
+
             }
         }
 
+        //return arithmentic mean of all the state action
         return this.multiplyArray(output, (1/output.length))
     }
 
