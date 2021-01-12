@@ -1,4 +1,4 @@
-const GameStart = require("./gameStart")
+const {GameStart, shuffle}  = require("./gameStart")
 const agents = require("../models/agents")
 
 
@@ -8,7 +8,11 @@ agents.find((err, data)=>{
 
     }else{
 
-        new GameStart(data[0], data[1])
+        let agentOrder = shuffle(data) 
+
+        for(let i = 0; i < agentOrder.length / 2; i++){
+            new GameStart(agentOrder[i], agentOrder[agentOrder.length / 2 + i])
+        }
 
     }
 })

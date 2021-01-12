@@ -19,4 +19,4 @@ class GameStart extends GamePlay{
 }
 
 
-module.exports = GameStart
+module.exports = {GameStart, shuffle}

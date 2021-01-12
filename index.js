@@ -4,10 +4,7 @@ const express = require('express')
 
 const app = express()
 
-
 const agents = require("./models/agents")
-
-const game_env = require("./game_env")
 
 
 

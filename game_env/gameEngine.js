@@ -6,9 +6,6 @@ class GameEngine{
 
     constructor(playerOne, playerTwo){
 
-        //this.playerOneState = []
-        //this.playerTwoState = []
-
         this.agentOneName = playerOne.agentName
         this.agentTwoName = playerTwo.agentName      
         
@@ -23,9 +20,14 @@ class GameEngine{
         return this.round
     }
 
-
     
     addReward(agent, point, states, action){
+
+        //+-----------------------------------------------------------------+
+        //|  This method is used to add rewards to the agent in question    |                                                   |    
+        //+-----------------------------------------------------------------+
+
+        agent.points = agent.points + point
 
         for(let x = 0; x < states.length; x++){
 
@@ -70,9 +72,10 @@ class GameEngine{
         let playerOneNumber = 0
         let playerTwoNumber = 0
 
+
+        //sum the card numbers if any is remaining for agent one
         if(playerOneCardAtHand.length > 0){
 
-            
             for(let i = 0; i < playerOneCardAtHand.length; i++)
             {
 
@@ -91,6 +94,7 @@ class GameEngine{
         }
 
 
+        //sum the card numbers if any is remaining for agent two
         if(playerTwoCardAtHand.length > 0){
 
             for(let i = 0; i < playerTwoCardAtHand.length; i++)
@@ -111,19 +115,39 @@ class GameEngine{
         }
 
         if(playerOneNumber != 0 || playerTwoNumber != 0){
-            this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
-            this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
-        }
+            //penalise both agent
+            if(this.playerOneNumber > this.playerTwoNumber){
+                //
+                this.addReward(playerOneAgent, 5 - 1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
+                this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+   
+            }else if(this.playerOneNumber < this.playerTwoNumber){
+                //
+                this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
+                this.addReward(playerTwoAgent, 5 - 1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+   
+            }else{
+                //
+                this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
+                this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+   
+            }
+
+         }
 
         if(playerOneNumber == 0){
+            //reward player one
             this.addReward(playerOneAgent, 5,  this.playerOneStateRound, playerOneActions)
+            //penalise player two
             this.addReward(playerTwoAgent, -2 -1 * playerTwoNumber / 10, this.playerTwoStateRound, playerTwoActions)
         }else if(playerTwoNumber == 0){
+            //penalise player one
             this.addReward(playerOneAgent, -2 -1 * playerTwoNumber / 10,  this.playerOneStateRound, playerOneActions)
+            //reward player two
             this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions)
         }
 
-        //Empty the StateRound array after one round
+        //empty the StateRound array after one round
         this.playerOneStateRound = []
         this.playerTwoStateRound = []
        
@@ -176,7 +200,6 @@ class GameEngine{
 
         //add this state to the right player
         if(this.agentOneName == player.agentName) this.playerOneStateRound.push(player.states[stateLength])
-
         if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(player.states[stateLength])
 
         //return the state action
@@ -208,9 +231,7 @@ class GameEngine{
                 if(condition){ 
 
                     //add to state
-
                     if(this.agentOneName == player.agentName) this.playerOneStateRound.push(states[i])
-
                     if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(states[i])
 
                     //return the action of the selected state
