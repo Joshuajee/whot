@@ -3,7 +3,7 @@
 # dependencies
 /node_modules
 
-
+/game_ui/.eslintcache
 /.pnp
 .pnp.js
 
