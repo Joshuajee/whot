@@ -11,7 +11,7 @@ function Home() {
 
             <div className="start-button">
 
-                <Button text={"Start Game"} link={"/startgame"} class={"btn-start"}/>
+                <Button text={"Start Game"} link={"/game"} class={"btn-start"}/>
 
                 <Button text={"Options"} link={"/options"}  class={"btn-options"}/>
 
