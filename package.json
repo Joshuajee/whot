@@ -12,7 +12,8 @@
     "dev": "nodemon index.js",
     "game": "npm run start --prefix game_ui",
     "train": "node game_env/index.js",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=true npm install --prefix game_ui && npm run build --prefix game_ui"
+    "build": "npm install --prefix game_ui",
+    "heroku-postbuild": "npm run build --prefix game_ui"
   },
   "author": "Joshua Evuetapha",
   "license": "ISC",
