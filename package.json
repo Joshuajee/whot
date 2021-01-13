@@ -12,7 +12,7 @@
     "dev": "nodemon index.js",
     "game": "npm run start --prefix game_ui",
     "train": "node game_env/index.js",
-    "build": "npm install --prefix game_ui",
+    "postinstall": "npm install --prefix game_ui",
     "heroku-postbuild": "npm run build --prefix game_ui"
   },
   "author": "Joshua Evuetapha",
