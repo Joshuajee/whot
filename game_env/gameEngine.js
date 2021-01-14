@@ -21,14 +21,12 @@ class GameEngine{
     }
 
     
-    addReward(agent, point, states, action){
+    addReward(agent, point, states, action, endGame=false, win=false){
 
         //+-----------------------------------------------------------------+
         //|  This method is used to add rewards to the agent in question    |                                                   |    
         //+-----------------------------------------------------------------+
-
-        agent.points = agent.points + point
-
+        
         for(let x = 0; x < states.length; x++){
 
             for(let y = 0; y < agent.states.length; y++){
@@ -53,9 +51,20 @@ class GameEngine{
         
         }
 
-        agent.save((err) => {
+        
 
-        })
+        if(endGame){ 
+            
+            agent.points = agent.points + point
+
+            if(win) agent.wins = agent.wins + 1
+            else agent.losses = agent.losses + 1
+
+            agent.save((err) => {
+
+            })
+
+        }
 
     }
 
@@ -136,15 +145,17 @@ class GameEngine{
          }
 
         if(playerOneNumber == 0){
+            console.log("Player One")
             //reward player one
-            this.addReward(playerOneAgent, 5,  this.playerOneStateRound, playerOneActions)
+            this.addReward(playerOneAgent, 5,  this.playerOneStateRound, playerOneActions, true, true)
             //penalise player two
-            this.addReward(playerTwoAgent, -2 -1 * playerTwoNumber / 10, this.playerTwoStateRound, playerTwoActions)
+            this.addReward(playerTwoAgent, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRound, playerTwoActions, true, false)
         }else if(playerTwoNumber == 0){
+            console.log("Player Two")
             //penalise player one
-            this.addReward(playerOneAgent, -2 -1 * playerTwoNumber / 10,  this.playerOneStateRound, playerOneActions)
+            this.addReward(playerOneAgent, -2 - 1 * playerTwoNumber / 10,  this.playerOneStateRound, playerOneActions, true, true)
             //reward player two
-            this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions)
+            this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions, true, false)
         }
 
         //empty the StateRound array after one round
