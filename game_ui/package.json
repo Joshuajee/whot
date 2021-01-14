@@ -1,7 +1,8 @@
 {
-  "name": "Whot",
+  "name": "whot",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:10000",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
