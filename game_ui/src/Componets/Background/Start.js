@@ -6,13 +6,22 @@ cards.push("cover:20")
 
 function Start(props) {
 
+    let width = window.innerWidth
+    let height = window.innerHeight
+
+    let area = width * height
+
+    let size = width / 10
+
+    let cardSize = size
+
     cards =  shuffle(cards)
 
     let componet = []
 
     for (let i = 0; i < cards.length; i++) {
     
-        componet.push(chooseCard(cards[i], 57 * 57 * 6))
+        componet.push(chooseCard(cards[i], cardSize))
 
     }
    

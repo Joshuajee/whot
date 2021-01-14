@@ -7,14 +7,9 @@ import WhotCard from "../Componets/Cards/WhotCard";
 import CardCover from "../Componets/Cards/CardCover";
 
 
-function chooseCard(card, cardSpace){
+function chooseCard(card, cardSize){
 
-    let width = window.screen.availWidth
-    let height = window.screen.availHeight
-
-    let area = width * height
-
-    let cardSize = area/(cardSpace)
+    
 
 
     let index = card.indexOf(":")

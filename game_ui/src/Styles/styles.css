@@ -70,7 +70,6 @@ body{
 .card{
   border: 1px solid brown;
   background-color: whitesmoke;
-  margin: 2%;
   border-radius: 4%;
   box-shadow: dimgrey 333;
 }
@@ -85,13 +84,13 @@ body{
 }
 
 .in-play{
-  position: absolute;
-  margin-left: auto;
-  margin-right: auto;
+  background-color: crimson;
+}
 
+.market{
+  background-color: crimson;
 }
  
-
 .rotate{
     transform: rotate(90deg);
 }

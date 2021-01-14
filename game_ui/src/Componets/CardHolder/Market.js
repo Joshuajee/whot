@@ -1,6 +1,6 @@
 import chooseCard from "../../GameLogic/chooseCard";
 
-function InPlay(props) {
+function Market(props) {
     
     let width = window.innerWidth
     let height = window.innerHeight
@@ -9,15 +9,20 @@ function InPlay(props) {
     const style = {
         position:"absolute",
         top:height/2 - cardSize,
-        left:width/2 - cardSize * 0.6666666667
+        left:width/2 - cardSize * 0.6666666667 - width * 0.2
     }
 
     return(
         <div style={style}>
-            { chooseCard(props.cards, cardSize) }
+            <span onClick={() => play("market")}>{ chooseCard("ff", cardSize) }</span>
         </div>
         )
 
 }
 
-export default InPlay
+function play(card) {
+    console.log(card)
+}
+
+
+export default Market
