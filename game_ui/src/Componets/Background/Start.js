@@ -1,5 +1,5 @@
 import Cards from "../../GameEnv/cards";
-import chooseCard from "../../businessLogic/chooseCard";
+import chooseCard from "../../GameLogic/chooseCard";
 
 var cards = Cards.cards
 cards.push("cover:20")
