@@ -1,29 +1,17 @@
 import Start from "../Componets/Background/Start";
 import Button from "../Componets/Button";
-
+import chooseCard from "../GameLogic/chooseCard";
 
 function Options() {
 
     return(
-        <center>
+        <center style={{padding:10}}>
 
-            <Start />
-
-            <div className="start-button">
-
-                <Button text={"Start Game"} class={"btn-start"}/>
-
-                <Button text={"Options"} class={"btn-options"}/>
-
-                <Button text={"Leaderboard"} class={"btn-leader"}/>
-
-                <Button text={"Settings"} class={"btn-settings"}/>
-                
-            </div>
+            {chooseCard("ee", 350)}
             
         </center>
     )
 
 }
 
-export default Option
+export default Options
