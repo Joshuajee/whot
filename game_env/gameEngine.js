@@ -1,5 +1,13 @@
-require("../configs/dbConnections")
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * Instagram: @Joshua.jee
+ * This program is distributed under the MIT license
+ */
 
+
+require("../configs/dbConnections")
 
 
 class GameEngine{
@@ -26,33 +34,18 @@ class GameEngine{
         //+-----------------------------------------------------------------+
         //|  This method is used to add rewards to the agent in question    |                                                   |    
         //+-----------------------------------------------------------------+
-        
-        for(let x = 0; x < states.length; x++){
 
-            for(let y = 0; y < agent.states.length; y++){
+    
+        for(let i = 0; i < states.length; i++){
 
-                let agStates = agent.states[y]
+            states[i].actions[action[i][1]] = states[i].actions[action[i][1]] + point
 
-                let condition = this.compareArray(agStates.cardAtHand, states[x].cardAtHand)           && 
-                                this.compareArray(agStates.cardPlayed, states[x].cardPlayed)           && 
-                                this.compareArray(agStates.availableMove, states[x].availableMove)     &&
-                                agStates.cardInPlay == states[x].cardInPlay                            &&
-                                agStates.noOfCardsInMarket == states[x].noOfCardsInMarket              &&
-                                agStates.noOfCardsWithOpponent == states[x].noOfCardsWithOpponent         
+            agent.states.push(states[i])
 
-                if(condition){
-
-                    agent.states[y].actions[action[x][1]] = agent.states[y].actions[action[x][1]] + point
-
-                    break;
-                }
-
-            }
-        
         }
 
         
-
+        //save the agents to database when the game ends
         if(endGame){ 
             
             agent.points = agent.points + point
@@ -125,21 +118,18 @@ class GameEngine{
 
         if(playerOneNumber != 0 || playerTwoNumber != 0){
             //penalise both agent
-            if(this.playerOneNumber > this.playerTwoNumber){
-                //
+            if(this.playerOneNumber < this.playerTwoNumber){
+                // rewards when player one has fewer card number than player two
                 this.addReward(playerOneAgent, 5 - 1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
                 this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
-   
-            }else if(this.playerOneNumber < this.playerTwoNumber){
-                //
+            }else if(this.playerOneNumber > this.playerTwoNumber){
+                // rewards when player two has fewer card number than player one
                 this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
                 this.addReward(playerTwoAgent, 5 - 1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
-   
             }else{
-                //
+                //rewards when player two has same card number as player one
                 this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
                 this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
-   
             }
 
          }
@@ -205,13 +195,10 @@ class GameEngine{
                         "rules":rules
                     }
                     
-        player.states.push(currState)
-
-        let stateLength = player.states.length - 1
 
         //add this state to the right player
-        if(this.agentOneName == player.agentName) this.playerOneStateRound.push(player.states[stateLength])
-        if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(player.states[stateLength])
+        if(this.agentOneName == player.agentName) this.playerOneStateRound.push(currState)
+        if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(currState)
 
         //return the state action
         return actions
@@ -227,28 +214,28 @@ class GameEngine{
         //+---------------------------------------------------------------------------+
 
             let states = player.states
-            for(let i = 0; i < states.length; i++){
 
+            let currentState = {
+                                "cardAtHand":cardAtHand, 
+                                "cardPlayed":cardPlayed,
+                                "availableMove":availableMove,
+                                "cardInPlay":inPlayCards,
+                                "noOfCardsInMarket":noOfCardsInMarket,
+                                "noOfCardsWithOpponent":noOfCardsWithOpponent                            
+                            }
+            
+            let state = this.findState(states, currentState)
+    
+            if(state){ 
 
-                let condition = this.compareArray(states[i].cardAtHand, cardAtHand)           && 
-                                this.compareArray(states[i].cardPlayed, cardPlayed)           && 
-                                this.compareArray(states[i].availableMove, availableMove)     &&
-                                states[i].cardInPlay === inPlayCards                          &&
-                                states[i].noOfCardsInMarket === noOfCardsInMarket             &&
-                                states[i].noOfCardsWithOpponent === noOfCardsWithOpponent           
+                //add to state
+                if(this.agentOneName == player.agentName) this.playerOneStateRound.push(state)
+                if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(state)
 
-
-
-                if(condition){ 
-
-                    //add to state
-                    if(this.agentOneName == player.agentName) this.playerOneStateRound.push(states[i])
-                    if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(states[i])
-
-                    //return the action of the selected state
-                    return states[i].actions
-                }
+                //return the action of the selected state
+                return state.actions
             }
+
 
         //create a new state if a state doesn't exist and return it's actions
         return this.stateCreater(this.player, cardPlayed, cardAtHand, noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
@@ -262,6 +249,8 @@ class GameEngine{
         //|  This method initialise actions for newly created states                  |
         //+---------------------------------------------------------------------------+
 
+        let states = this.filterState(playerStates, availableMove)
+
         let output = []
 
         //set inital values of zeros for output
@@ -269,24 +258,25 @@ class GameEngine{
             output.push(0)
         }
 
-        for(let i = 0; i < playerStates.length; i++){
-            if(this.compareArray(availableMove, playerStates[i].availableMove)){
+        //check if any state was fount if no state was found it returns actions of zeros
+        if(!states.length) return output
 
-                //get an aggregated sum of similar actions
-                output = this.sumArray(output, playerStates[i].actions)
+        for(let i = 0; i < states.length; i++){
 
-            }
+            //get an aggregated sum of similar actions
+            output = this.sumArray(output, states[i].actions)
+
         }
-
+ 
         //return arithmentic mean of all the state action
-        return this.multiplyArray(output, (1/output.length))
+        return this.multiplyArray(output, (1/states.length))
     }
 
     sumArray(array1, array2){
 
-        //+---------------------------------------------------------+
-        //|    This method adds two arrays and return the sum       |
-        //+---------------------------------------------------------+
+        //+---------------------------------------------------------------------------+
+        //|    This method adds two arrays and return the sum                         |
+        //+---------------------------------------------------------------------------+
 
         let result = []
 
@@ -299,11 +289,10 @@ class GameEngine{
 
     multiplyArray(array, num){
 
-        //+---------------------------------------------------------+
-        //|    This method multiply an array with a scaler value    |
-        //|    it receive an array as the first argument and the    |
-        //|    scalar value as the second                           |
-        //+---------------------------------------------------------+
+        //+---------------------------------------------------------------------------+
+        //|    This method multiply an array with a scaler value, it receive an       |
+        //|    array as the first argument and the scalar value as the second         |
+        //+---------------------------------------------------------------------------+
 
         let result = []
 
@@ -314,33 +303,74 @@ class GameEngine{
         return result
     }
 
-    compareArray(array1, array2){
 
-        //+---------------------------------------------------------+
-        //|    This method compares two one dimensional arrays      |
-        //|    and return true if they are thesame else false       |
-        //|    it takes an arrays as the first and second argument  |                            |
-        //+---------------------------------------------------------+
+    findState(states, state) {
 
-        if(array1.length == array2.length){
+        //+---------------------------------------------------------------------------+
+        //|    This method receives two arguments states and state, and uses the      |
+        //|    state object to search the states array return the state object        |
+        //|    if found                                                               |
+        //+---------------------------------------------------------------------------+
 
-            for(let i = 0; i < array1.length; i++){
+        return states.find(function(el) {
 
-                if(array1[i] != array2[i]){
-                    return false;
-                }
+            let condition = compareArray(el.cardAtHand, state.cardAtHand)           && 
+                            compareArray(el.cardPlayed, state.cardPlayed)           && 
+                            compareArray(el.availableMove, state.availableMove)     &&
+                            el.cardInPlay == state.cardInPlay                          &&
+                            el.noOfCardsInMarket == state.noOfCardsInMarket             &&
+                            el.noOfCardsWithOpponent == state.noOfCardsWithOpponent           
 
-            }
+            return condition
 
-        }else{
-            return false
-        }
-
-        return true
+        })
 
     }
 
 
+    filterState(states, state) {
+
+        //+---------------------------------------------------------------------------+
+        //|    This method receives two arguments states and state, and uses the      |
+        //|    state object to search the states array return an array of state       |
+        //|    objects that was found                                                 |
+        //+---------------------------------------------------------------------------+
+
+
+        return states.filter(function(el) {
+
+            return compareArray(el.availableMove, state)
+
+        })
+
+    }
+   
+
+}
+
+function compareArray(array1, array2){
+
+    //+---------------------------------------------------------------------------+
+    //|    This function compares two one dimensional arrays and return true if   |
+    //|    they are thesame else false it takes an arrays as the first and        |
+    //|    second argument  |                                                     |
+    //+---------------------------------------------------------------------------+ 
+
+    if(array1.length == array2.length){
+
+        for(let i = 0; i < array1.length; i++){
+
+            if(array1[i] != array2[i]){
+                return false;
+            }
+
+        }
+
+    }else{
+        return false
+    }
+
+    return true
 
 }
 
