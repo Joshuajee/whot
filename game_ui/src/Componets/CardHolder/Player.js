@@ -6,13 +6,14 @@ function Player(props) {
     let height = window.innerHeight
     let cardSize = height/10
     let angle = props.angle
+    let margin = (width / 2) - cardSize * 0.6666666667 - width * 0.2
 
     const style = {
         position:"absolute",
         top:height * props.top - cardSize,
-        left:width / 2 - cardSize * 0.6666666667 - width * 0.2,
+        left: margin,
         align:"center",
-        width: width * 0.5,
+        width: (width - margin * 2),
         transform: "rotate(" + angle + "deg)"
         
     }
@@ -43,7 +44,3 @@ function displayCards(cards, cardSize) {
 }
 
 export default Player
-
-
-
-//https://help.heroku.com/sharing/e46fcc46-a4a6-4e3c-ac8a-e7f0021d65b7
