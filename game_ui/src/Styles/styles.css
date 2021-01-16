@@ -80,16 +80,8 @@ body{
   margin: 5vh;
   border-radius: 4%;
   box-shadow: dimgrey 333;
-  height: 90vh;
 }
 
-.in-play{
-  background-color: crimson;
-}
-
-.market{
-  background-color: crimson;
-}
  
 .rotate{
     transform: rotate(90deg);
