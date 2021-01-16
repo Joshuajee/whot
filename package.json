@@ -11,19 +11,16 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "game": "npm run start --prefix game_ui",
-    "train": "node game_env/index.js",
-    "heroku-prebuild": "pre build",
-    "heroku-postbuild": "post bulid"
+    "train": "node game_env/index.js"
   },
   "author": "Joshua Evuetapha",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.21.0",
     "concurrently": "^5.3.0",
     "express": "^4.17.1",
     "mongoose": "^5.10.5",
     "node-cron": "^2.0.3",
-    "nodemon": "^2.0.6",
-    "react-router-dom": "^5.2.0"
+    "nodemon": "^2.0.7"
   }
 }

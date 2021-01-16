@@ -9,6 +9,7 @@ function StarCard(props) {
     let width = size
     let height = size * 1.5
 
+    //parameters for the big center star
     let XCenter = width / 2
     let top = height * 0.2
     let XTop = height * 0.42
@@ -18,6 +19,7 @@ function StarCard(props) {
     let XBottomLeft = width * 0.2
     let XBottomRight = width * 0.8
 
+    //parameters for the top left star
     let firstXCenter = width * 0.24
     let firstTop = height * 0.12
     let firstXTop = height * 0.195
@@ -27,6 +29,7 @@ function StarCard(props) {
     let firstXBottomLeft = width * 0.12
     let firstXBottomRight = width * 0.34
 
+    //parameters for the bottom right star
     let lastXCenter = width  * 0.8
     let lastTop = height * 0.9
     let lastXTop = height * 0.83
@@ -36,17 +39,32 @@ function StarCard(props) {
     let lastXBottomLeft = width * 0.9
     let lastXBottomRight = width * 0.7
 
+    //parameters for the top right number
     let topNumberMarginLeft = width * 0.01
     let topNumberMarginTop = height * 0.12
 
+    //parameters for the bottom left number
     let bottomNumberMarginLeft = width * 0.01
     let bottomNumberMarginTop = height * 0.18
 
-    let topStarNumberMarginLeft = width * 0.17
+    //parameters for the top right number in star
+    let topStarNumberMarginLeft = width * 0.21
     let topStarNumberMarginTop = height * 0.25
 
-    let bottomStarNumberMarginLeft = width * 0.14
+    //parameters for the bottom left number in star
+    let bottomStarNumberMarginLeft = width * 0.17
     let bottomStarNumberMarginTop = height * 0.295
+
+    if(props.number > 4){
+        //parameters for the top right number in star
+        topStarNumberMarginLeft = width * 0.17
+        topStarNumberMarginTop = height * 0.25
+
+        //parameters for the bottom left number in star
+        bottomStarNumberMarginLeft = width * 0.14
+        bottomStarNumberMarginTop = height * 0.295
+    }
+    
 
     let fontSizeNumber = size / 5
     let fontSizeNumberStar = size / 10
@@ -57,8 +75,6 @@ function StarCard(props) {
 
     return(
         <svg className="card" width={width} height={height}>
-
-
 
             <Text 
                 x={0} y={0} z={0}

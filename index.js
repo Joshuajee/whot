@@ -7,7 +7,22 @@ const app = express()
 const agents = require("./models/agents")
 
 
+app.get('/play/:agent', (req, res) =>{
 
+    let agentName = req.params.agent
+
+    agents.find({agentName: agentName}, (err, data)=>{
+   
+        if(err){
+            res.json({"err":err})
+            console.log("Failed to retrieve data " + err)
+        }else{
+            
+            res.send(data[0])
+        }
+    })
+
+})
 
 
 app.get('/agents', (req, res) =>{
