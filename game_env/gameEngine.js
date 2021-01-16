@@ -9,7 +9,6 @@
 
 require("../configs/dbConnections")
 
-
 class GameEngine{
 
     constructor(playerOne, playerTwo){
@@ -35,7 +34,6 @@ class GameEngine{
         //|  This method is used to add rewards to the agent in question    |                                                   |    
         //+-----------------------------------------------------------------+
 
-    
         for(let i = 0; i < states.length; i++){
 
             states[i].actions[action[i][1]] = states[i].actions[action[i][1]] + point
@@ -43,7 +41,6 @@ class GameEngine{
             agent.states.push(states[i])
 
         }
-
         
         //save the agents to database when the game ends
         if(endGame){ 
@@ -53,8 +50,9 @@ class GameEngine{
             if(win) agent.wins = agent.wins + 1
             else agent.losses = agent.losses + 1
 
+            //save agents experience
             agent.save((err) => {
-
+                console.log(agent.agentName + err)
             })
 
         }
@@ -122,30 +120,39 @@ class GameEngine{
                 // rewards when player one has fewer card number than player two
                 this.addReward(playerOneAgent, 5 - 1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
                 this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+            
             }else if(this.playerOneNumber > this.playerTwoNumber){
                 // rewards when player two has fewer card number than player one
                 this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
                 this.addReward(playerTwoAgent, 5 - 1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+
+                
             }else{
                 //rewards when player two has same card number as player one
                 this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
                 this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+
             }
+
 
          }
 
         if(playerOneNumber == 0){
-            console.log("Player One")
+
+            console.log("Player One Win")
             //reward player one
             this.addReward(playerOneAgent, 5,  this.playerOneStateRound, playerOneActions, true, true)
             //penalise player two
             this.addReward(playerTwoAgent, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRound, playerTwoActions, true, false)
+        
         }else if(playerTwoNumber == 0){
-            console.log("Player Two")
+
+            console.log("Player Two Win")
             //penalise player one
-            this.addReward(playerOneAgent, -2 - 1 * playerTwoNumber / 10,  this.playerOneStateRound, playerOneActions, true, true)
+            this.addReward(playerOneAgent, -2 - 1 * playerOneNumber / 10,  this.playerOneStateRound, playerOneActions, true, false)
             //reward player two
-            this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions, true, false)
+            this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions, true, true)
+        
         }
 
         //empty the StateRound array after one round
