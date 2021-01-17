@@ -1,4 +1,5 @@
 import chooseCard from "../../GameLogic/chooseCard";
+import axios from "axios"
 
 function Player(props) {
     
@@ -7,6 +8,7 @@ function Player(props) {
     let cardSize = height/10
     let angle = props.angle
     let margin = (width / 2) - cardSize * 0.6666666667 - width * 0.2
+    console.log(props.position)
 
     const style = {
         position:"absolute",
@@ -29,7 +31,29 @@ function Player(props) {
 }
 
 function play(card) {
-    console.log(card)
+
+
+
+    let req = {
+                cardAtHand:{type:Array, default:[]},
+                cardInPlay:{type:String, default:""},
+                cardPlayed:{type:Array, default:[]},
+                noOfCardsInMarket:{type:Number, default:0},
+                noOfCardsWithOpponent:{type:Number, default:0},
+                availableMove:{type:Array, default:[]},
+                rules: {"holdOn":{"active":true, "card":1, "defend":false},
+                        "pickTwo":{"active":true, "card":2, "defend":false},
+                        "pickThree":{"active":true, "card":5, "defend":false}, 
+                        "suspension":{"active":true, "card":8, "defend":false},
+                        "generalMarket":{"active":true, "card":14, "defend":false}
+                    }
+    
+            }
+
+    axios.post("/api/play/",{agentName:"Jee", cardAtHand:[]}).then((response)=>{
+        console.log(response)
+    })
+    //console.log(card)
 }
 
 function displayCards(cards, cardSize) {
