@@ -1,6 +1,6 @@
 import Cards from "../../GameEnv/cards";
 import chooseCard from "../../GameLogic/chooseCard";
-import shuffle from "../../GameLogic/logics";
+import {shuffle} from "../../GameLogic/logics";
 
 var cards = Cards.cards
 cards.push("cover:20")
