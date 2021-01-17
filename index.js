@@ -1,16 +1,21 @@
 require("./configs/dbConnections")
 
 const express = require('express')
+const bodyParser = require('body-parser')
 
 const app = express()
 
 const agents = require("./models/agents")
 
 
-app.get('/play/:agent', (req, res) =>{
+//Here we are configuring express to use body-parser as middle-ware.
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-    let agentName = req.params.agent
+app.post('/api/play', (req, res) =>{
 
+    console.log(req.body)
+    /*
     agents.find({agentName: agentName}, (err, data)=>{
    
         if(err){
@@ -20,7 +25,7 @@ app.get('/play/:agent', (req, res) =>{
             
             res.send(data[0])
         }
-    })
+    })*/
 
 })
 
