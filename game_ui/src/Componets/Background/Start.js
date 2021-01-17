@@ -1,10 +1,11 @@
 import Cards from "../../GameEnv/cards";
 import chooseCard from "../../GameLogic/chooseCard";
+import shuffle from "../../GameLogic/logics";
 
 var cards = Cards.cards
 cards.push("cover:20")
 
-function Start(props) {
+function Start() {
 
     let width = window.innerWidth
     let height = window.innerHeight
@@ -33,24 +34,6 @@ function Start(props) {
         )
 }
 
-function shuffle(array){
 
-    let currIndex = array.length
-
-    while (0 !== currIndex) {
-        
-        //pick an element not prevously selected
-        let randIndex = Math.floor(Math.random() * currIndex)
-        currIndex--
-
-        //swap it with the current element
-        let tempVal  = array[currIndex]
-        array[currIndex] = array[randIndex]
-        array[randIndex] = tempVal
-    
-    }
-
-    return array
-}
 
 export default Start
