@@ -2,7 +2,7 @@ import Cards from "../../GameEnv/cards";
 import chooseCard from "../../GameLogic/chooseCard";
 import {shuffle} from "../../GameLogic/logics";
 
-var cards = Cards.cards
+var cards = [...Cards.cards]
 cards.push("cover:20")
 
 function Start() {
@@ -12,7 +12,7 @@ function Start() {
 
     let area = width * height
 
-    let size = width / 10
+    let size = Math.sqrt(area/(2 * 57))
 
     let cardSize = size
 
