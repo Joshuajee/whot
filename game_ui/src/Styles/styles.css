@@ -46,6 +46,28 @@ body{
   margin-bottom: 1vh;
 }
 
+.leaderboard{
+  width: 80%;
+  max-width: 600px;
+  min-width: 300px;
+  margin-top: 10vh;
+  margin-bottom: 10vh;
+  background-color: darkgray;
+  height: 80vh;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-y: auto;
+}
+
+.agents{
+  color: white;
+  background-color: gold;
+  border-radius: 5%;
+  font-size: large;
+  border: gold;
+  margin-top: 1vh;
+}
+
 
 
 .start-page{
