@@ -1,29 +1,27 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faUserCircle } from '@fortawesome/free-solid-svg-icons'
 
+ 
 
 function Agent(props) {
 
     return(
-        <div>
+        <div className="agents">
 
-            <div className="">
-                <image src="" alt="agent profile" />
-            </div>
+            <table>
+                <tr>
+                    <td>
+                        <FontAwesomeIcon size="5x" color={"gray"} icon={faUserCircle} /> 
+                    </td>
 
-            <div>
-                Agents Name
-            </div>
-
-            <div>
-                Wins
-            </div>
-
-            <div>
-                Loss
-            </div>
-
-            <div>
-                points
-            </div>
+                    <td>
+                        Name {props.agentName} <br/>
+                        Wins  {props.wins} <br/>
+                        Loss {props.losses} <br/>
+                        points {parseFloat(props.points.toPrecision(6))} <br/>
+                    </td>
+                </tr>
+            </table>
 
         </div>
         )
