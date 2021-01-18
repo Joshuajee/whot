@@ -10,7 +10,7 @@ body{
   height: 50px;
   font-size: large;
   border: greenyellow;
-  margin-bottom: 4%;
+  margin-bottom: 1vh;
 }
 
 .btn-options{
@@ -21,7 +21,7 @@ body{
   height: 50px;
   font-size: large;
   border: gold;
-  margin-bottom: 4%;
+  margin-bottom: 1vh;
 }
 
 .btn-leader{
@@ -32,7 +32,7 @@ body{
   height: 50px;
   font-size: large;
   border:blue;
-  margin-bottom: 4%;
+  margin-bottom: 1vh;
 }
 
 .btn-settings{
@@ -43,7 +43,7 @@ body{
   height: 50px;
   font-size: large;
   border:blueviolet;
-  margin-bottom: 4%;
+  margin-bottom: 1vh;
 }
 
 
