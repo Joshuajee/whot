@@ -4,12 +4,19 @@ import Button from "../Componets/Button";
 
 function Home() {
 
+
+    let height = window.innerHeight * 0.25
+
+    const style = {
+        marginTop:height
+    }
+
     return(
         <center>
 
             <Start />
 
-            <div className="start-button">
+            <div style={style}>
 
                 <Button text={"Start Game"} link={"/game"} class={"btn-start"}/>
 
