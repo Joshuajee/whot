@@ -11,8 +11,6 @@ import Leaderboard from "./Routes/Leaderboard";
 import Settings from "./Routes/Settings";
 import GamePlay from "./Routes/GamePlay"
 
-//"heroku-postbuild": "NPM_CONFIG_PRODUCTION=true npm install --prefix game_ui && npm run build --prefix game_ui"
-
 
 const home =  () => <Home />
 const options =  () => <Options />
