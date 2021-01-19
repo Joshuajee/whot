@@ -8,7 +8,6 @@ function Player(props) {
     let cardSize = height/10
     let angle = props.angle
     let margin = (width / 2) - cardSize * 0.6666666667 - width * 0.2
-    console.log(props.position)
 
     const style = {
         position:"absolute",
@@ -50,10 +49,10 @@ function play(card) {
     
             }
 
-    axios.post("/api/play/",{agentName:"Jee", cardAtHand:[]}).then((response)=>{
-        console.log(response)
-    })
-    //console.log(card)
+    //axios.post("/api/play/",{agentName:"Jee", cardAtHand:[]}).then((response)=>{
+    //    console.log(response)
+    //})
+    console.log(card)
 }
 
 function displayCards(cards, cardSize) {
