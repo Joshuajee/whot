@@ -46,6 +46,18 @@ body{
   margin-bottom: 1vh;
 }
 
+
+.btn-play{
+  color: white;
+  background-color: rgb(47, 255, 210);
+  border-radius: 5%;
+  width: 100px;
+  height: 30px;
+  font-size: large;
+  border: rgb(47, 255, 210);
+  margin-bottom: 1vh;
+}
+
 .leaderboard{
   width: 80%;
   max-width: 600px;
@@ -56,7 +68,7 @@ body{
   height: 80vh;
   margin-left: auto;
   margin-right: auto;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .agents{
