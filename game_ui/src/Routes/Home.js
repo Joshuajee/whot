@@ -18,7 +18,7 @@ function Home() {
 
             <div style={style}>
 
-                <Button text={"Start Game"} link={"/game"} class={"btn-start"}/>
+                <Button text={"Play Game"} link={"/leaderboard"} class={"btn-start"}/>
 
                 <Button text={"Options"} link={"/options"}  class={"btn-options"}/>
 
