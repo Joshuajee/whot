@@ -42,18 +42,13 @@ class GameEngine{
 
         }
         
-        //save the agents to database when the game ends
+
         if(endGame){ 
             
             agent.points = agent.points + point
 
             if(win) agent.wins = agent.wins + 1
             else agent.losses = agent.losses + 1
-
-            //save agents experience
-            agent.save((err) => {
-                console.log(agent.agentName + err)
-            })
 
         }
 
@@ -145,6 +140,16 @@ class GameEngine{
             //penalise player two
             this.addReward(playerTwoAgent, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRound, playerTwoActions, true, false)
         
+            //save playerOneAgent experience
+            playerOneAgent.save((err) => {
+                console.log(playerOneAgent.agentName + err)
+            })
+
+            //save playerTwoAgent experience
+            playerTwoAgent.save((err) => {
+                console.log(playerTwoAgent.agentName + err)
+            })
+
         }else if(playerTwoNumber == 0){
 
             console.log("Player Two Win")
@@ -152,7 +157,17 @@ class GameEngine{
             this.addReward(playerOneAgent, -2 - 1 * playerOneNumber / 10,  this.playerOneStateRound, playerOneActions, true, false)
             //reward player two
             this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions, true, true)
-        
+            
+            //save playerOneAgent experience
+            playerOneAgent.save((err) => {
+                console.log(playerOneAgent.agentName + err)
+            })
+
+            //save playerTwoAgent experience
+            playerTwoAgent.save((err) => {
+                console.log(playerTwoAgent.agentName + err)
+            })
+
         }
 
         //empty the StateRound array after one round
