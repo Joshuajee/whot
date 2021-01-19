@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const app = express()
 
 const agents = require("./models/agents")
+const {GameStart, shuffle}  = require("./game_env/gameStart")
 
 
 //Here we are configuring express to use body-parser as middle-ware.
@@ -28,6 +29,36 @@ app.post('/api/play', (req, res) =>{
     })*/
 
 })
+
+
+
+//this route starts the game
+app.post('/api/game', (req, res) =>{
+
+    console.log(req.body)
+
+    new GameStart(req.body.agentsName, req.body.user, req.body.rules, false)
+
+    res.send(req.body)
+
+
+})
+
+//this route fetch the agents from leaderboard
+app.get('/api/leaderboard/:skip', (req, res) =>{
+
+    let skip = parseInt(req.params.skip)
+
+    console.log(skip)
+    agents.find().select("agentName wins losses points createdBy createdOn").sort("-points").limit(20).skip(skip)
+    .exec((error,response)=>{
+        console.log(response)
+        res.send(response)
+    })
+
+})
+
+
 
 
 app.get('/agents', (req, res) =>{
