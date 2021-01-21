@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 
 //schema for state as a subdocument of agent
 var stateSchema = new mongoose.Schema({ 
-
+    agentName:{type:String, default:"Guest"},
     cardAtHand:{type:Array, default:[]},
     cardInPlay:{type:String, default:""},
     cardPlayed:{type:Array, default:[]},
@@ -22,4 +22,6 @@ var stateSchema = new mongoose.Schema({
     }
 })
 
-module.exports =  stateSchema
+
+
+module.exports = mongoose.model("states", stateSchema) 

@@ -9,18 +9,21 @@ let rules = {"holdOn":{"active":true, "card":1, "defend":false},
                     } 
                     
 
-agents.find((err, data)=>{
+agents.find().select("agentName").exec((err, data)=>{
+
     if(err){
         console.log("Failed to retrieve data " + err)
 
     }else{
 
         let agentOrder = shuffle(data) 
+        let isPlayerOneHuman = false
+        let isPlayerTwoHuman = false
 
-
-            new GameStart(agentOrder[4], agentOrder[5], rules, true)
+        new GameStart(agentOrder[0].agentName, agentOrder[1].agentName, rules, isPlayerOneHuman, isPlayerTwoHuman)
 
     }
+
 })
 
 

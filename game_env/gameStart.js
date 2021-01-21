@@ -3,12 +3,10 @@ const {GamePlay, shuffle} = require("./gamePlay")
 
 class GameStart extends GamePlay{
 
-    constructor(agentOne, agentTwo, rules, agent){
+    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
 
-        super(agentOne, agentTwo, rules, agent)
+        super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
 
-        console.log(agentOne)
-        console.log(agentTwo)
     }
 
 }

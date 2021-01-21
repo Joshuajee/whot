@@ -37,7 +37,7 @@ app.post('/api/game', (req, res) =>{
 
     console.log(req.body)
 
-    new GameStart(req.body.agentsName, req.body.user, req.body.rules, false)
+    new GameStart(req.body.agentName, req.body.user, req.body.rules, false, false)
 
     res.send(req.body)
 
@@ -51,7 +51,7 @@ app.get('/api/leaderboard/:skip', (req, res) =>{
 
     console.log(skip)
     agents.find().select("agentName wins losses points createdBy createdOn").sort("-points").limit(20).skip(skip)
-    .exec((error,response)=>{
+    .exec((error, response)=>{
         console.log(response)
         res.send(response)
     })

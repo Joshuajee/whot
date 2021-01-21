@@ -2,60 +2,125 @@
  * Copyright (C) 2021 Joshua Evuetapha
  * Twitter : @evuetaphajoshua
  * Github : @Joshuajee
- * Instagram: @Joshua.jee
  * This program is distributed under the MIT license
  */
+
+const { EventEmitter } = require("events")
+const agents = require("../models/agents")
+const states = require("../models/states")
 
 
 require("../configs/dbConnections")
 
-class GameEngine{
+class GameEngine extends EventEmitter{
 
-    constructor(playerOne, playerTwo){
-
-        this.agentOneName = playerOne.agentName
-        this.agentTwoName = playerTwo.agentName      
+    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
         
-        this.playerOneStateRound = []
-        this.playerTwoStateRound = []
+        super()
+
+        console.log(playerOneName)
+        console.log(playerTwoName)
+
+        this.action = []
+            
+        this.playerOneStateRoundOld = []
+        this.playerTwoStateRoundOld = []
+
+        this.playerOneStateRoundNew = []
+        this.playerTwoStateRoundNew = []
+
+        this.playerStateOld = []
+        this.playerStateNew = []
+
         
         this.round = 1
+        
+        super.on("actionOutput", ()=>{
+
+            const state = {
+                            "agentName":this.playerName,
+                            "cardAtHand":this.cardAtHand, 
+                            "noOfCardsWithOpponent": this.noOfCardsWithOpponent,
+                            "cardInPlay":this.inPlayCards,
+                            "cardPlayed": this.cardPlayed, 
+                            "noOfCardsInMarket":this.noOfCardsInMarket,
+                            "availableMove":this.availableMove,
+                            "actions":this.actionOutput,
+                            "rules":this.rules
+                        }
+                    
+            this.action = [true, this.actionOutput]
+
+            console.log(this.eventString)
+
+            //add this state to the right player
+            if(this.playerName === playerOneName)
+                this.playerOneStateRoundNew.push(state)
+            else
+                this.playerTwoStateRoundNew.push(state)
+
+            super.emit(this.eventString)
+        })
+
+        super.on("action", () => {
+
+            for(let i = 0; i < this.states.length; i++){
+
+                //get an aggregated sum of similar actions
+                this.output = this.sumArray(this.output, this.states[i].actions)
+            }
+ 
+            //get arithmentic mean of all the state action
+            if(this.states.length > 0){
+                this.actionOutput = this.multiplyArray(this.output, (1/this.states.length))
+            }else{
+                this.actionOutput = this.output
+            }
+            
+            super.emit("actionOutput")
+
+        })
     
+
+        
     }
 
     get roundVal(){
         return this.round
     }
 
-    
-    addReward(agent, point, states, action, endGame=false, win=false){
+    get getAction(){
+        return this.action
+    }
+
+    addReward(point, statesOld, statesNew, actionsOld, actionsNew){
 
         //+-----------------------------------------------------------------+
         //|  This method is used to add rewards to the agent in question    |                                                   |    
         //+-----------------------------------------------------------------+
 
-        for(let i = 0; i < states.length; i++){
+        for(let i = 0; i < statesNew.length; i++){
 
-            states[i].actions[action[i][1]] = states[i].actions[action[i][1]] + point
-
-            agent.states.push(states[i])
+            statesNew[i].actions[actionsNew[i][1]] = statesNew[i].actions[actionsNew[i][1]] + point
+            this.playerStateNew.push(statesNew[i])
 
         }
+
+        for(let i = 0; i < statesOld.length; i++){
+
+            statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
+            this.playerStateOld.push(statesOld[i])
+
+        }
+
+        console.log(this.playerTwoStateOne)
+
+        console.log(this.playerTwoStateOld)
         
-
-        if(endGame){ 
-            
-            agent.points = agent.points + point
-
-            if(win) agent.wins = agent.wins + 1
-            else agent.losses = agent.losses + 1
-
-        }
-
     }
 
 
-    rewards(playerOneAgent, playerTwoAgent, playerOneCardAtHand, playerTwoCardAtHand, playerOneActions, playerTwoActions){
+    rewards(playerOneName, playerTwoName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActionsNew, playerOneActionsOld, playerTwoActionsNew, playerTwoActionsOld){
 
         //+---------------------------------------------------------------------------+
         //|  This method is called when the game ends it reward the agents according  |
@@ -113,19 +178,18 @@ class GameEngine{
             //penalise both agent
             if(this.playerOneNumber < this.playerTwoNumber){
                 // rewards when player one has fewer card number than player two
-                this.addReward(playerOneAgent, 5 - 1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
-                this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+                this.addReward(5 - 1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+                this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
             
             }else if(this.playerOneNumber > this.playerTwoNumber){
                 // rewards when player two has fewer card number than player one
-                this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
-                this.addReward(playerTwoAgent, 5 - 1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
-
-                
+                this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+                this.addReward(5 - 1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+       
             }else{
                 //rewards when player two has same card number as player one
-                this.addReward(playerOneAgent, -1 * playerOneNumber / 100, this.playerOneStateRound, playerOneActions)
-                this.addReward(playerTwoAgent, -1 * playerTwoNumber / 100, this.playerTwoStateRound, playerTwoActions)
+                this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+                this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
             }
 
@@ -136,163 +200,139 @@ class GameEngine{
 
             console.log("Player One Win")
             //reward player one
-            this.addReward(playerOneAgent, 5,  this.playerOneStateRound, playerOneActions, true, true)
+            this.addReward(playerOneName, 5, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
             //penalise player two
-            this.addReward(playerTwoAgent, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRound, playerTwoActions, true, false)
-        
-            //save playerOneAgent experience
-            playerOneAgent.save((err) => {
-                console.log(playerOneAgent.agentName + err)
-            })
+            this.addReward(playerTwoName, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
-            //save playerTwoAgent experience
-            playerTwoAgent.save((err) => {
-                console.log(playerTwoAgent.agentName + err)
-            })
+            //save the new states
+            states.insertMany(this.playerStateNew)
 
         }else if(playerTwoNumber == 0){
 
             console.log("Player Two Win")
             //penalise player one
-            this.addReward(playerOneAgent, -2 - 1 * playerOneNumber / 10,  this.playerOneStateRound, playerOneActions, true, false)
+            this.addReward(playerOneName, -2 - 1 * playerOneNumber / 10, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
             //reward player two
-            this.addReward(playerTwoAgent, 5, this.playerTwoStateRound, playerTwoActions, true, true)
+            this.addReward(playerTwoName, 5, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
             
-            //save playerOneAgent experience
-            playerOneAgent.save((err) => {
-                console.log(playerOneAgent.agentName + err)
-            })
-
-            //save playerTwoAgent experience
-            playerTwoAgent.save((err) => {
-                console.log(playerTwoAgent.agentName + err)
-            })
-
+            //save the new states
+            states.insertMany(this.playerStateNew)
+    
         }
 
         //empty the StateRound array after one round
-        this.playerOneStateRound = []
-        this.playerTwoStateRound = []
-       
+        this.playerOneStateRoundNew = []
+        this.playerOneStateRoundOld = []
+
+        this.playerTwoStateRoundNew = []
+        this.playerTwoStateRoundOld = []
+  
     }
     
 
-    stateFinder(playerAgent, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
+    stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString="received"){
 
         //+---------------------------------------------------------------------------+
         //|  This method finds all the relevant states an angent has                  |
         //+---------------------------------------------------------------------------+
 
-        this.cardAtHand = cardAtHand
+        this.playerName = playerName
 
-        this.player = playerAgent
+        //make sure action array is empty for every play
+        this.action = []
 
-        switch(this.player.states.length){
-            case 0:
-                return this.stateCreater(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
-            default:
-                return this.stateSearch(this.player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
-        }
+        let query = {
+                    "agentName":playerName,
+                    "cardAtHand":cardAtHand, 
+                    "noOfCardsWithOpponent": noOfCardsWithOpponent,
+                    "cardInPlay":inPlayCards,
+                    "cardPlayed": cardPlayed, 
+                    "noOfCardsInMarket":noOfCardsInMarket,
+                    "availableMove":availableMove,
+                    "rules":rules
+                }
 
+        console.log("search")
+        
+        states.find(query, (error, data) =>{
+
+
+            if(data.length === 0){
+
+                this.stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString)
+            
+            }else{
+
+                this.action = [false, data.action]
+
+                if(playerName === playerOneName)
+                    this.playerOneStateRoundOld.push(data)
+                else
+                    this.playerTwoStateRoundOld.push(data)
+                
+                super.emit(eventString)
+
+            }
+
+        })
 
     }
 
 
-    stateCreater(player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
+    stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString){
         
         //+---------------------------------------------------------------------------+
         //|  This method creates a state and save it to an angent in the database     |
         //|  it also save it to the correspondingn state array                        |
         //+---------------------------------------------------------------------------+
 
-        let actions = this.actionCreater(availableMove, player.states)
+        this.cardAtHand = cardAtHand
+        this.noOfCardsWithOpponent = noOfCardsWithOpponent
+        this.inPlayCards = inPlayCards
+        this.cardPlayed = cardPlayed
+        this.noOfCardsInMarket = noOfCardsInMarket
+        this.availableMove = availableMove
+        this.rules = rules
+        this.eventString = eventString
 
-        let currState = {"cardAtHand":cardAtHand, 
-                        "noOfCardsWithOpponent": noOfCardsWithOpponent,
-                        "cardInPlay":inPlayCards,
-                        "cardPlayed": cardPlayed, 
-                        "noOfCardsInMarket":noOfCardsInMarket,
-                        "availableMove":availableMove,
-                        "actions":actions,
-                        "rules":rules
-                    }
-                    
-
-        //add this state to the right player
-        if(this.agentOneName == player.agentName) this.playerOneStateRound.push(currState)
-        if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(currState)
-
-        //return the state action
-        return actions
-    }
-
-
-    stateSearch(player, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules){
+        this.actionCreater(availableMove, playerName)
         
-        //+---------------------------------------------------------------------------+
-        //|  This method search for existing states within an angent and returns      |
-        //|  it's action value if no state is found it returns the stateCreater       |
-        //|  method                                                                   |
-        //+---------------------------------------------------------------------------+
-
-            let states = player.states
-
-            let currentState = {
-                                "cardAtHand":cardAtHand, 
-                                "cardPlayed":cardPlayed,
-                                "availableMove":availableMove,
-                                "cardInPlay":inPlayCards,
-                                "noOfCardsInMarket":noOfCardsInMarket,
-                                "noOfCardsWithOpponent":noOfCardsWithOpponent                            
-                            }
-            
-            let state = this.findState(states, currentState)
-    
-            if(state){ 
-
-                //add to state
-                if(this.agentOneName == player.agentName) this.playerOneStateRound.push(state)
-                if(this.agentTwoName == player.agentName) this.playerTwoStateRound.push(state)
-
-                //return the action of the selected state
-                return state.actions
-            }
-
-
-        //create a new state if a state doesn't exist and return it's actions
-        return this.stateCreater(this.player, cardPlayed, cardAtHand, noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules)
-              
     }
 
 
-    actionCreater(availableMove, playerStates){
+
+    actionCreater(availableMove, playerName){
 
         //+---------------------------------------------------------------------------+
         //|  This method initialise actions for newly created states                  |
         //+---------------------------------------------------------------------------+
 
-        let states = this.filterState(playerStates, availableMove)
-
-        let output = []
-
+        let query = {
+            "agentName":playerName,
+            "availableMove":availableMove
+            }
+        
+        this.output = []
+        
         //set inital values of zeros for output
         for(let i = 0; i < availableMove.length; i++){
-            output.push(0)
+            this.output.push(0)
         }
 
-        //check if any state was fount if no state was found it returns actions of zeros
-        if(!states.length) return output
+        this.states = []
 
-        for(let i = 0; i < states.length; i++){
+        states.find(query, (error, data) =>{
 
-            //get an aggregated sum of similar actions
-            output = this.sumArray(output, states[i].actions)
+            this.states = data
+                       
+            super.emit('action')
 
-        }
- 
-        //return arithmentic mean of all the state action
-        return this.multiplyArray(output, (1/states.length))
+        })
+
+        
+        
     }
+
 
     sumArray(array1, array2){
 
