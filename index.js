@@ -15,7 +15,7 @@ const app = express()
 const agents = require("./models/agents")
 const states = require("./models/states")
 
-const {GameStart, shuffle}  = require("./game_env/gameStart")
+const {GamePlaying, shuffle}  = require("./game_env/gameStart")
 
 var gameStart
 
@@ -40,7 +40,7 @@ app.post('/api/play', (req, res) =>{
 app.post('/api/game', (req, res) =>{
 
 
-    gameStart = new GameStart(req.body.user, req.body.agentName, req.body.rules, false, false)
+    gameStart = new GamePlaying(req.body.user, req.body.agentName, req.body.rules, false, false)
 
     let response = gameStart.startGame()
 

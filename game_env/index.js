@@ -5,7 +5,7 @@
  * This program is distributed under the MIT license
  */
 
-const {GameStart, shuffle}  = require("./gameStart")
+const {GameTraining, shuffle}  = require("./gameStart")
 const agents = require("../models/agents")
 
 let rules = {"holdOn":{"active":true, "card":1, "defend":false},
@@ -27,7 +27,7 @@ agents.find().select("agentName").exec((err, data)=>{
         let isPlayerOneHuman = false
         let isPlayerTwoHuman = false
 
-        new GameStart(agentOrder[0].agentName, agentOrder[1].agentName, rules, isPlayerOneHuman, isPlayerTwoHuman).train()
+        new GameTraining(agentOrder[0].agentName, agentOrder[1].agentName, rules, isPlayerOneHuman, isPlayerTwoHuman).startGame()
 
     }
 

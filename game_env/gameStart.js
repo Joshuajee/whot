@@ -5,10 +5,12 @@
  * This program is distributed under the MIT license
  */
 
-const {GamePlay, shuffle} = require("./gamePlay")
+const {GameTrain, shuffle} = require("./gameTrain")
+const GamePlay = require("./gamePlay")
 
 
-class GameStart extends GamePlay{
+
+class GameTraining extends GameTrain{
 
     constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
 
@@ -19,4 +21,15 @@ class GameStart extends GamePlay{
 }
 
 
-module.exports = {GameStart, shuffle}
+class GamePlaying extends GamePlay{
+
+    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
+
+        super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
+
+    }
+
+}
+
+
+module.exports = {GameTraining, GamePlaying, shuffle}
