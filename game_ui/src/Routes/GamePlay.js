@@ -37,9 +37,12 @@ class GamePlay extends React.Component{
 
     componentDidMount(){
 
-        
+        let url = window.location.href 
+  
+        let index = url.indexOf("/:") + 2
+        let user = url.slice(index, url.length)
 
-        axios.post("/api/game", {"agentName":"Jee", "user":"Guest", rule:rules}).then((res)=>{
+        axios.post("/api/game", {"agentName":user, "user":"Guest", rule:rules}).then((res)=>{
             console.log(res)  
             this.setState({
                 isLoading:false,
@@ -54,13 +57,15 @@ class GamePlay extends React.Component{
 
     playCard(card) {
 
-        if(canPlay(card, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])){
+        let playGame = canPlay(card, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
+
+        if(playGame[0]){
 
             this.setState({
                 opponetIsPlaying:true
             })
 
-            axios.post("/api/play", {"gameState":this.state.gameState, "cardPlayed":card, rule:rules}).then((res)=>{
+            axios.post("/api/play", {"gameState":this.state.gameState, "playerMove":card, "need":playGame[1], rules:rules}).then((res)=>{
                 
                 console.log(res)  
 

@@ -20,7 +20,7 @@ function Agent(props) {
                         Wins  {props.wins} <br/>
                         Loss {props.losses} <br/>
                         points {parseFloat(props.points.toPrecision(6))} <br/>
-                        <Button text={"Play Agent"}  class={"btn-play"} link="/game" />
+                        <Button text={"Play Agent"}  class={"btn-play"} link={"/game/:" + props.agentName} />
     
                     </td>
                 </tr>

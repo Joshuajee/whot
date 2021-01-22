@@ -44,11 +44,11 @@ export function referee(card, rules, opponentsCardAtHand){
     let index = card.indexOf(":") + 1
     let number = card.slice(index, card.length)
 
-    if(rules.holdOn.active && number == rules.holdOn.card){
+    if(rules.holdOn.active && number === rules.holdOn.card){
 
         console.log("hold On")
        
-    }else if(rules.pickTwo.active && number == rules.pickTwo.card){
+    }else if(rules.pickTwo.active && number === rules.pickTwo.card){
 
         console.log("pick 2")
 
@@ -56,7 +56,7 @@ export function referee(card, rules, opponentsCardAtHand){
 
         goMarket(opponentsCardAtHand, 2)
 
-    }else if(rules.pickThree.active && number == rules.pickThree.card){
+    }else if(rules.pickThree.active && number === rules.pickThree.card){
 
         console.log("pick 3")
 
@@ -66,11 +66,11 @@ export function referee(card, rules, opponentsCardAtHand){
 
 
 
-    }else if(rules.suspension.active && number == rules.suspension.card){
+    }else if(rules.suspension.active && number === rules.suspension.card){
 
         console.log("suspension")
 
-    }else if(rules.generalMarket.active && number == rules.generalMarket.card){
+    }else if(rules.generalMarket.active && number === rules.generalMarket.card){
 
         console.log("general market")
 
@@ -79,7 +79,7 @@ export function referee(card, rules, opponentsCardAtHand){
         goMarket(opponentsCardAtHand)
 
    
-    }else if(number == 20){
+    }else if(number === 20){
 
         let need = true
 
@@ -92,16 +92,18 @@ export function referee(card, rules, opponentsCardAtHand){
 export function canPlay(card, inPlay) {
 
     let index = card.indexOf(":") + 1
-    let number = card.slice(index, card.length)
+    let number = parseInt(card.slice(index, card.length))
     let shape = card.slice(0, index)
 
     let index_in = inPlay.indexOf(":") + 1
-    let number_in = inPlay.slice(index_in, inPlay.length)
+    let number_in = parseInt(inPlay.slice(index_in, inPlay.length))
     let shape_in = inPlay.slice(0, index_in)
-    
-    if(number == number_in || shape == shape_in || number == 20) return true
 
-    return false
+    if(number === 20) return [true, true]
+    
+    if(number === number_in || shape === shape_in) return [true, false]
+
+    return [false, false]
 
 }
 
