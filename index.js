@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * This program is distributed under the MIT license
+ */
+
 require("./configs/dbConnections")
 
 const express = require('express')
@@ -6,7 +13,11 @@ const bodyParser = require('body-parser')
 const app = express()
 
 const agents = require("./models/agents")
+const states = require("./models/states")
+
 const {GameStart, shuffle}  = require("./game_env/gameStart")
+
+var gameStart
 
 
 //Here we are configuring express to use body-parser as middle-ware.
@@ -16,17 +27,10 @@ app.use(bodyParser.json());
 app.post('/api/play', (req, res) =>{
 
     console.log(req.body)
-    /*
-    agents.find({agentName: agentName}, (err, data)=>{
-   
-        if(err){
-            res.json({"err":err})
-            console.log("Failed to retrieve data " + err)
-        }else{
-            
-            res.send(data[0])
-        }
-    })*/
+
+    let response = gameStart.humanPlay(req.body)
+
+    res.send(response)
 
 })
 
@@ -35,11 +39,14 @@ app.post('/api/play', (req, res) =>{
 //this route starts the game
 app.post('/api/game', (req, res) =>{
 
-    console.log(req.body)
 
-    new GameStart(req.body.agentName, req.body.user, req.body.rules, false, false)
+    gameStart = new GameStart(req.body.user, req.body.agentName, req.body.rules, false, false)
 
-    res.send(req.body)
+    let response = gameStart.startGame()
+
+    console.log(response)
+
+    res.send(response)
 
 
 })
