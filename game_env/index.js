@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * This program is distributed under the MIT license
+ */
+
 const {GameStart, shuffle}  = require("./gameStart")
 const agents = require("../models/agents")
 
@@ -20,10 +27,8 @@ agents.find().select("agentName").exec((err, data)=>{
         let isPlayerOneHuman = false
         let isPlayerTwoHuman = false
 
-        new GameStart(agentOrder[0].agentName, agentOrder[1].agentName, rules, isPlayerOneHuman, isPlayerTwoHuman)
+        new GameStart(agentOrder[0].agentName, agentOrder[1].agentName, rules, isPlayerOneHuman, isPlayerTwoHuman).train()
 
     }
 
 })
-
-

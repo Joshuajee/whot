@@ -111,11 +111,12 @@ class GameEngine extends EventEmitter{
             statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
             this.playerStateOld.push(statesOld[i])
 
+            console.log("DDDDDDDDDDDDDdddddddddddddddd")
+
         }
 
-        console.log(this.playerTwoStateOne)
 
-        console.log(this.playerTwoStateOld)
+        console.log(this.playerStateOld)
         
     }
 
@@ -205,7 +206,9 @@ class GameEngine extends EventEmitter{
             this.addReward(playerTwoName, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
             //save the new states
-            states.insertMany(this.playerStateNew)
+            states.insertMany(this.playerStateNew, (error)=>{
+                console.log("error: " + error)
+            })
 
         }else if(playerTwoNumber == 0){
 
@@ -216,7 +219,9 @@ class GameEngine extends EventEmitter{
             this.addReward(playerTwoName, 5, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
             
             //save the new states
-            states.insertMany(this.playerStateNew)
+            states.insertMany(this.playerStateNew, (error)=>{
+                console.log("error: " + error)
+            })
     
         }
 
@@ -264,7 +269,7 @@ class GameEngine extends EventEmitter{
             }else{
 
                 this.action = [false, data.action]
-
+                nnnnnnnnnnnnnnn
                 if(playerName === playerOneName)
                     this.playerOneStateRoundOld.push(data)
                 else
