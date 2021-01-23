@@ -41,10 +41,10 @@ export function goMarket(player,  market, times = 1){
 
 export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed){
 
-    let index = card.indexOf(":") + 1
-    let number = card.slice(index, card.length)
+    let index = card[0].indexOf(":") + 1
+    let number = card[0].slice(index, card[0].length)
 
-    playGame(playerCardAtHand, card[0], cardPlayed)
+    playGame(playerCardAtHand, card, cardPlayed)
 
     if(rules.holdOn.active && number === rules.holdOn.card){
 
@@ -129,7 +129,7 @@ export function playGame(player, card, cardPlayed){
         for(let i = 0; i < player.length; i++){
             if(player[i] === card[0]){
                 player.splice(i, 1)
-                this.need = false
+                need = false
             }
         }
 
@@ -178,7 +178,7 @@ export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCa
 
         //console.log(response[i])
         
-        referee(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed)
+        referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed)
         
     }
 

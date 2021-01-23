@@ -79,7 +79,7 @@ class GamePlay extends React.Component{
                 this.state.gameState.playerOne.cardAtHand.splice(index, 1)
                 this.state.gameState.cardPlayed.push(card)
                 console.log(request)
-                checkPlayResponse(response.length, response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
 
 
        
