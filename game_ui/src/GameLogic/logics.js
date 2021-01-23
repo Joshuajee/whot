@@ -39,10 +39,12 @@ export function goMarket(player,  market, times = 1){
 
 }
 
-export function referee(card, rules, opponentsCardAtHand){
+export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed){
 
     let index = card.indexOf(":") + 1
     let number = card.slice(index, card.length)
+
+    playGame(playerCardAtHand, card[0], cardPlayed)
 
     if(rules.holdOn.active && number === rules.holdOn.card){
 
@@ -89,6 +91,53 @@ export function referee(card, rules, opponentsCardAtHand){
 
 }
 
+export function playGame(player, card, cardPlayed){
+
+
+    //+---------------------------------------------------------------------------+
+    //|     This function takes in the player cards at hand an the action to be   |
+    //|     taken it takes it, if a card is played it adds it to gamePlayed and   |
+    //|     subracts it from the player card at hand                              |
+    //+---------------------------------------------------------------------------+
+    
+
+    let need = false
+
+    console.log("game played " + card[0])
+
+    if(card[0] === "z:goMarket"){
+
+        //goMarket(player)
+
+    }else if(!need){
+
+        cardPlayed.push(card[0])
+        alert(cardPlayed)
+
+        for(let i = 0; i < player.length; i++){
+            if(player[i] === card[0]){
+                player.splice(i, 1)
+                console.log(player)
+                need = false
+            }
+        }
+
+    }else if(need){
+
+        cardPlayed.push(card[0])
+
+        for(let i = 0; i < player.length; i++){
+            if(player[i] === card[0]){
+                player.splice(i, 1)
+                this.need = false
+            }
+        }
+
+    }
+
+}
+
+
 export function canPlay(card, inPlay) {
 
     let index = card.indexOf(":") + 1
@@ -120,5 +169,17 @@ export function checkGame(card, inPlay) {
     if(number === number_in || shape === shape_in || number === 20) return true
 
     return false
+
+}
+
+export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed){
+
+    for (let i = 0; i < response.length; i++) {
+
+        //console.log(response[i])
+        
+        referee(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed)
+        
+    }
 
 }

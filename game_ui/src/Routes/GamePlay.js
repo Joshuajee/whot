@@ -1,11 +1,12 @@
 import React from "react"
 import axios from "axios"
 
-import {canPlay} from  "../GameLogic/logics"
+import {canPlay, checkPlayResponse} from  "../GameLogic/logics"
 
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
 import Player from "../Componets/CardHolder/Player";
+
 
 
 
@@ -65,13 +66,23 @@ class GamePlay extends React.Component{
                 opponetIsPlaying:true
             })
 
-            axios.post("/api/play", {"gameState":this.state.gameState, "playerMove":card, "need":playGame[1], rules:rules}).then((res)=>{
+            let request = {"gameState":this.state.gameState, "playerMove":card, "need":playGame[1], rules:rules}
+    
+            axios.post("/api/play", request).then((res)=>{
                 
-                console.log(res)  
+                console.log(res.data)  
+
+                let response = res.data
+                
 
                 let index = this.state.gameState.playerOne.cardAtHand.indexOf(card)
                 this.state.gameState.playerOne.cardAtHand.splice(index, 1)
                 this.state.gameState.cardPlayed.push(card)
+                console.log(request)
+                checkPlayResponse(response.length, response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
+
+
+       
 
 
                 this.setState({

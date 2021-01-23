@@ -30,7 +30,13 @@ app.post('/api/play', (req, res) =>{
 
     let response = gameStart.humanPlay(req.body)
 
-    res.send(response)
+    gameStart.on("move-made", () => {
+        res.send(gameStart.move)
+    })
+
+    console.log(response)
+
+    return response
 
 })
 
