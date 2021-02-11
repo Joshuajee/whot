@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * This program is distributed under the MIT license
+ */
+
+
 import React from "react"
 import axios from "axios"
 
@@ -6,6 +14,8 @@ import {canPlay, checkPlayResponse} from  "../GameLogic/logics"
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
 import Player from "../Componets/CardHolder/Player";
+
+import Need from "../Componets/Need"
 
 
 
@@ -29,10 +39,13 @@ class GamePlay extends React.Component{
         this.state = {
             isLoading:true,
             opponetIsPlaying:true,
-            gameState:null
+            gameState:null,
+            isNeeded:false
         }
 
+         
         this.playCard = this.playCard.bind(this)
+        this.needed = this.needed.bind(this)
 
     }
 
@@ -45,14 +58,49 @@ class GamePlay extends React.Component{
 
         axios.post("/api/game", {"agentName":user, "user":"Guest", rule:rules}).then((res)=>{
             console.log(res)  
+
             this.setState({
                 isLoading:false,
                 opponetIsPlaying:false,
                 gameState:res.data
             })
+
         })
 
         
+
+    }
+
+    needed(card){
+
+        alert(card)
+
+        this.setState({
+            isNeeded : false
+        })
+
+
+        let request = {"gameState":this.state.gameState, "playerMove":"whot:20", "need":true, neededCard:card, rules:rules}
+    
+            axios.post("/api/play", request).then((res)=>{
+                
+                console.log(res.data)  
+
+                let response = res.data
+
+                let index = this.state.gameState.playerOne.cardAtHand.indexOf(card)
+                this.state.gameState.playerOne.cardAtHand.splice(index, 1)
+                this.state.gameState.cardPlayed.push(card)
+
+                console.log(request)
+
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
+
+                this.setState({
+                    opponetIsPlaying:false
+                })
+        
+            })
 
     }
 
@@ -60,7 +108,15 @@ class GamePlay extends React.Component{
 
         let playGame = canPlay(card, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
 
-        if(playGame[0]){
+        this.state.isNeeded = playGame[1]
+
+        if(playGame[0] && playGame[1]){
+
+            this.setState({
+                isNeeded : true
+            })
+
+        }else if(playGame[0]){
 
             this.setState({
                 opponetIsPlaying:true
@@ -80,9 +136,6 @@ class GamePlay extends React.Component{
                 this.state.gameState.cardPlayed.push(card)
                 console.log(request)
                 checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
-
-
-       
 
 
                 this.setState({
@@ -133,11 +186,24 @@ class GamePlay extends React.Component{
        
         }
 
+        if(this.state.isNeeded){
+           var gameObjects = <Need  height = {height} need={this.needed}/> 
+        }else{
+            var gameObjects = <div>
+                                   <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
+                                   <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
+                                   <InPlay className="center" cards={inPlay}/>
+                                   <Market />
+                             </div>
+        }
 
-        return(
+
+        return(<div>
+                
                 <center id="game-table" style={style} className="game-table">
                     {gameObjects}
                 </center>
+            </div>
             )
 
     }

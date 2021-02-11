@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * This program is distributed under the MIT license
+ */
+
+
 import Star from "../Shapes/Star"
 import Text from "../Shapes/Text";
 
@@ -65,12 +73,22 @@ function StarCard(props) {
         bottomStarNumberMarginTop = height * 0.295
     }
     
-
+    //fonts
     let fontSizeNumber = size / 5
     let fontSizeNumberStar = size / 10
 
+    //rotation
     let rotateY = width * 0.5
     let rotateZ = width * 0.8 
+
+    //card number
+    let number = parseInt(props.number)
+    let number_ = number * 2
+    if(props.need){ 
+        number = ""
+        number_ = ""
+    }
+        
  
 
     return(
@@ -80,7 +98,7 @@ function StarCard(props) {
                 x={0} y={0} z={0}
                 marginLeft={topNumberMarginLeft} 
                 marginTop={topNumberMarginTop} 
-                text={props.number}
+                text={number}
                 fontSize={fontSizeNumber} 
                 color={"brown"} />
 
@@ -100,7 +118,7 @@ function StarCard(props) {
                 x={0} y={0} z={0}
                 marginLeft={topStarNumberMarginLeft} 
                 marginTop={topStarNumberMarginTop} 
-                text={props.number * 2}
+                text={number_}
                 fontSize={fontSizeNumberStar} 
                 color={"white"} />
         
@@ -132,7 +150,7 @@ function StarCard(props) {
                 x={180} y={rotateY} z={rotateZ}
                 marginLeft={bottomNumberMarginLeft} 
                 marginTop={bottomNumberMarginTop} 
-                text={props.number}
+                text={number}
                 fontSize={fontSizeNumber} 
                 color={"brown"}/>
 
@@ -140,7 +158,7 @@ function StarCard(props) {
                 x={180} y={rotateY} z={rotateZ}
                 marginLeft={bottomStarNumberMarginLeft} 
                 marginTop={bottomStarNumberMarginTop} 
-                text={props.number * 2}
+                text={number_}
                 fontSize={fontSizeNumberStar} 
                 color={"white"}/>
 

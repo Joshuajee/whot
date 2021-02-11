@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * This program is distributed under the MIT license
+ */
+
+
 import Cards from "../../GameEnv/cards";
 import chooseCard from "../../GameLogic/chooseCard";
 import {shuffle} from "../../GameLogic/logics";

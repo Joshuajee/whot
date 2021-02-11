@@ -1,3 +1,12 @@
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * This program is distributed under the MIT license
+ */
+
+
+
 import React from "react"
 import Start from "../Componets/Background/Start";
 import Agent from "../Componets/Agent";
@@ -28,6 +37,7 @@ class Leaderboard extends React.Component {
     }
     
     render(){
+
         if(this.state.isLoading) return (<div>Loading</div>)
         let data = this.state.response
         let agents = []

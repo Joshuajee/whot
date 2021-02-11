@@ -1,3 +1,12 @@
+/*
+ * Copyright (C) 2021 Joshua Evuetapha
+ * Twitter : @evuetaphajoshua
+ * Github : @Joshuajee
+ * This program is distributed under the MIT license
+ */
+
+
+
 import SquareCard from "../Componets/Cards/SquareCard";
 import CircleCard from "../Componets/Cards/CircleCard";
 import CrossCard from "../Componets/Cards/CrossCard";
@@ -7,19 +16,17 @@ import WhotCard from "../Componets/Cards/WhotCard";
 import CardCover from "../Componets/Cards/CardCover";
 
 
-function chooseCard(card, cardSize){
+function chooseCard(card, cardSize, need=false){
 
     
-
-
     let index = card.indexOf(":")
-    let number = parseInt(card.slice(index + 1, card.length))
+    let number = card.slice(index + 1, card.length)
     let shape = card.slice(0, index)
 
     switch(shape){
 
         case "star":
-            return(<StarCard size={cardSize} number={number} />)
+            return(<StarCard size={cardSize} number={number} need={need} />)
         case "circle":
             return(<CircleCard size={cardSize} number={number} />)
         case "square":
