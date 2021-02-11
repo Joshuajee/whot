@@ -28,7 +28,7 @@ class GamePlay extends GameEngine{
 
             this.neededAction =  action[1]
 
-            this.neededCard = this.chooseAction(this.neededAction, this.needOption)
+            this.neededCard = this.chooseAction(action, this.needOption)
 
             console.log("needed card " + this.neededCard[0])
 
@@ -215,31 +215,30 @@ class GamePlay extends GameEngine{
 
         this.need = state.need
 
-        if(state.need){
+        this.neededCard = state.neededCard
 
-            /*
-            for(let i = 0; i < playerTwoCard.length; i++){
+        if(this.need){
 
-                let index_in = this.neededCard[0].indexOf(":") + 1
-                let shape_in = this.neededCard[0].slice(0, index_in)
+            for(let i = 0; i < this.playerTwoCard.length; i++){
 
-                let index = playerTwoCard[i].indexOf(":") + 1
-                let number = playerTwoCard[i].slice(index, playerTwoCard[i].length)
-                let shape = playerTwoCard[i].slice(0, index)
+                let index_in = this.neededCard.indexOf(":") + 1
+                let shape_in = this.neededCard.slice(0, index_in)
+
+                let index = this.playerTwoCard[i].indexOf(":") + 1
+                let number = this.playerTwoCard[i].slice(index, this.playerTwoCard[i].length)
+                let shape = this.playerTwoCard[i].slice(0, index)
                 
                 if(shape == shape_in){
                 
-                    availableMove.push(playerTwoCard[i])
+                    this.availableMove.push(this.playerTwoCard[i])
 
                 }else if(number == 20){
 
-                    availableMove.push("whot:20")
+                    this.availableMove.push("whot:20")
 
                 }
 
             }
-
-            */
             
         }else{
 
@@ -297,7 +296,7 @@ class GamePlay extends GameEngine{
         //|  or a random value of the maximums move if there is move than one maximum | 
         //+---------------------------------------------------------------------------+
 
-        let maxAction = Math.max(action)
+        let maxAction = Math.max(...action)
 
         let actionPicked = []
         let pickedAction = []
@@ -305,9 +304,9 @@ class GamePlay extends GameEngine{
         let maxFound = false
 
 
-        for(let i = 0; i < action.length; i++){
+        for(let i = 0; i < action[1].length; i++){
 
-            if(maxAction == action[i]){
+            if(maxAction === action[1][i]){
                 actionPicked.push([availableMove[i], i])
                 maxFound = true
             } 

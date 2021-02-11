@@ -47,7 +47,7 @@ class GameTrain extends GameEngine{
 
             this.neededAction =  action[1]
 
-            this.neededCard = this.chooseAction(this.neededAction, this.needOption)
+            this.neededCard = this.chooseAction(action, this.needOption)
 
 
             if(this.currentPlayerName == this.playerOneName){
@@ -331,15 +331,15 @@ class GameTrain extends GameEngine{
 
     chooseAction(action, availableMove){
 
-        ///suspected of having bugs
-
         //+---------------------------------------------------------------------------+
         //|  This method receive action a vector of numbers and the availableMoves,   |
         //|  and return the available move with highest corresponding action value    |
         //|  or a random value of the maximums move if there is move than one maximum | 
         //+---------------------------------------------------------------------------+
 
-        let maxAction = Math.max(action)
+
+        let maxAction = Math.max(...action[1])
+
 
         let actionPicked = []
         let pickedAction = []
@@ -347,9 +347,9 @@ class GameTrain extends GameEngine{
         let maxFound = false
 
 
-        for(let i = 0; i < action.length; i++){
+        for(let i = 0; i < action[1].length; i++){
 
-            if(maxAction == action[i]){
+            if(maxAction === action[1][i]){
                 actionPicked.push([availableMove[i], i])
                 maxFound = true
             } 
@@ -357,7 +357,8 @@ class GameTrain extends GameEngine{
             pickedAction.push([availableMove[i], i])
 
         }
-  
+
+        
         if(maxFound) return actionPicked[Math.floor(Math.random() * (actionPicked.length))]
 
         return pickedAction[Math.floor(Math.random() * (pickedAction.length))]
