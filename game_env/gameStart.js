@@ -26,8 +26,11 @@ class GamePlaying extends GamePlay{
     constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
 
         super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
-
+        
     }
+
+ 
+
 
 }
 

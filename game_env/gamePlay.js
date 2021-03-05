@@ -34,7 +34,9 @@ class GamePlay extends GameEngine{
 
             this.moves.push(this.need)
 
-            super.emit("move-made")
+            //super.emit("move-made", this.moves, this.res)
+
+            this.res.send(this.moves)
 
             this.close()
 
@@ -54,7 +56,6 @@ class GamePlay extends GameEngine{
     get move(){
         return this.moves
     }
-
 
     startGame(){
 
@@ -100,11 +101,13 @@ class GamePlay extends GameEngine{
         return state
     }
 
-    humanPlay(state){
+    humanPlay(state, res){
 
         this.state = state
 
         this.moves = []
+
+        this.res = res
 
         this.play(state)
 
@@ -129,6 +132,7 @@ class GamePlay extends GameEngine{
         this.playGame(playerTwoCard, card)
 
         this.moves.push(card)
+
 
         if(rules.holdOn.active && number == rules.holdOn.card){
 
@@ -175,8 +179,8 @@ class GamePlay extends GameEngine{
 
             console.log(playerTwoCard)
 
-            super.emit("move-made")
-
+            //super.emit("move-made", this.moves, this.res)
+            this.res.send(this.moves)
         }
 
         console.log(playerTwoCard)
@@ -273,6 +277,8 @@ class GamePlay extends GameEngine{
             console.log(" in play " + this.inPlay[this.inPlay.length - 1])
             //this.goMarket(playerTwoCard) 
             this.moves.push(["z:goMarket"])
+
+            this.res.send(this.moves)
 
         }else{
             //search for states

@@ -33,4 +33,4 @@ var stateSchema = new mongoose.Schema({
 
 
 
-module.exports = mongoose.model("states", stateSchema) 
+module.exports =  mongoose.model("states", stateSchema) 

@@ -18,6 +18,8 @@ class GameEngine extends EventEmitter{
         
         super()
 
+
+
         console.log(playerOneName)
         console.log(playerTwoName)
 
@@ -31,6 +33,9 @@ class GameEngine extends EventEmitter{
 
         this.playerStateOld = []
         this.playerStateNew = []
+
+        this.playerOnePoints = 0
+        this.playerTwoPoints = 0
 
         
         this.round = 1
@@ -51,8 +56,6 @@ class GameEngine extends EventEmitter{
                     
             this.action = [true, this.actionOutput]
 
-            console.log(this.eventString)
-
             //add this state to the right player
             if(this.playerName === playerOneName)
                 this.playerOneStateRoundNew.push(state)
@@ -60,6 +63,7 @@ class GameEngine extends EventEmitter{
                 this.playerTwoStateRoundNew.push(state)
 
             super.emit(this.eventString)
+
         })
 
         super.on("action", () => {
@@ -68,13 +72,18 @@ class GameEngine extends EventEmitter{
 
                 //get an aggregated sum of similar actions
                 this.output = this.sumArray(this.output, this.states[i].actions)
+            
             }
  
             //get arithmentic mean of all the state action
             if(this.states.length > 0){
+
                 this.actionOutput = this.multiplyArray(this.output, (1/this.states.length))
+           
             }else{
+
                 this.actionOutput = this.output
+            
             }
             
             super.emit("actionOutput")
@@ -93,10 +102,19 @@ class GameEngine extends EventEmitter{
         return this.action
     }
 
+
+    updatePlayer(winnerName, losserName, winnerPoints, losserPoints){
+
+        agents.updateOne({agentName:winnerName})
+
+        agents.updateOne({agentName:losserName})
+
+    }
+
     addReward(point, statesOld, statesNew, actionsOld, actionsNew){
 
         //+-----------------------------------------------------------------+
-        //|  This method is used to add rewards to the agent in question    |                                                   |    
+        //|   This method is used to add rewards to the agent in question   |                                                   |    
         //+-----------------------------------------------------------------+
 
         for(let i = 0; i < statesNew.length; i++){
@@ -111,13 +129,8 @@ class GameEngine extends EventEmitter{
             statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
             this.playerStateOld.push(statesOld[i])
 
-            console.log("DDDDDDDDDDDDDdddddddddddddddd")
-
         }
 
-
-        console.log(this.playerStateOld)
-        
     }
 
 
@@ -145,9 +158,13 @@ class GameEngine extends EventEmitter{
                 let shape_in = playerOneCardAtHand[i].slice(0, index_in)
 
                 if(shape_in == "star"){
+
                     playerOneNumber += number_in * 2
+
                 }else{
+
                     playerOneNumber += number_in 
+
                 }
                 
             }
@@ -166,38 +183,69 @@ class GameEngine extends EventEmitter{
                 let shape_in = playerTwoCardAtHand[i].slice(0, index_in)
 
                 if(shape_in == "star"){
+
                     playerTwoNumber += number_in * 2
+
                 }else{
+
                     playerTwoNumber += number_in 
+
                 }
                 
             }
             
         }
 
-        if(playerOneNumber != 0 || playerTwoNumber != 0){
+        if(playerOneNumber !== 0 || playerTwoNumber !== 0){
+
             //penalise both agent
             if(this.playerOneNumber < this.playerTwoNumber){
+
                 // rewards when player one has fewer card number than player two
                 this.addReward(5 - 1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
-            
+
+                //save the new states
+                states.insertMany(this.playerStateNew, (error)=>{
+                    console.log("error: " + error)
+                })
+
+                this.playerOnePoints += 5 - 1 * playerOneNumber / 100
+                this.playerTwoPoints += -1 * playerTwoNumber / 100
+
             }else if(this.playerOneNumber > this.playerTwoNumber){
+
                 // rewards when player two has fewer card number than player one
                 this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(5 - 1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
-       
+
+                //save the new states
+                states.insertMany(this.playerStateNew, (error)=>{
+                    console.log("error: " + error)
+                })
+
+                this.playerOnePoints += -1 * playerOneNumber / 100
+                this.playerTwoPoints += 5 -1 * playerTwoNumber / 100
+
             }else{
+
                 //rewards when player two has same card number as player one
                 this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
+                //save the new states
+                states.insertMany(this.playerStateNew, (error)=>{
+                    console.log("error: " + error)
+                })
+
+                this.playerOnePoints += -1 * playerOneNumber / 100
+                this.playerTwoPoints += -1 * playerTwoNumber / 100
+
             }
+        
+        }
 
-
-         }
-
-        if(playerOneNumber == 0){
+        if(playerOneNumber === 0){
 
             console.log("Player One Win")
             //reward player one
@@ -210,7 +258,9 @@ class GameEngine extends EventEmitter{
                 console.log("error: " + error)
             })
 
-        }else if(playerTwoNumber == 0){
+            this.updatePlayer(playerOneName, playerTwoName, 5, -2 - 1 * playerTwoNumber / 10)
+
+        }else if(playerTwoNumber === 0){
 
             console.log("Player Two Win")
             //penalise player one
@@ -222,24 +272,31 @@ class GameEngine extends EventEmitter{
             states.insertMany(this.playerStateNew, (error)=>{
                 console.log("error: " + error)
             })
+
+            this.updatePlayer(playerOneName, playerTwoName, -2 - 1 * playerOneNumber / 10, 5)
+
     
         }
 
         //empty the StateRound array after one round
+
         this.playerOneStateRoundNew = []
         this.playerOneStateRoundOld = []
 
         this.playerTwoStateRoundNew = []
         this.playerTwoStateRoundOld = []
+
+        this.playerStateNew = []
+        this.playerStateOld = []
   
     }
     
 
     stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString="received"){
 
-        //+---------------------------------------------------------------------------+
+        //+---------------------------------------------------------------------+
         //|  This method finds all the relevant states an angent has                  |
-        //+---------------------------------------------------------------------------+
+        //+---------------------------------------------------------------------+
 
         this.playerName = playerName
 
@@ -261,7 +318,6 @@ class GameEngine extends EventEmitter{
         
         states.find(query, (error, data) =>{
 
-
             if(data.length === 0){
 
                 this.stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString)
@@ -269,7 +325,7 @@ class GameEngine extends EventEmitter{
             }else{
 
                 this.action = [false, data.action]
-                nnnnnnnnnnnnnnn
+    
                 if(playerName === playerOneName)
                     this.playerOneStateRoundOld.push(data)
                 else
@@ -420,7 +476,7 @@ function compareArray(array1, array2){
     //+---------------------------------------------------------------------------+
     //|    This function compares two one dimensional arrays and return true if   |
     //|    they are thesame else false it takes an arrays as the first and        |
-    //|    second argument  |                                                     |
+    //|    second argument                                                        |
     //+---------------------------------------------------------------------------+ 
 
     if(array1.length == array2.length){

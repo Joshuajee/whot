@@ -73,8 +73,6 @@ class GamePlay extends React.Component{
 
     needed(card){
 
-        alert(card)
-
         this.setState({
             isNeeded : false
         })
@@ -88,9 +86,9 @@ class GamePlay extends React.Component{
 
                 let response = res.data
 
-                let index = this.state.gameState.playerOne.cardAtHand.indexOf(card)
+                let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
                 this.state.gameState.playerOne.cardAtHand.splice(index, 1)
-                this.state.gameState.cardPlayed.push(card)
+                this.state.gameState.cardPlayed.push("whot:20")
 
                 console.log(request)
 
@@ -126,26 +124,24 @@ class GamePlay extends React.Component{
     
             axios.post("/api/play", request).then((res)=>{
                 
-                console.log(res.data)  
-
                 let response = res.data
                 
-
                 let index = this.state.gameState.playerOne.cardAtHand.indexOf(card)
                 this.state.gameState.playerOne.cardAtHand.splice(index, 1)
                 this.state.gameState.cardPlayed.push(card)
-                console.log(request)
+ 
                 checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
-
 
                 this.setState({
                     opponetIsPlaying:false
                 })
-        
+                
             })
 
         }else{
+
             alert("illegal move")
+
         }
         
       

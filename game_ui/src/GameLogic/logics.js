@@ -121,7 +121,7 @@ export function playGame(player, card, cardPlayed){
     }else if(!need){
 
         cardPlayed.push(card[0])
-        alert(cardPlayed)
+        //alert(cardPlayed)
 
         for(let i = 0; i < player.length; i++){
             if(player[i] === card[0]){
