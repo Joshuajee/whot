@@ -32,9 +32,7 @@ class GamePlay extends GameEngine{
 
             console.log("needed card " + this.neededCard[0])
 
-            this.moves.push(this.need)
-
-            //super.emit("move-made", this.moves, this.res)
+            this.moves.push(this.neededCard)
 
             this.res.send(this.moves)
 
@@ -108,6 +106,8 @@ class GamePlay extends GameEngine{
         this.moves = []
 
         this.res = res
+
+        
 
         this.play(state)
 

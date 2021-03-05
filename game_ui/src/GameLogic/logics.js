@@ -9,6 +9,12 @@
 
 export function shuffle(array){
 
+    //+----------------------------------------------------------------+
+    //|                This Function shuffles the card                 |
+    //+----------------------------------------------------------------+
+     
+
+
     let currIndex = array.length
 
     while (0 !== currIndex) {
@@ -30,7 +36,7 @@ export function shuffle(array){
 export function goMarket(player,  market, times = 1){
 
     //+---------------------------------------------------------------------------+
-    //|      This method adds card to player and remove that same card from       |  
+    //|      This function adds card to player and remove that same card from     |  
     //|      market for n number of times                                         |
     //+---------------------------------------------------------------------------+
 
@@ -51,7 +57,7 @@ export function goMarket(player,  market, times = 1){
 export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed){
 
     let index = card[0].indexOf(":") + 1
-    let number = card[0].slice(index, card[0].length)
+    let number = parseInt(card[0].slice(index, card[0].length))
 
     playGame(playerCardAtHand, card, cardPlayed)
 
@@ -96,6 +102,8 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
         let needOption = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
 
+        alert("yeah")
+
     }
 
 }
@@ -121,7 +129,7 @@ export function playGame(player, card, cardPlayed){
     }else if(!need){
 
         cardPlayed.push(card[0])
-        //alert(cardPlayed)
+
 
         for(let i = 0; i < player.length; i++){
             if(player[i] === card[0]){
@@ -147,7 +155,7 @@ export function playGame(player, card, cardPlayed){
 }
 
 
-export function canPlay(card, inPlay) {
+export function canPlay(card, inPlay, need = false) {
 
     let index = card.indexOf(":") + 1
     let number = parseInt(card.slice(index, card.length))
@@ -159,7 +167,7 @@ export function canPlay(card, inPlay) {
 
     if(number === 20) return [true, true]
     
-    if(number === number_in || shape === shape_in) return [true, false]
+    if(number === number_in || shape === shape_in || need) return [true, false]
 
     return [false, false]
 
@@ -185,9 +193,9 @@ export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCa
 
     for (let i = 0; i < response.length; i++) {
 
-        //console.log(response[i])
-        
-        referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed)
+        alert(response[i])
+        if(response[i] !== "z:goMarket")
+            referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed)
         
     }
 

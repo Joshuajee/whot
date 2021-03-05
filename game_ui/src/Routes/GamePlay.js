@@ -40,7 +40,9 @@ class GamePlay extends React.Component{
             isLoading:true,
             opponetIsPlaying:true,
             gameState:null,
-            isNeeded:false
+            isNeeded:false,
+            needActive:false, 
+            neededCard: ""
         }
 
          
@@ -74,7 +76,7 @@ class GamePlay extends React.Component{
     needed(card){
 
         this.setState({
-            isNeeded : false
+            isNeeded:false
         })
 
 
@@ -82,7 +84,16 @@ class GamePlay extends React.Component{
     
             axios.post("/api/play", request).then((res)=>{
                 
-                console.log(res.data)  
+                console.log(res.data) 
+                
+                if(res.data[0][0] !== "z:goMarket"){
+
+                    this.setState({
+                        needActive:false,
+                        neededCard : card
+                    })
+
+                }
 
                 let response = res.data
 
@@ -92,7 +103,7 @@ class GamePlay extends React.Component{
 
                 console.log(request)
 
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive)
 
                 this.setState({
                     opponetIsPlaying:false
@@ -104,14 +115,16 @@ class GamePlay extends React.Component{
 
     playCard(card) {
 
-        let playGame = canPlay(card, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
+    
+        let playGame = canPlay(card, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1], this.state.needActive)
 
         this.state.isNeeded = playGame[1]
 
         if(playGame[0] && playGame[1]){
 
             this.setState({
-                isNeeded : true
+                isNeeded : true,
+                needActive : true
             })
 
         }else if(playGame[0]){
@@ -130,7 +143,7 @@ class GamePlay extends React.Component{
                 this.state.gameState.playerOne.cardAtHand.splice(index, 1)
                 this.state.gameState.cardPlayed.push(card)
  
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed)
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive)
 
                 this.setState({
                     opponetIsPlaying:false
