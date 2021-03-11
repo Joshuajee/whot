@@ -34,7 +34,7 @@ class Player extends React.Component {
 
         return(
             <div style={style} className="in-play">
-            {displayCards(this.props.cards, cardSize, this.props.action)}
+            {displayCards(this.props.cards.sort(), cardSize, this.props.action)}
             </div>
             )
     }
@@ -48,7 +48,7 @@ function displayCards(cards, cardSize, action) {
     let cardArray = []
 
     for(let i = 0; i < cards.length; i++){
-        cardArray.push(<span onClick = {() => action(cards[i])}> { chooseCard(cards[i], cardSize) } </span>)
+        cardArray.push(<span onClick = {() => action([cards[i], i])}> { chooseCard(cards[i], cardSize) } </span>)
     }
 
     return cardArray

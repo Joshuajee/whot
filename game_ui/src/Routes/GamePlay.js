@@ -9,7 +9,7 @@
 import React from "react"
 import axios from "axios"
 
-import {canPlay, checkPlayResponse} from  "../GameLogic/logics"
+import {canPlay, checkPlayResponse, referee} from  "../GameLogic/logics"
 
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
@@ -100,10 +100,9 @@ class GamePlay extends React.Component{
                 let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
                 this.state.gameState.playerOne.cardAtHand.splice(index, 1)
                 this.state.gameState.cardPlayed.push("whot:20")
-
-                console.log(request)
-
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive)
+            
+                //check the type of response gotten from server
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive, this.state.gameState.market)
 
                 this.setState({
                     opponetIsPlaying:false
@@ -116,9 +115,12 @@ class GamePlay extends React.Component{
     playCard(card) {
 
     
-        let playGame = canPlay(card, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1], this.state.needActive)
+        let playGame = canPlay(card[0], this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1], this.state.needActive)
 
-        this.state.isNeeded = playGame[1]
+        this.setState({
+            isNeeded : playGame[1],
+            needActive : playGame[1]
+        })
 
         if(playGame[0] && playGame[1]){
 
@@ -133,17 +135,20 @@ class GamePlay extends React.Component{
                 opponetIsPlaying:true
             })
 
-            let request = {"gameState":this.state.gameState, "playerMove":card, "need":playGame[1], rules:rules}
+            alert(card)
+            
+            
+            let request = {"gameState":this.state.gameState, "playerMove":card[0], "need":playGame[1], rules:rules}
     
             axios.post("/api/play", request).then((res)=>{
                 
                 let response = res.data
                 
-                let index = this.state.gameState.playerOne.cardAtHand.indexOf(card)
-                this.state.gameState.playerOne.cardAtHand.splice(index, 1)
-                this.state.gameState.cardPlayed.push(card)
- 
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive)
+                referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+
+
+                //check the type of response gotten from server
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive, this.state.gameState.market)
 
                 this.setState({
                     opponetIsPlaying:false
@@ -175,35 +180,40 @@ class GamePlay extends React.Component{
 
         let inPlay = this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1]
 
+        var gameObjects = null
+
         if(this.state.opponetIsPlaying){
 
-            var gameObjects = <div>
-                                    <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
-                                    <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
-                                    <InPlay className="center" cards={inPlay} />
-                                    <Market />
-                              </div>
+            gameObjects = <div>
+                            <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
+                            <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
+                            <InPlay className="center" cards={inPlay} />
+                            <Market />
+                          </div>
        
         }else{
             
-            var gameObjects = <div>
-                                   <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
-                                   <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
-                                   <InPlay className="center" cards={inPlay}/>
-                                   <Market />
-                             </div>
+            gameObjects = <div>
+                                <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
+                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
+                                <InPlay className="center" cards={inPlay}/>
+                                <Market />
+                           </div>
        
         }
 
         if(this.state.isNeeded){
-           var gameObjects = <Need  height = {height} need={this.needed}/> 
+
+            gameObjects = <Need  height = {height} need={this.needed}/> 
+
         }else{
-            var gameObjects = <div>
-                                   <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
-                                   <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
-                                   <InPlay className="center" cards={inPlay}/>
-                                   <Market />
-                             </div>
+
+            gameObjects = <div>
+                                <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
+                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
+                                <InPlay className="center" cards={inPlay}/>
+                                <Market />
+                          </div>
         }
 
 

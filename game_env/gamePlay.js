@@ -138,34 +138,39 @@ class GamePlay extends GameEngine{
 
             console.log("hold On")
 
-            this.play(this.state)
+            //this.play(this.state)
 
-            this.close()
+           //ythis.close()
+           this.res.send(this.moves)
             
           
         }else if(rules.pickTwo.active && number == rules.pickTwo.card){
 
             console.log("pick 2")
 
-            this.play(this.state)
+            //this.play(this.state)
+            this.res.send(this.moves)
 
         }else if(rules.pickThree.active && number == rules.pickThree.card){
 
             console.log("pick 3")
 
-            this.play(this.state)
+            //this.play(this.state)
+            this.res.send(this.moves)
 
         }else if(rules.suspension.active && number == rules.suspension.card){
 
             console.log("suspension")
 
-            this.play(this.state)
+            //this.play(this.state)
+            this.res.send(this.moves)
 
         }else if(rules.generalMarket.active && number == rules.generalMarket.card){
 
             console.log("general market")
 
-            this.play(this.state)
+            //this.play(this.state)
+            this.res.send(this.moves)
 
         }else if(number == 20){
 
@@ -276,7 +281,7 @@ class GamePlay extends GameEngine{
             console.log(this.playerTwoCard)
             console.log(" in play " + this.inPlay[this.inPlay.length - 1])
             //this.goMarket(playerTwoCard) 
-            this.moves.push(["z:goMarket"])
+            this.moves.push(["z:goMarket", -1])
 
             this.res.send(this.moves)
 

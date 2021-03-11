@@ -32,8 +32,6 @@ app.post('/api/play', (req, res) =>{
 
     gameStart.humanPlay(req.body, res)
 
-    
-
 })
 
 

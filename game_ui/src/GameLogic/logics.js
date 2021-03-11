@@ -54,8 +54,9 @@ export function goMarket(player,  market, times = 1){
 
 }
 
-export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed){
+export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
 
+ 
     let index = card[0].indexOf(":") + 1
     let number = parseInt(card[0].slice(index, card[0].length))
 
@@ -63,37 +64,35 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
     if(rules.holdOn.active && number === rules.holdOn.card){
 
-        console.log("hold On")
+        alert("hold On")
        
     }else if(rules.pickTwo.active && number === rules.pickTwo.card){
 
-        console.log("pick 2")
+        alert("pick 2")
 
-        checkGame()
+        
 
-        goMarket(opponentsCardAtHand, 2)
+        goMarket(opponentsCardAtHand, market, 2)
 
     }else if(rules.pickThree.active && number === rules.pickThree.card){
 
-        console.log("pick 3")
+        alert("pick 3")
 
-        checkGame()
-
-        goMarket(opponentsCardAtHand, 3)
+    
+        goMarket(opponentsCardAtHand, market, 3)
 
 
 
     }else if(rules.suspension.active && number === rules.suspension.card){
 
-        console.log("suspension")
+        alert("suspension")
 
     }else if(rules.generalMarket.active && number === rules.generalMarket.card){
 
-        console.log("general market")
+        alert("general market")
 
-        checkGame()
 
-        goMarket(opponentsCardAtHand)
+        goMarket(opponentsCardAtHand, market)
 
    
     }else if(number === 20){
@@ -120,11 +119,9 @@ export function playGame(player, card, cardPlayed){
 
     let need = false
 
-    console.log("game played " + card[0])
+    console.log("game played " + card)
 
     if(card[0] === "z:goMarket"){
-
-        //goMarket(player)
 
     }else if(!need){
 
@@ -189,14 +186,19 @@ export function checkGame(card, inPlay) {
 
 }
 
-export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed){
+export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, needActive, market){
 
     for (let i = 0; i < response.length; i++) {
 
-        alert(response[i])
-        if(response[i] !== "z:goMarket")
-            referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed)
-        
+        if(response[i][0] !== "z:goMarket")
+            referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
+        else{
+
+            goMarket(playerCardAtHand, market)
+
+        }
     }
 
 }
+
+
