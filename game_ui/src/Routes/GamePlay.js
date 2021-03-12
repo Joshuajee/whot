@@ -9,7 +9,7 @@
 import React from "react"
 import axios from "axios"
 
-import {canPlay, checkPlayResponse, referee} from  "../GameLogic/logics"
+import {canPlay, checkPlayResponse, referee, goMarket} from  "../GameLogic/logics"
 
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
@@ -114,51 +114,67 @@ class GamePlay extends React.Component{
 
     playCard(card) {
 
-    
-        let playGame = canPlay(card[0], this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1], this.state.needActive)
-
-        this.setState({
-            isNeeded : playGame[1],
-            needActive : playGame[1]
-        })
-
-        if(playGame[0] && playGame[1]){
-
-            this.setState({
-                isNeeded : true,
-                needActive : true
-            })
-
-        }else if(playGame[0]){
+        if(card === "z:goMarket"){
 
             this.setState({
                 opponetIsPlaying:true
             })
 
-            alert(card)
-            
-            
-            let request = {"gameState":this.state.gameState, "playerMove":card[0], "need":playGame[1], rules:rules}
-    
-            axios.post("/api/play", request).then((res)=>{
-                
-                let response = res.data
-                
-                referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+            goMarket(this.state.gameState.playerOne.cardAtHand, this.state.gameState.market)
 
-
-                //check the type of response gotten from server
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive, this.state.gameState.market)
-
-                this.setState({
-                    opponetIsPlaying:false
-                })
-                
+            this.setState({
+                opponetIsPlaying:false
             })
 
         }else{
 
-            alert("illegal move")
+    
+            let playGame = canPlay(card[0], this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1], this.state.needActive)
+
+            this.setState({
+                isNeeded : playGame[1],
+                needActive : playGame[1]
+            })
+
+            if(playGame[0] && playGame[1]){
+
+                this.setState({
+                    isNeeded : true,
+                    needActive : true
+                })
+
+            }else if(playGame[0]){
+
+                this.setState({
+                    opponetIsPlaying:true
+                })
+
+                alert(card)
+                
+                
+                let request = {"gameState":this.state.gameState, "playerMove":card[0], "need":playGame[1], rules:rules}
+        
+                axios.post("/api/play", request).then((res)=>{
+                    
+                    let response = res.data
+                    
+                    referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+
+
+                    //check the type of response gotten from server
+                    checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive, this.state.gameState.market)
+
+                    this.setState({
+                        opponetIsPlaying:false
+                    })
+                    
+                })
+            
+            }else{
+
+                alert("illegal move")
+    
+            }
 
         }
         
@@ -188,7 +204,7 @@ class GamePlay extends React.Component{
                             <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
                             <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
                             <InPlay className="center" cards={inPlay} />
-                            <Market />
+                            <Market action={this.playCard} />
                           </div>
        
         }else{
@@ -197,7 +213,7 @@ class GamePlay extends React.Component{
                                 <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
                                 <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
                                 <InPlay className="center" cards={inPlay}/>
-                                <Market />
+                                <Market action={this.playCard} />
                            </div>
        
         }
@@ -212,7 +228,7 @@ class GamePlay extends React.Component{
                                 <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
                                 <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
                                 <InPlay className="center" cards={inPlay}/>
-                                <Market />
+                                <Market action={this.playCard} />
                           </div>
         }
 

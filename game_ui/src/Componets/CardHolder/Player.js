@@ -8,12 +8,16 @@
 
 
 import React from "react"
-import chooseCard from "../../GameLogic/chooseCard";
+import chooseCard from "../../GameLogic/chooseCard"
+import LeftNav from "./LeftNav"
+import RightNav from "./RightNav"
 
 class Player extends React.Component {
 
     
     render(){
+
+        let top = this.props.top
 
         let width = window.innerWidth
         let height = window.innerHeight
@@ -23,7 +27,7 @@ class Player extends React.Component {
 
         const style = {
             position:"absolute",
-            top:height * this.props.top - cardSize,
+            top:height * top - cardSize,
             left: margin,
             align:"center",
             width: (width - margin * 2),
@@ -34,7 +38,7 @@ class Player extends React.Component {
 
         return(
             <div style={style} className="in-play">
-            {displayCards(this.props.cards.sort(), cardSize, this.props.action)}
+                <LeftNav top={top} /> {displayCards(this.props.cards.sort(), cardSize, this.props.action)}  <RightNav top={top} /> 
             </div>
             )
     }
