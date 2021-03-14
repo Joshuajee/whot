@@ -49,7 +49,7 @@ class Player extends React.Component {
         }
 
         const navStyle = {
-            height:cardSize*1.5 * 1.1
+            height:cardSize * 1.5 * 1.1
         }
 
         let left = null
@@ -83,9 +83,13 @@ class Player extends React.Component {
         return(
             <div style={style} className="player">
 
-                    {left}
-                    {this.displayCards(this.props.cards.sort(), cardSize, this.props.action, this.state.start)}  
-                    {right}
+                {left}
+                {this.displayCards(this.props.cards.sort(), cardSize, this.props.action, this.state.start)}  
+                {right}
+
+                <div className="card-number" style={{position:"relative", top:-1}}>
+                    {this.props.cards.length}
+                </div>
                 
             </div>
             )

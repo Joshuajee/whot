@@ -141,6 +141,11 @@ body{
   display: block;
 }
 
+.card-number{
+  color: whitesmoke;
+  background-color: blueviolet;
+  width: 10%;
+}
 
 @keyframes rotates {
     0%{

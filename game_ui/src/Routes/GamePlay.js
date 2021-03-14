@@ -148,9 +148,6 @@ class GamePlay extends React.Component{
                 this.setState({
                     opponetIsPlaying:true
                 })
-
-                alert(card)
-                
                 
                 let request = {"gameState":this.state.gameState, "playerMove":card[0], "need":playGame[1], rules:rules}
         
