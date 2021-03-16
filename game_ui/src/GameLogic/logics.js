@@ -109,42 +109,30 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
 export function playGame(player, card, cardPlayed){
 
-
     //+---------------------------------------------------------------------------+
     //|     This function takes in the player cards at hand an the action to be   |
     //|     taken it takes it, if a card is played it adds it to gamePlayed and   |
     //|     subracts it from the player card at hand                              |
     //+---------------------------------------------------------------------------+
     
-
-    let need = false
-
     console.log("game played " + card)
 
+    //if player goes to market
     if(card[0] === "z:goMarket"){
 
-    }else if(!need){
+    }else{
 
         cardPlayed.push(card[0])
 
-
         for(let i = 0; i < player.length; i++){
+
             if(player[i] === card[0]){
+
                 player.splice(i, 1)
                 console.log(player)
-                need = false
+
             }
-        }
-
-    }else if(need){
-
-        cardPlayed.push(card[0])
-
-        for(let i = 0; i < player.length; i++){
-            if(player[i] === card[0]){
-                player.splice(i, 1)
-                need = false
-            }
+            
         }
 
     }
@@ -166,7 +154,7 @@ export function canPlay(card, inPlay, need = false) {
     
     if(number === number_in || shape === shape_in || need) return [true, false]
 
-    return [false, false]
+    return false
 
 }
 
@@ -186,13 +174,15 @@ export function checkGame(card, inPlay) {
 
 }
 
-export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, needActive, market){
+export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
 
     for (let i = 0; i < response.length; i++) {
 
-        if(response[i][0] !== "z:goMarket")
+        if(response[i][0] !== "z:goMarket"){
+
             referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
-        else{
+        
+        }else{
 
             goMarket(playerCardAtHand, market)
 

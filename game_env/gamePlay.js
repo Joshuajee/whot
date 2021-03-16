@@ -108,7 +108,8 @@ class GamePlay extends GameEngine{
         this.res = res
 
         
-
+        console.log(state)
+        
         this.play(state)
 
 

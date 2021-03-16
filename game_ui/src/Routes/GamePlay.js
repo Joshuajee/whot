@@ -41,8 +41,6 @@ class GamePlay extends React.Component{
             opponetIsPlaying:true,
             gameState:null,
             isNeeded:false,
-            needActive:false, 
-            neededCard: ""
         }
 
          
@@ -76,11 +74,13 @@ class GamePlay extends React.Component{
     needed(card){
 
         this.setState({
+            
             isNeeded:false
+
         })
 
 
-        let request = {"gameState":this.state.gameState, "playerMove":"whot:20", "need":true, neededCard:card, rules:rules}
+        let request = {"gameState":this.state.gameState, "playerMove":card, rules:rules}
     
             axios.post("/api/play", request).then((res)=>{
                 
@@ -89,8 +89,9 @@ class GamePlay extends React.Component{
                 if(res.data[0][0] !== "z:goMarket"){
 
                     this.setState({
+
                         needActive:false,
-                        neededCard : card
+
                     })
 
                 }
@@ -99,13 +100,15 @@ class GamePlay extends React.Component{
 
                 let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
                 this.state.gameState.playerOne.cardAtHand.splice(index, 1)
-                this.state.gameState.cardPlayed.push("whot:20")
+                this.state.gameState.cardPlayed.push(card)
             
                 //check the type of response gotten from server
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive, this.state.gameState.market)
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
                 this.setState({
+
                     opponetIsPlaying:false
+
                 })
         
             })
@@ -117,55 +120,82 @@ class GamePlay extends React.Component{
         if(card === "z:goMarket"){
 
             this.setState({
+
                 opponetIsPlaying:true
+
             })
 
             goMarket(this.state.gameState.playerOne.cardAtHand, this.state.gameState.market)
 
             this.setState({
+
                 opponetIsPlaying:false
+
             })
 
-        }else{
-
-    
-            let playGame = canPlay(card[0], this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1], this.state.needActive)
-
-            this.setState({
-                isNeeded : playGame[1],
-                needActive : playGame[1]
-            })
-
-            if(playGame[0] && playGame[1]){
-
-                this.setState({
-                    isNeeded : true,
-                    needActive : true
-                })
-
-            }else if(playGame[0]){
-
-                this.setState({
-                    opponetIsPlaying:true
-                })
-                
-                let request = {"gameState":this.state.gameState, "playerMove":card[0], "need":playGame[1], rules:rules}
+            let request = {"gameState":this.state.gameState, "playerMove":"z:goMarket", rules:rules}
         
                 axios.post("/api/play", request).then((res)=>{
                     
                     let response = res.data
                     
-                    referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
-
+                    referee([card, this.state.gameState.playerOne.cardAtHand + 1], rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
                     //check the type of response gotten from server
-                    checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.needActive, this.state.gameState.market)
+                    checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
                     this.setState({
+
                         opponetIsPlaying:false
+
                     })
                     
                 })
+
+        }else{
+
+    
+            let playGame = canPlay(card[0], this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
+
+            this.setState({
+
+                isNeeded : playGame[1],
+
+            })
+
+            if(playGame[0]){
+
+                if(playGame[1]){
+
+                    this.setState({
+
+                        isNeeded : true,
+
+                    })
+
+                }else{
+            
+
+                    let request = {"gameState":this.state.gameState, "playerMove":card[0], rules:rules}
+                
+                    axios.post("/api/play", request).then((res)=>{
+                        
+                        let response = res.data
+                        
+                        referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+
+                        //check the type of response gotten from server
+                        checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market)
+
+                        this.setState({
+
+                            opponetIsPlaying:false
+                            
+                        })
+                        
+                    })
+
+                }
             
             }else{
 
