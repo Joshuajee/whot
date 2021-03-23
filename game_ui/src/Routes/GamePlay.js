@@ -16,6 +16,7 @@ import Market from "../Componets/CardHolder/Market";
 import Player from "../Componets/CardHolder/Player";
 
 import Need from "../Componets/Need"
+import Loader from "../Componets/Loader"
 
 
 
@@ -75,9 +76,11 @@ class GamePlay extends React.Component{
 
         this.setState({
             
-            isNeeded:false
+            isNeeded:false,
+            isLoading:true
 
         })
+
 
 
         let request = {"gameState":this.state.gameState, "playerMove":card, rules:rules}
@@ -85,16 +88,6 @@ class GamePlay extends React.Component{
             axios.post("/api/play", request).then((res)=>{
                 
                 console.log(res.data) 
-                
-                if(res.data[0][0] !== "z:goMarket"){
-
-                    this.setState({
-
-                        needActive:false,
-
-                    })
-
-                }
 
                 let response = res.data
 
@@ -107,7 +100,8 @@ class GamePlay extends React.Component{
 
                 this.setState({
 
-                    opponetIsPlaying:false
+                    opponetIsPlaying:false,
+                    isLoading :false
 
                 })
         
@@ -117,21 +111,24 @@ class GamePlay extends React.Component{
 
     playCard(card) {
 
+        this.setState({ isLoading:true })
+
         
 
         if(card === "z:goMarket"){
 
             this.setState({
 
-                opponetIsPlaying:true
-
+                opponetIsPlaying:true,
+                
             })
 
             goMarket(this.state.gameState.playerOne.cardAtHand, this.state.gameState.market)
 
             this.setState({
 
-                opponetIsPlaying:false
+                opponetIsPlaying:false,
+                isLoading:true
 
             })
 
@@ -148,7 +145,8 @@ class GamePlay extends React.Component{
 
                     this.setState({
 
-                        opponetIsPlaying:false
+                        opponetIsPlaying:false,
+                        isLoading: false
 
                     })
                     
@@ -191,7 +189,8 @@ class GamePlay extends React.Component{
 
                         this.setState({
 
-                            opponetIsPlaying:false
+                            opponetIsPlaying:false,
+                            isLoading:false
                             
                         })
                         
@@ -216,10 +215,7 @@ class GamePlay extends React.Component{
 
         const style = {height: height * 0.9}
 
-        
-
-
-        if(this.state.isLoading) return(<div>Loading</div>)
+        if(this.state.isLoading) return(<Loader />)
 
         let playerCard = this.state.gameState.playerOne.cardAtHand
 

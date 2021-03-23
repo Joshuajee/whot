@@ -12,6 +12,8 @@ import Start from "../Componets/Background/Start";
 import Agent from "../Componets/Agent";
 import axios from "axios"
 
+import Loader from "../Componets/Loader"
+
 class Leaderboard extends React.Component {
 
     constructor(){
@@ -38,7 +40,7 @@ class Leaderboard extends React.Component {
     
     render(){
 
-        if(this.state.isLoading) return (<div>Loading</div>)
+        if(this.state.isLoading) return (<Loader />)
         let data = this.state.response
         let agents = []
         for (let i = 0; i < data.length; i++) {
