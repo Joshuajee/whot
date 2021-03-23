@@ -40,11 +40,20 @@ class GamePlay extends React.Component{
         this.state = {
             isLoading:true,
             opponetIsPlaying:true,
-            gameState:{"market":[0,0]},
             isNeeded:false,
+            gameState:{"playerOne":{
+                            "cardAtHand":[],
+                            "name":""
+                        },
+                        "playerTwo":{
+                            "cardAtHand":[],
+                            "name":""
+                        },
+                    "market":[],
+                    "cardPlayed":[]
+            },
+            
         }
-
-        this.marketCards = 56
 
          
         this.playCard = this.playCard.bind(this)
@@ -89,8 +98,6 @@ class GamePlay extends React.Component{
     
             axios.post("/api/play", request).then((res)=>{
                 
-                console.log(res.data) 
-
                 let response = res.data
 
                 let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
@@ -210,6 +217,8 @@ class GamePlay extends React.Component{
     }
 
     render(){
+
+        checkGameState(this.state.gameState)
 
         let height = window.innerHeight
 

@@ -123,28 +123,13 @@ body{
 
 .need-bar{
   background-color: darkmagenta;
-  width: 100%;
-  position: fixed;
-  left: 0;
   z-index: 10;
-  margin: auto;
-  display: block;
-}
-
-.need{
-  background-color: darkmagenta;
-  width: 100%;
-  position: fixed;
-  left: 0;
-  z-index: 10;
-  margin: auto;
-  display: block;
 }
 
 .card-number{
   color: whitesmoke;
   background-color: blueviolet;
-  display: inline-block;
+  width: 25px;
 }
 
 .loader{

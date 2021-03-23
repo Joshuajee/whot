@@ -34,18 +34,7 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
     let index = card[0].indexOf(":") + 1
     let number = parseInt(card[0].slice(index, card[0].length))
 
-    playGame(playerCardAtHand, card, cardPlayed)
-
-    /*
-    //check the current state of the game
-    checkGameState(this.state.gameState.playerOne.name, 
-        this.state.gameState.playerOne.cardAtHand, 
-        this.state.gameState.playerTwo.name, 
-        this.state.gameState.playerTwo.cardAtHand, 
-        this.state.gameState.market, 
-        this.state.gameState.cardPlayed)
-
-    */
+    playGame(playerCardAtHand, card, cardPlayed, number)
 
     if(rules.holdOn.active && number === rules.holdOn.card){
 
@@ -78,15 +67,16 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
         goMarket(opponentsCardAtHand, market)
 
    
-    }else if(number === 20){
-
-        alert("need")
-
     }
+
+    alert(card)
 
 }
 
-export function playGame(player, card, cardPlayed){
+
+
+
+export function playGame(player, card, cardPlayed, number){
 
     //+---------------------------------------------------------------------------+
     //|     This function takes in the player cards at hand an the action to be   |
@@ -99,18 +89,23 @@ export function playGame(player, card, cardPlayed){
     //if player goes to market
     if(card[0] === "z:goMarket"){
 
+    }else if(number === 20){
+
+        cardPlayed.push(card[0])
+
+        for(let i = 0; i < player.length; i++){
+
+            if(player[i] === "whot:20") player.splice(i, 1)
+            
+        }
+
     }else{
 
         cardPlayed.push(card[0])
 
         for(let i = 0; i < player.length; i++){
 
-            if(player[i] === card[0]){
-
-                player.splice(i, 1)
-                console.log(player)
-
-            }
+            if(player[i] === card[0]) player.splice(i, 1)
             
         }
 
@@ -171,7 +166,7 @@ export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCa
 
 
 
-export function checkGameState(playerOneName, playerOneCard, playerTwoName, playerTwoCard, market, cardPlayed){
+export function checkGameState(gameState){
 
     //+---------------------------------------------------------------------------+
     //|      This method checks if any of the player cards or market is less      |  
@@ -181,31 +176,33 @@ export function checkGameState(playerOneName, playerOneCard, playerTwoName, play
     //|      card Played to market and shuffle them while calling the reward      |
     //|      method in GameEngine, but the game continues                         |
     //+---------------------------------------------------------------------------+
-
-    if(playerOneCard.length < 1 || playerTwoCard.length < 1){
+    console.log(gameState.playerOne)
+    
+    if(gameState.playerOne.cardAtHand.length < 1 || gameState.playerOne.cardAtHand.length < 1){
 
         //super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
 
-    }else if(market.length < 1){
+    }else if(gameState.market.length < 1){
 
-        console.log(cardPlayed)
+        console.log(gameState.cardPlayed)
 
         //super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
         
         //
-        let inPlay = sanitizeCardPlayed(cardPlayed)
+        let inPlay = sanitizeCardPlayed(gameState.cardPlayed)
 
         //adds all the card played to market
-        market = inPlay
+        gameState.market = inPlay
         
         //reasign inplay giving it just its last value
-        cardPlayed = [cardPlayed[cardPlayed.length - 1]]
+        gameState.cardPlayed = [ gameState.cardPlayed[gameState.cardPlayed.length - 1]]
 
         //removed the last card from market
-        market.pop()
+        gameState.market.pop()
 
         //shuffles the cards
-        market = shuffle(market)
+        gameState.market = shuffle(gameState.market)
+
     }
 
 }

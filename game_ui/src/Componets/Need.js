@@ -25,7 +25,7 @@ class Need extends React.Component{
 
         let area = width * height
 
-        let size = Math.sqrt(area/(3 * 5))
+        let size = Math.sqrt(area/(3 * 5 * 1.1))
 
         let cardSize = size
 
@@ -36,7 +36,7 @@ class Need extends React.Component{
 
         return (
             <center className="need-bar" style={{height:height * .9}}>
-                <div className="need" style={{marginTop:margin}}>
+                <div>
                     <span onClick = {() => this.props.need("star:20")}> {chooseCard("star:", cardSize, true)} </span>
                     <span onClick = {() => this.props.need("triangle:20")}> {chooseCard("triangle:", cardSize)}   </span>
                     <span onClick = {() => this.props.need("square:20")}> {chooseCard("square:", cardSize)}     </span>
