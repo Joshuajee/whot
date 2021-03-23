@@ -44,7 +44,6 @@ class GamePlay extends GameEngine{
         super.on("received", ()=>{
             let action = super.getAction
             console.log(action)
-            console.log(this.gameRules)
             console.log(this.availableMove.sort())
             this.referee(action, this.gameRules, this.availableMove.sort(), this.playerTwoCard.sort(), this.playerTwoName, this.playerTwoCard)
         })  
@@ -107,7 +106,6 @@ class GamePlay extends GameEngine{
 
         this.res = res
 
-        
         console.log(state)
         
         this.play(state)
@@ -134,43 +132,34 @@ class GamePlay extends GameEngine{
 
         this.moves.push(card)
 
-
         if(rules.holdOn.active && number == rules.holdOn.card){
 
             console.log("hold On")
 
-            //this.play(this.state)
-
-           //ythis.close()
            this.res.send(this.moves)
-            
           
         }else if(rules.pickTwo.active && number == rules.pickTwo.card){
 
             console.log("pick 2")
 
-            //this.play(this.state)
             this.res.send(this.moves)
 
         }else if(rules.pickThree.active && number == rules.pickThree.card){
 
             console.log("pick 3")
 
-            //this.play(this.state)
             this.res.send(this.moves)
 
         }else if(rules.suspension.active && number == rules.suspension.card){
 
             console.log("suspension")
 
-            //this.play(this.state)
             this.res.send(this.moves)
 
         }else if(rules.generalMarket.active && number == rules.generalMarket.card){
 
             console.log("general market")
 
-            //this.play(this.state)
             this.res.send(this.moves)
 
         }else if(number == 20){
@@ -183,13 +172,13 @@ class GamePlay extends GameEngine{
             
         }else{
 
-            console.log(playerTwoCard)
+            //console.log(playerTwoCard)
 
-            //super.emit("move-made", this.moves, this.res)
+            //send th move made to the client
             this.res.send(this.moves)
         }
 
-        console.log(playerTwoCard)
+        //console.log(playerTwoCard)
 
     }
 
@@ -279,8 +268,8 @@ class GamePlay extends GameEngine{
 
         if(this.availableMove.length == 1){
             //console.log(playerName) 
-            console.log(this.playerTwoCard)
-            console.log(" in play " + this.inPlay[this.inPlay.length - 1])
+            //console.log(this.playerTwoCard)
+            //console.log(" in play " + this.inPlay[this.inPlay.length - 1])
             //this.goMarket(playerTwoCard) 
             this.moves.push(["z:goMarket", -1])
 
@@ -291,7 +280,7 @@ class GamePlay extends GameEngine{
             super.stateFinder(this.playerTwoName, this.cardPlayed, this.playerTwoCard, this.noOfCardsWithPlayerOne, this.availableMove.sort(), this.playerMove, this.market.length, this.gameRules)
         }
     
-        console.log("avaaaa "+ this.availableMove)
+        console.log("available moves: "+ this.availableMove)
 
     }
 
@@ -358,7 +347,7 @@ class GamePlay extends GameEngine{
             for(let i = 0; i < player.length; i++){
                 if(player[i] === card[0]){
                     player.splice(i, 1)
-                    console.log(player)
+                    //console.log(player)
                     this.need = false
                 }
             }

@@ -7,32 +7,6 @@
 
 
 
-export function shuffle(array){
-
-    //+----------------------------------------------------------------+
-    //|                This Function shuffles the card                 |
-    //+----------------------------------------------------------------+
-     
-
-
-    let currIndex = array.length
-
-    while (0 !== currIndex) {
-        
-        //pick an element not prevously selected
-        let randIndex = Math.floor(Math.random() * currIndex)
-        currIndex--
-
-        //swap it with the current element
-        let tempVal  = array[currIndex]
-        array[currIndex] = array[randIndex]
-        array[randIndex] = tempVal
-    
-    }
-
-    return array
-}
-
 export function goMarket(player,  market, times = 1){
 
     //+---------------------------------------------------------------------------+
@@ -62,6 +36,17 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
     playGame(playerCardAtHand, card, cardPlayed)
 
+    /*
+    //check the current state of the game
+    checkGameState(this.state.gameState.playerOne.name, 
+        this.state.gameState.playerOne.cardAtHand, 
+        this.state.gameState.playerTwo.name, 
+        this.state.gameState.playerTwo.cardAtHand, 
+        this.state.gameState.market, 
+        this.state.gameState.cardPlayed)
+
+    */
+
     if(rules.holdOn.active && number === rules.holdOn.card){
 
         alert("hold On")
@@ -69,8 +54,6 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
     }else if(rules.pickTwo.active && number === rules.pickTwo.card){
 
         alert("pick 2")
-
-        
 
         goMarket(opponentsCardAtHand, market, 2)
 
@@ -97,11 +80,7 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
    
     }else if(number === 20){
 
-        let need = true
-
-        let needOption = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
-
-        alert("yeah")
+        alert("need")
 
     }
 
@@ -176,18 +155,101 @@ export function checkGame(card, inPlay) {
 
 export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
 
-    for (let i = 0; i < response.length; i++) {
+    let responseIndex = response.length - 1
 
-        if(response[i][0] !== "z:goMarket"){
+    if(response[responseIndex][0] !== "z:goMarket"){
 
-            referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
-        
-        }else{
+        referee(response[responseIndex], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
+    
+    }else{
 
-            goMarket(playerCardAtHand, market)
+        goMarket(playerCardAtHand, market)
 
-        }
     }
+
+}
+
+
+
+export function checkGameState(playerOneName, playerOneCard, playerTwoName, playerTwoCard, market, cardPlayed){
+
+    //+---------------------------------------------------------------------------+
+    //|      This method checks if any of the player cards or market is less      |  
+    //|      than one then it calls the reward method in GameEngine, if  any      |
+    //|      of the player cards is finished that player wins the game and the    |
+    //|      game is over but if market is finished, it adds all cards from       |
+    //|      card Played to market and shuffle them while calling the reward      |
+    //|      method in GameEngine, but the game continues                         |
+    //+---------------------------------------------------------------------------+
+
+    if(playerOneCard.length < 1 || playerTwoCard.length < 1){
+
+        //super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+
+    }else if(market.length < 1){
+
+        console.log(cardPlayed)
+
+        //super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+        
+        //
+        let inPlay = sanitizeCardPlayed(cardPlayed)
+
+        //adds all the card played to market
+        market = inPlay
+        
+        //reasign inplay giving it just its last value
+        cardPlayed = [cardPlayed[cardPlayed.length - 1]]
+
+        //removed the last card from market
+        market.pop()
+
+        //shuffles the cards
+        market = shuffle(market)
+    }
+
+}
+
+
+export function shuffle(array){
+
+    let currIndex = array.length
+
+    while (0 !== currIndex) {
+        
+        //pick an element not prevously selected
+        let randIndex = Math.floor(Math.random() * currIndex)
+        currIndex--
+
+        //swap it with the current element
+        let tempVal  = array[currIndex]
+        array[currIndex] = array[randIndex]
+        array[randIndex] = tempVal
+    
+    }
+
+    return array
+}
+
+
+
+
+export function sanitizeCardPlayed(cards){
+
+    let result = []
+
+    for(let i = 0; i < cards.length; i++){
+
+        let index = cards[i].indexOf(":") + 1
+        let number = cards[i].slice(index, cards.length)
+
+        if(number == 20)
+            result.push("whot:20")
+        else
+            result.push(cards[i])
+    }
+
+    return result
 
 }
 

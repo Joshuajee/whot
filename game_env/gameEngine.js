@@ -18,7 +18,8 @@ class GameEngine extends EventEmitter{
         
         super()
 
-
+        this.playerOneName = playerOneName
+        this.playerTwoName = playerTwoName
 
         console.log(playerOneName)
         console.log(playerTwoName)
@@ -207,7 +208,9 @@ class GameEngine extends EventEmitter{
 
                 //save the new states
                 states.insertMany(this.playerStateNew, (error)=>{
-                    console.log("error: " + error)
+
+                    if(error) console.log("error: " + error)
+
                 })
 
                 this.playerOnePoints += 5 - 1 * playerOneNumber / 100
@@ -221,7 +224,9 @@ class GameEngine extends EventEmitter{
 
                 //save the new states
                 states.insertMany(this.playerStateNew, (error)=>{
-                    console.log("error: " + error)
+
+                    if(error) console.log("error: " + error)
+
                 })
 
                 this.playerOnePoints += -1 * playerOneNumber / 100
@@ -235,7 +240,9 @@ class GameEngine extends EventEmitter{
 
                 //save the new states
                 states.insertMany(this.playerStateNew, (error)=>{
-                    console.log("error: " + error)
+
+                    if(error) console.log("error: " + error)
+
                 })
 
                 this.playerOnePoints += -1 * playerOneNumber / 100
@@ -248,14 +255,18 @@ class GameEngine extends EventEmitter{
         if(playerOneNumber === 0){
 
             console.log("Player One Win")
+            
             //reward player one
             this.addReward(playerOneName, 5, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+           
             //penalise player two
             this.addReward(playerTwoName, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
             //save the new states
             states.insertMany(this.playerStateNew, (error)=>{
-                console.log("error: " + error)
+
+                if(error) console.log("error: " + error)
+
             })
 
             this.updatePlayer(playerOneName, playerTwoName, 5, -2 - 1 * playerTwoNumber / 10)
@@ -270,7 +281,9 @@ class GameEngine extends EventEmitter{
             
             //save the new states
             states.insertMany(this.playerStateNew, (error)=>{
-                console.log("error: " + error)
+
+                if(error) console.log("error: " + error)
+       
             })
 
             this.updatePlayer(playerOneName, playerTwoName, -2 - 1 * playerOneNumber / 10, 5)
@@ -321,14 +334,19 @@ class GameEngine extends EventEmitter{
             if(data.length === 0){
 
                 this.stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString)
-            
+                
+                if(error) console.log("error: " + error)
+
             }else{
 
                 this.action = [false, data.action]
     
-                if(playerName === playerOneName)
+                if(playerName === this.playerOneName)
+
                     this.playerOneStateRoundOld.push(data)
+
                 else
+
                     this.playerTwoStateRoundOld.push(data)
                 
                 super.emit(eventString)
@@ -385,6 +403,8 @@ class GameEngine extends EventEmitter{
         states.find(query, (error, data) =>{
 
             this.states = data
+
+            if(error) console.log("error: " + error)
                        
             super.emit('action')
 

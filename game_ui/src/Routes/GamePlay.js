@@ -9,7 +9,7 @@
 import React from "react"
 import axios from "axios"
 
-import {canPlay, checkPlayResponse, referee, goMarket} from  "../GameLogic/logics"
+import {canPlay, checkPlayResponse, referee, goMarket, checkGameState} from  "../GameLogic/logics"
 
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
@@ -117,6 +117,8 @@ class GamePlay extends React.Component{
 
     playCard(card) {
 
+        
+
         if(card === "z:goMarket"){
 
             this.setState({
@@ -214,6 +216,8 @@ class GamePlay extends React.Component{
 
         const style = {height: height * 0.9}
 
+        
+
 
         if(this.state.isLoading) return(<div>Loading</div>)
 
@@ -265,6 +269,7 @@ class GamePlay extends React.Component{
                 <center id="game-table" style={style} className="game-table">
                     {gameObjects}
                 </center>
+
             </div>
             )
 
