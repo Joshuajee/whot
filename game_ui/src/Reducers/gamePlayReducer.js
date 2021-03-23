@@ -1,4 +1,6 @@
-export default function (state = {}, action) {
+/*
+
+default function (state = {}, action) {
 
     switch(action.type){
 
@@ -7,3 +9,4 @@ export default function (state = {}, action) {
     }
     
 }
+*/

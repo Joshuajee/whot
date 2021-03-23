@@ -12,11 +12,6 @@ import chooseCard from "../GameLogic/chooseCard"
 
 class Need extends React.Component{
 
-    constructor(){
-        super()
-       
-        
-    }
 
     render(){
         
@@ -28,11 +23,6 @@ class Need extends React.Component{
         let size = Math.sqrt(area/(3 * 5 * 1.1))
 
         let cardSize = size
-
-        let margin = (height - cardSize * 1.5) / 2.5
-
-        if(width < cardSize * 5.2) margin = (height - cardSize * 3) / 2.5
-        
 
         return (
             <center className="need-bar" style={{height:height * .9}}>

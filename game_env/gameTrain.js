@@ -47,8 +47,6 @@ class GameTrain extends GameEngine{
 
             this.neededAction =  action[1]
 
-            console.log(this.neededAction)
-
             this.neededCard = this.chooseAction(action, this.needOption)
 
             if(this.currentPlayerName == this.playerOneName){

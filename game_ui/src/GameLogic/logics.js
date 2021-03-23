@@ -238,9 +238,9 @@ export function sanitizeCardPlayed(cards){
     for(let i = 0; i < cards.length; i++){
 
         let index = cards[i].indexOf(":") + 1
-        let number = cards[i].slice(index, cards.length)
+        let number = parseInt(cards[i].slice(index, cards.length))
 
-        if(number == 20)
+        if(number === 20)
             result.push("whot:20")
         else
             result.push(cards[i])

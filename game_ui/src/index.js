@@ -10,14 +10,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux'
-import {createStore, applyMiddleware} from 'redux';
+//import {createStore, applyMiddleware} from 'redux';
 import './index.css';
 import  "./Styles/styles.css";
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route} from 'react-router-dom'
-import reduxThunk from 'redux-thunk'
+//import reduxThunk from 'redux-thunk'
 
-import reducers from "./Reducers";
+//import reducers from "./Reducers";
 
 import Home from "./Routes/Home";
 import Options from "./Routes/Options";
@@ -32,12 +32,12 @@ const leaderboard = () => <Leaderboard />
 const settings = () => <Settings />
 const game = () => <GamePlay />
 
-const store = createStore(reducers, {}, applyMiddleware(reduxThunk))
+//const store = createStore(reducers, {}, applyMiddleware(reduxThunk))
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
+    <Provider store={"store"}>
       <BrowserRouter>
         <Route path="/" exact={true} component={home} />
         <Route path="/home" exact={true} component={home} />

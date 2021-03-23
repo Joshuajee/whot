@@ -180,7 +180,7 @@ class GamePlay extends React.Component{
                     })
 
                 }else{
-            
+                    
 
                     let request = {"gameState":this.state.gameState, "playerMove":card[0], rules:rules}
                 

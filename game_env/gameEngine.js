@@ -106,9 +106,30 @@ class GameEngine extends EventEmitter{
 
     updatePlayer(winnerName, losserName, winnerPoints, losserPoints){
 
-        agents.updateOne({agentName:winnerName})
+        agents.updateOne({agentName:winnerName},
+                    {
+                        wins: +1,
+                        points: +winnerPoints,
+                        botWins: +1,
+                        botPoints: +winnerPoints,
+                    }).then(err => {
+                        console.log(err)
+                    })
+                    
 
-        agents.updateOne({agentName:losserName})
+        agents.updateOne({agentName:losserName}, 
+                    {
+                        losses: +1,
+                        points: -losserPoints,
+                        botLosses: +1,
+                        botPoints: -losserPoints,
+                    }).then(err => {
+                        console.log(err)
+                    })
+
+                    console.log("yyyyyyyyyyyyyyyyyyyyy")
+
+
 
     }
 
@@ -327,8 +348,6 @@ class GameEngine extends EventEmitter{
                     "rules":rules
                 }
 
-        console.log("search")
-        
         states.find(query, (error, data) =>{
 
             if(data.length === 0){
@@ -342,11 +361,8 @@ class GameEngine extends EventEmitter{
                 this.action = [false, data.action]
     
                 if(playerName === this.playerOneName)
-
                     this.playerOneStateRoundOld.push(data)
-
                 else
-
                     this.playerTwoStateRoundOld.push(data)
                 
                 super.emit(eventString)
@@ -377,7 +393,6 @@ class GameEngine extends EventEmitter{
         this.actionCreater(availableMove, playerName)
         
     }
-
 
 
     actionCreater(availableMove, playerName){
@@ -411,7 +426,6 @@ class GameEngine extends EventEmitter{
         })
 
         
-        
     }
 
 
@@ -429,6 +443,7 @@ class GameEngine extends EventEmitter{
 
         return result
     }
+
 
     multiplyArray(array, num){
 
@@ -491,6 +506,7 @@ class GameEngine extends EventEmitter{
 
 }
 
+
 function compareArray(array1, array2){
 
     //+---------------------------------------------------------------------------+
@@ -516,5 +532,6 @@ function compareArray(array1, array2){
     return true
 
 }
+
 
 module.exports = GameEngine
