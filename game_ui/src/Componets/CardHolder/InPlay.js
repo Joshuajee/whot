@@ -8,6 +8,7 @@
 
 
 import chooseCard from "../../GameLogic/chooseCard";
+import CardNumber from "./CardNumber"
 
 
 
@@ -27,6 +28,7 @@ function InPlay(props) {
     return(
         <div style={style}>
             { chooseCard(props.cards, cardSize) }
+            <CardNumber cardNumber={props.cardNumber} />
         </div>
         )
 

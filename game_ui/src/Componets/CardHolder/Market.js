@@ -7,6 +7,7 @@
 
 
 import chooseCard from "../../GameLogic/chooseCard";
+import CardNumber from "./CardNumber"
 
 function Market(props) {
     
@@ -23,6 +24,7 @@ function Market(props) {
     return(
         <div style={style}>
             <span onClick={() => props.action("z:goMarket")}>{ chooseCard("ff", cardSize) }</span>
+            <CardNumber cardNumber={props.cardNumber} />
         </div>
         )
 

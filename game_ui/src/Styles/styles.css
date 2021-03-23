@@ -144,7 +144,7 @@ body{
 .card-number{
   color: whitesmoke;
   background-color: blueviolet;
-  width: 10%;
+  display: inline-block;
 }
 
 .loader{

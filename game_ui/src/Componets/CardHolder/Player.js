@@ -13,6 +13,8 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 
 import chooseCard from "../../GameLogic/chooseCard"
 
+import CardNumber from "./CardNumber"
+
 
 class Player extends React.Component {
 
@@ -87,9 +89,7 @@ class Player extends React.Component {
                 {this.displayCards(this.props.cards.sort(), cardSize, this.props.action, this.state.start)}  
                 {right}
 
-                <div className="card-number" style={{position:"relative", top:-1}}>
-                    {this.props.cards.length}
-                </div>
+                <CardNumber cardNumber={this.props.cards.length} />
                 
             </div>
             )

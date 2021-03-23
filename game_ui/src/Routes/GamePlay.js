@@ -40,9 +40,11 @@ class GamePlay extends React.Component{
         this.state = {
             isLoading:true,
             opponetIsPlaying:true,
-            gameState:null,
+            gameState:{"market":[0,0]},
             isNeeded:false,
         }
+
+        this.marketCards = 56
 
          
         this.playCard = this.playCard.bind(this)
@@ -157,11 +159,7 @@ class GamePlay extends React.Component{
     
             let playGame = canPlay(card[0], this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
 
-            this.setState({
-
-                isNeeded : playGame[1],
-
-            })
+            this.setState({isNeeded : playGame[1]})
 
             if(playGame[0]){
 
@@ -170,6 +168,7 @@ class GamePlay extends React.Component{
                     this.setState({
 
                         isNeeded : true,
+                        isLoading : false
 
                     })
 
@@ -200,6 +199,7 @@ class GamePlay extends React.Component{
             
             }else{
 
+                this.setState({isLoading : false})
                 alert("illegal move")
     
             }
@@ -223,42 +223,21 @@ class GamePlay extends React.Component{
 
         let inPlay = this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1]
 
-        var gameObjects = null
-
-        if(this.state.opponetIsPlaying){
-
-            gameObjects = <div>
-                            <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
-                            <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
-                            <InPlay className="center" cards={inPlay} />
-                            <Market action={this.playCard} />
-                          </div>
-       
-        }else{
-            
-            gameObjects = <div>
+        let gameObjects = <div>
                                 <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
                                 <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
-                                <InPlay className="center" cards={inPlay}/>
-                                <Market action={this.playCard} />
-                           </div>
-       
-        }
+                                <InPlay className="center" cards={inPlay} cardNumber={this.state.gameState.cardPlayed.length}/>
+                                <Market action={this.playCard} cardNumber={this.state.gameState.market.length} />
+                            </div>
+        
 
         if(this.state.isNeeded){
-
             gameObjects = <Need  height = {height} need={this.needed}/> 
-
-        }else{
-
-            gameObjects = <div>
-                                <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
-                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
-                                <InPlay className="center" cards={inPlay}/>
-                                <Market action={this.playCard} />
-                          </div>
         }
 
+        console.log("states")
+
+        console.log(this.state.gameState)
 
         return(<div>
                 
