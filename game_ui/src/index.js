@@ -9,7 +9,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux'
+//import {Provider} from 'react-redux'
 //import {createStore, applyMiddleware} from 'redux';
 import './index.css';
 import  "./Styles/styles.css";
@@ -37,7 +37,8 @@ const game = () => <GamePlay />
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={"store"}>
+    {//<Provider store={store}>
+    }
       <BrowserRouter>
         <Route path="/" exact={true} component={home} />
         <Route path="/home" exact={true} component={home} />
@@ -46,7 +47,8 @@ ReactDOM.render(
         <Route path="/settings" exact={true} component={settings} />
         <Route path="/game" exact={false} component={game}/>
       </BrowserRouter>
-    </Provider>  
+    {//</Provider>  
+    }
   </React.StrictMode>,
   document.getElementById('root')
 );
