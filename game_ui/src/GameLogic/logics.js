@@ -28,6 +28,9 @@ export function goMarket(player,  market, times = 1){
 
 }
 
+
+/*
+
 export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
 
  
@@ -70,6 +73,61 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
     }
 
     alert(card)
+
+}
+
+*/
+
+export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
+
+ 
+    let index = card[0].indexOf(":") + 1
+    let number = parseInt(card[0].slice(index, card[0].length))
+
+    playGame(playerCardAtHand, card, cardPlayed, number)
+
+    if(rules.holdOn.active && number === rules.holdOn.card){
+
+        alert("hold On")
+
+        return false
+       
+    }else if(rules.pickTwo.active && number === rules.pickTwo.card){
+
+        alert("pick 2")
+
+        goMarket(opponentsCardAtHand, market, 2)
+        return false
+
+    }else if(rules.pickThree.active && number === rules.pickThree.card){
+
+        alert("pick 3")
+
+    
+        goMarket(opponentsCardAtHand, market, 3)
+
+        return false
+
+    }else if(rules.suspension.active && number === rules.suspension.card){
+
+        alert("suspension")
+
+        return false
+
+    }else if(rules.generalMarket.active && number === rules.generalMarket.card){
+
+        alert("general market")
+
+
+        goMarket(opponentsCardAtHand, market)
+
+        return false
+   
+    }
+
+    alert(card)
+
+    return true
 
 }
 
@@ -150,15 +208,21 @@ export function checkGame(card, inPlay) {
 
 export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
 
-    let responseIndex = response.length - 1
+    //let responseIndex = response.length - 1
 
-    if(response[responseIndex][0] !== "z:goMarket"){
+    for(let i = 0; i < response.length; i++){
+        
+        if(response[i][0] === "whot:20"){
 
-        referee(response[responseIndex], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
-    
-    }else{
+        }else if(response[i][0] !== "z:goMarket"){
 
-        goMarket(playerCardAtHand, market)
+            referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
+            
+        }else{
+
+            goMarket(playerCardAtHand, market)
+
+        }
 
     }
 

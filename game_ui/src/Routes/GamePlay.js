@@ -181,17 +181,31 @@ class GamePlay extends React.Component{
 
                 }else{
                     
+                    let sendMove = referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
                     let request = {"gameState":this.state.gameState, "playerMove":card[0], rules:rules}
-                
-                    axios.post("/api/play", request).then((res)=>{
-                        
-                        let response = res.data
-                        
-                        referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+                    
+                    if(sendMove){
 
-                        //check the type of response gotten from server
-                        checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market)
+                        axios.post("/api/play", request).then((res)=>{
+                            
+                            let response = res.data
+                            
+                            //referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+
+                            //check the type of response gotten from server
+                            checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market)
+
+                            this.setState({
+
+                                opponetIsPlaying:false,
+                                isLoading:false
+                                
+                            })
+                            
+                        })
+
+                    }else{
 
                         this.setState({
 
@@ -199,8 +213,8 @@ class GamePlay extends React.Component{
                             isLoading:false
                             
                         })
-                        
-                    })
+
+                    }
 
                 }
             

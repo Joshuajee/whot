@@ -108,10 +108,10 @@ class GameEngine extends EventEmitter{
 
         agents.updateOne({agentName:winnerName},
                     {
-                        wins: +1,
-                        points: +winnerPoints,
-                        botWins: +1,
-                        botPoints: +winnerPoints,
+                        wins: 1,
+                        points: winnerPoints,
+                        botWins: 1,
+                        botPoints: winnerPoints,
                     }).then(err => {
                         console.log(err)
                     })
@@ -119,10 +119,10 @@ class GameEngine extends EventEmitter{
 
         agents.updateOne({agentName:losserName}, 
                     {
-                        losses: +1,
-                        points: -losserPoints,
-                        botLosses: +1,
-                        botPoints: -losserPoints,
+                        losses: 1,
+                        points: losserPoints,
+                        botLosses: 1,
+                        botPoints: losserPoints,
                     }).then(err => {
                         console.log(err)
                     })
