@@ -42,14 +42,14 @@ class GamePlay extends React.Component{
             opponetIsPlaying:true,
             isNeeded:false,
             gameState:{"playerOne":{
-                            "cardAtHand":[],
+                            "cardAtHand":[1,1,1,1,],
                             "name":""
                         },
                         "playerTwo":{
-                            "cardAtHand":[],
+                            "cardAtHand":[1,1,1,1,1],
                             "name":""
                         },
-                    "market":[],
+                    "market":[1,1,1,1,1],
                     "cardPlayed":[]
             },
             

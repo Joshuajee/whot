@@ -5,6 +5,13 @@
  * This program is distributed under the MIT license
  */
 
+var actionOneNew = []
+var actionOneOld = []
+
+var actionTwoNew = []
+var actionTwoOld = []
+
+
 
 
 export function goMarket(player,  market, times = 1){
@@ -29,54 +36,6 @@ export function goMarket(player,  market, times = 1){
 }
 
 
-/*
-
-export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
-
- 
-    let index = card[0].indexOf(":") + 1
-    let number = parseInt(card[0].slice(index, card[0].length))
-
-    playGame(playerCardAtHand, card, cardPlayed, number)
-
-    if(rules.holdOn.active && number === rules.holdOn.card){
-
-        alert("hold On")
-       
-    }else if(rules.pickTwo.active && number === rules.pickTwo.card){
-
-        alert("pick 2")
-
-        goMarket(opponentsCardAtHand, market, 2)
-
-    }else if(rules.pickThree.active && number === rules.pickThree.card){
-
-        alert("pick 3")
-
-    
-        goMarket(opponentsCardAtHand, market, 3)
-
-
-
-    }else if(rules.suspension.active && number === rules.suspension.card){
-
-        alert("suspension")
-
-    }else if(rules.generalMarket.active && number === rules.generalMarket.card){
-
-        alert("general market")
-
-
-        goMarket(opponentsCardAtHand, market)
-
-   
-    }
-
-    alert(card)
-
-}
-
-*/
 
 export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
 
@@ -97,13 +56,13 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
         alert("pick 2")
 
         goMarket(opponentsCardAtHand, market, 2)
+
         return false
 
     }else if(rules.pickThree.active && number === rules.pickThree.card){
 
         alert("pick 3")
 
-    
         goMarket(opponentsCardAtHand, market, 3)
 
         return false
@@ -118,14 +77,11 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
         alert("general market")
 
-
         goMarket(opponentsCardAtHand, market)
 
         return false
    
     }
-
-    alert(card)
 
     return true
 
@@ -244,14 +200,15 @@ export function checkGameState(gameState){
     
     if(gameState.playerOne.cardAtHand.length < 1 || gameState.playerOne.cardAtHand.length < 1){
 
-        //super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+        rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
 
     }else if(gameState.market.length < 1){
 
         console.log(gameState.cardPlayed)
 
-        //super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
-        
+        rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
+
+ 
         //
         let inPlay = sanitizeCardPlayed(gameState.cardPlayed)
 
@@ -315,3 +272,10 @@ export function sanitizeCardPlayed(cards){
 }
 
 
+function rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld){
+
+    if(gameState.playerOne.cardAtHand < 1) alert(gameState.playerOne.name + " Wins ")
+
+    if(gameState.playerTwo.cardAtHand < 1) alert(gameState.playerTwo.name + " Wins ")
+    
+}
