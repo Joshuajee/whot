@@ -9,7 +9,7 @@
 import React from "react"
 import axios from "axios"
 
-import {canPlay, checkPlayResponse, referee, goMarket, checkGameState} from  "../GameLogic/logics"
+import {canPlay, checkPlayResponse, referee, goMarket, checkGameState, checkGameChanges} from  "../GameLogic/logics"
 
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
@@ -19,7 +19,8 @@ import Need from "../Componets/Need"
 import Loader from "../Componets/Loader"
 
 
-
+var cardPlayedCards = [0]
+var marketCards = [0]
 
 let rules = {"holdOn":{"active":true, "card":1, "defend":false},
             "pickTwo":{"active":true, "card":2, "defend":false},
@@ -52,6 +53,9 @@ class GamePlay extends React.Component{
                     "market":[1,1,1,1,1],
                     "cardPlayed":[]
             },
+            playerOneCardIndex : 0,
+            playerTwoCardIndex : 0,
+            change : true
             
         }
 
@@ -79,8 +83,6 @@ class GamePlay extends React.Component{
 
         })
 
-        
-
     }
 
     needed(card){
@@ -105,12 +107,14 @@ class GamePlay extends React.Component{
                 this.state.gameState.cardPlayed.push(card)
             
                 //check the type of response gotten from server
+            
                 checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
                 this.setState({
 
                     opponetIsPlaying:false,
-                    isLoading :false
+                    isLoading :false, 
+
 
                 })
         
@@ -149,8 +153,7 @@ class GamePlay extends React.Component{
                     
                     referee([card, this.state.gameState.playerOne.cardAtHand + 1], rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
-                    //check the type of response gotten from server
-                    checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+                    checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market)
 
                     this.setState({
 
@@ -190,12 +193,11 @@ class GamePlay extends React.Component{
                         axios.post("/api/play", request).then((res)=>{
                             
                             let response = res.data
-                            
-                            //referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+
 
                             //check the type of response gotten from server
                             checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market)
-
+                            
                             this.setState({
 
                                 opponetIsPlaying:false,
@@ -203,6 +205,8 @@ class GamePlay extends React.Component{
                                 
                             })
                             
+                        }).catch((error) =>{
+                            alert(error)
                         })
 
                     }else{
@@ -238,7 +242,7 @@ class GamePlay extends React.Component{
 
         const style = {height: height * 0.9}
 
-        if(this.state.isLoading) return(<Loader />)
+        if(this.state.isLoading) return(<center id="game-table" style={style} className="game-table"><Loader /> </center>)
 
         let playerCard = this.state.gameState.playerOne.cardAtHand
 
@@ -246,13 +250,20 @@ class GamePlay extends React.Component{
 
         let inPlay = this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1]
 
-        let gameObjects = <div>
-                                <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} />
-                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard}  />
+        let gameObjects = null
+
+        let checkChanges = checkGameChanges(this.state.gameState, cardPlayedCards, marketCards)
+
+        if(checkChanges){
+
+            gameObjects = <div>
+                                <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} playable={false} index={this.state.playerTwoCardIndex} />
+                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard} playable={true} index={this.state.playerOneCardIndex}/>
                                 <InPlay className="center" cards={inPlay} cardNumber={this.state.gameState.cardPlayed.length}/>
                                 <Market action={this.playCard} cardNumber={this.state.gameState.market.length} />
                             </div>
-        
+
+        }
 
         if(this.state.isNeeded){
             gameObjects = <Need  height = {height} need={this.needed}/> 

@@ -11,6 +11,8 @@ var actionOneOld = []
 var actionTwoNew = []
 var actionTwoOld = []
 
+var MOVE_WAITING_PERIOD = 1000
+
 
 
 
@@ -162,27 +164,33 @@ export function checkGame(card, inPlay) {
 
 }
 
-export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
+export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, setState){
 
-    //let responseIndex = response.length - 1
+    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, setState)
 
-    for(let i = 0; i < response.length; i++){
+}
+
+
+function handleResponse(index, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, setState){
+   
+
+    if(response[index][0] === "whot:20"){
+
+    }else if(response[index][0] !== "z:goMarket"){
+
+        referee(response[index], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
         
-        if(response[i][0] === "whot:20"){
+    }else{
 
-        }else if(response[i][0] !== "z:goMarket"){
-
-            referee(response[i], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
-            
-        }else{
-
-            goMarket(playerCardAtHand, market)
-
-        }
+        goMarket(playerCardAtHand, market)
 
     }
 
+
+    if(index + 1 < response.length) setTimeout(handleResponse, MOVE_WAITING_PERIOD, index + 1, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
+
 }
+
 
 
 
@@ -196,7 +204,6 @@ export function checkGameState(gameState){
     //|      card Played to market and shuffle them while calling the reward      |
     //|      method in GameEngine, but the game continues                         |
     //+---------------------------------------------------------------------------+
-    console.log(gameState.playerOne)
     
     if(gameState.playerOne.cardAtHand.length < 1 || gameState.playerOne.cardAtHand.length < 1){
 
@@ -204,10 +211,7 @@ export function checkGameState(gameState){
 
     }else if(gameState.market.length < 1){
 
-        console.log(gameState.cardPlayed)
-
         rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
-
  
         //
         let inPlay = sanitizeCardPlayed(gameState.cardPlayed)
@@ -279,3 +283,29 @@ function rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoO
     if(gameState.playerTwo.cardAtHand < 1) alert(gameState.playerTwo.name + " Wins ")
     
 }
+
+export function checkGameChanges(gameState, cardPlayed, market){
+
+    //returns true if there is a change in market length
+    if(gameState.market.length !== market.length){
+        
+        market = gameState.market
+        cardPlayed = gameState.cardPlayed
+
+        return true
+    }
+
+    //returns true if there is a change in market length
+    if(gameState.cardPlayed.length !== cardPlayed.length){
+        
+        market = gameState.market
+        cardPlayed = gameState.cardPlayed
+        
+        return true
+    }
+
+    return false
+
+}
+
+

@@ -60,23 +60,23 @@ class Player extends React.Component {
         if(this.state.start > 0 && this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed){
             
             left =  <span onClick={() =>  { this.setState({start: this.state.start - 1}) } } >
-                        <FontAwesomeIcon style={navStyle} size="2x" color={"blue"} icon={faArrowLeft} /> 
+                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowLeft} /> 
                     </span>
             
             right = <span onClick={() => { if(this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed) this.setState({start: this.state.start + 1}) } } >
-                        <FontAwesomeIcon style={navStyle} size="2x" color={"blue"} icon={faArrowRight} /> 
+                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowRight} /> 
                     </span>
 
         }else if(this.state.start > 0){
 
             left =  <span style={{top:100}} onClick={() =>  { this.setState({start: this.state.start - 1}) } } >
-                        <FontAwesomeIcon style={navStyle} size="2x" color={"blue"} icon={faArrowLeft} /> 
+                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowLeft} /> 
                     </span>
 
         }else if(this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed){
             
             right = <span style={{top:100}} onClick={() => { if(this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed) this.setState({start: this.state.start + 1}) } } >
-                        <FontAwesomeIcon style={navStyle} size="2x" color={"blue"} icon={faArrowRight} /> 
+                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowRight} /> 
                     </span>
 
         }
@@ -107,9 +107,11 @@ class Player extends React.Component {
         for(let i = start; i < cards.length; i++){
            
             if((i + 1 - start) * 1.1 * cardSize >= cardSpaceAvailable) break
-    
-            cardArray.push(<span onClick = {() => action([cards[i], i])}> { chooseCard(cards[i], cardSize) } </span>)
-        
+            
+            if(this.props.playable)
+                cardArray.push(<span onClick = {() => action([cards[i], i])}> { chooseCard(cards[i], cardSize) } </span>)
+            else
+            cardArray.push(<span> { chooseCard(cards[i], cardSize) } </span>)
         }
     
         return cardArray
