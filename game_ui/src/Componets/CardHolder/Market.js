@@ -21,12 +21,20 @@ function Market(props) {
         left:width/2 - cardSize * 0.6666666667 - width * 0.2
     }
 
-    return(
-        <div style={style}>
-            <span onClick={() => props.action("z:goMarket")}>{ chooseCard("ff", cardSize) }</span>
-            <CardNumber cardNumber={props.cardNumber} />
-        </div>
-        )
+    if(props.playable)
+        return(
+            <div style={style}>
+                    <span onClick={() => props.action("z:goMarket")}>{ chooseCard("ff", cardSize) }</span>
+                    <CardNumber cardNumber={props.cardNumber} />
+            </div>
+            )
+    else
+        return(
+            <div style={style}>
+                    <span>{ chooseCard("ff", cardSize) }</span>
+                    <CardNumber cardNumber={props.cardNumber} />
+            </div>
+            )
 
 }
 

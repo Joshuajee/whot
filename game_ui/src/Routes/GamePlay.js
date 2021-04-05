@@ -18,6 +18,8 @@ import Player from "../Componets/CardHolder/Player";
 import Need from "../Componets/Need"
 import Loader from "../Componets/Loader"
 
+import {EventEmitter} from "events"
+
 
 var cardPlayedCards = [0]
 var marketCards = [0]
@@ -40,7 +42,7 @@ class GamePlay extends React.Component{
 
         this.state = {
             isLoading:true,
-            opponetIsPlaying:true,
+            opponetIsPlaying:false,
             isNeeded:false,
             gameState:{"playerOne":{
                             "cardAtHand":[1,1,1,1,],
@@ -55,13 +57,35 @@ class GamePlay extends React.Component{
             },
             playerOneCardIndex : 0,
             playerTwoCardIndex : 0,
-            change : true
+            change : true,
             
         }
 
          
         this.playCard = this.playCard.bind(this)
         this.needed = this.needed.bind(this)
+
+        this.events = new EventEmitter()
+
+        this.events.on("play", ()=>{
+
+            this.setState({
+
+                change : this.state.change ? false : true 
+
+            })
+
+        })
+
+        this.events.on("play-end", ()=>{
+
+            this.setState({
+
+                opponetIsPlaying : false
+
+            })
+            
+        })
 
     }
 
@@ -73,6 +97,7 @@ class GamePlay extends React.Component{
         let user = url.slice(index, url.length)
 
         axios.post("/api/game", {"agentName":user, "user":"Guest", rule:rules}).then((res)=>{
+            
             console.log(res)  
 
             this.setState({
@@ -108,7 +133,7 @@ class GamePlay extends React.Component{
             
                 //check the type of response gotten from server
             
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market, this.events)
 
                 this.setState({
 
@@ -125,8 +150,6 @@ class GamePlay extends React.Component{
     playCard(card) {
 
         this.setState({ isLoading:true })
-
-        
 
         if(card === "z:goMarket"){
 
@@ -150,17 +173,17 @@ class GamePlay extends React.Component{
                 axios.post("/api/play", request).then((res)=>{
                     
                     let response = res.data
-                    
-                    referee([card, this.state.gameState.playerOne.cardAtHand + 1], rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
-
-                    checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market)
 
                     this.setState({
 
-                        opponetIsPlaying:false,
-                        isLoading: false
-
+                        isLoading : false,
+                        opponetIsPlaying : true
+                        
                     })
+                    
+                    referee([card, this.state.gameState.playerOne.cardAtHand + 1], rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+
+                    checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market, this.events)
                     
                 })
 
@@ -194,26 +217,28 @@ class GamePlay extends React.Component{
                             
                             let response = res.data
 
-
-                            //check the type of response gotten from server
-                            checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market)
-                            
                             this.setState({
 
-                                opponetIsPlaying:false,
-                                isLoading:false
+                                isLoading : false,
+                                opponetIsPlaying : true
                                 
                             })
+
+                            //check the type of response gotten from server
+
+                            checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market, this.events)
+     
                             
                         }).catch((error) =>{
+
                             alert(error)
+
                         })
 
                     }else{
 
                         this.setState({
 
-                            opponetIsPlaying:false,
                             isLoading:false
                             
                         })
@@ -225,6 +250,7 @@ class GamePlay extends React.Component{
             }else{
 
                 this.setState({isLoading : false})
+
                 alert("illegal move")
     
             }
@@ -258,9 +284,9 @@ class GamePlay extends React.Component{
 
             gameObjects = <div>
                                 <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard} playable={false} index={this.state.playerTwoCardIndex} />
-                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard} playable={true} index={this.state.playerOneCardIndex}/>
+                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard} playable={!this.state.opponetIsPlaying} index={this.state.playerOneCardIndex}/>
                                 <InPlay className="center" cards={inPlay} cardNumber={this.state.gameState.cardPlayed.length}/>
-                                <Market action={this.playCard} cardNumber={this.state.gameState.market.length} />
+                                <Market action={this.playCard} playable={!this.state.opponetIsPlaying} cardNumber={this.state.gameState.market.length} />
                             </div>
 
         }

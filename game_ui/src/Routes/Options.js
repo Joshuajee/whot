@@ -10,7 +10,7 @@
 //import Button from "../Componets/Button";
 import chooseCard from "../GameLogic/chooseCard";
 
-import Loader from "../Componets/Loader"
+//import Loader from "../Componets/Loader"
 
 function Options() {
 
@@ -18,7 +18,7 @@ function Options() {
         <center style={{padding:10}}>
 
             {chooseCard("ee", 350)}
-            <Loader />
+      
             
         </center>
     )

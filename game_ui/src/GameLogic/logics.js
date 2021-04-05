@@ -49,13 +49,9 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
     if(rules.holdOn.active && number === rules.holdOn.card){
 
-        alert("hold On")
-
         return false
        
     }else if(rules.pickTwo.active && number === rules.pickTwo.card){
-
-        alert("pick 2")
 
         goMarket(opponentsCardAtHand, market, 2)
 
@@ -63,21 +59,15 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
     }else if(rules.pickThree.active && number === rules.pickThree.card){
 
-        alert("pick 3")
-
         goMarket(opponentsCardAtHand, market, 3)
 
         return false
 
     }else if(rules.suspension.active && number === rules.suspension.card){
 
-        alert("suspension")
-
         return false
 
     }else if(rules.generalMarket.active && number === rules.generalMarket.card){
-
-        alert("general market")
 
         goMarket(opponentsCardAtHand, market)
 
@@ -107,13 +97,9 @@ export function playGame(player, card, cardPlayed, number){
 
     }else if(number === 20){
 
+        cardPlayed.pop()
+
         cardPlayed.push(card[0])
-
-        for(let i = 0; i < player.length; i++){
-
-            if(player[i] === "whot:20") player.splice(i, 1)
-            
-        }
 
     }else{
 
@@ -164,17 +150,26 @@ export function checkGame(card, inPlay) {
 
 }
 
-export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, setState){
+export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events){
 
-    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, setState)
+    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events)
 
 }
 
 
-function handleResponse(index, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, setState){
+function handleResponse(index, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events){
    
+    
 
     if(response[index][0] === "whot:20"){
+
+        cardPlayed.push("whot:20")
+
+        for(let i = 0; i < playerCardAtHand.length; i++){
+
+            if(playerCardAtHand[i] === "whot:20") playerCardAtHand.splice(i, 1)
+            
+        }
 
     }else if(response[index][0] !== "z:goMarket"){
 
@@ -186,9 +181,10 @@ function handleResponse(index, response, rules, playerCardAtHand, opponentsCardA
 
     }
 
+    events.emit("play")
 
-    if(index + 1 < response.length) setTimeout(handleResponse, MOVE_WAITING_PERIOD, index + 1, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
-
+    if(index + 1 < response.length) setTimeout(handleResponse, MOVE_WAITING_PERIOD, index + 1, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events)
+    else events.emit("play-end")
 }
 
 
@@ -213,7 +209,7 @@ export function checkGameState(gameState){
 
         rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
  
-        //
+        // 
         let inPlay = sanitizeCardPlayed(gameState.cardPlayed)
 
         //adds all the card played to market
@@ -307,5 +303,3 @@ export function checkGameChanges(gameState, cardPlayed, market){
     return false
 
 }
-
-
