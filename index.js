@@ -96,7 +96,42 @@ app.get('/add_agents', (req, res) =>{
 
 })
 
+app.get('/jee', (req, res) =>{
+    /*
+    agents.update({agentName:"jee"}, 
+        {
+            losses: 1,
+            points: 1,
+            botLosses: 1,
+            botPoints: 1,
+        }).then(err => {
+            console.log(err)
+        })
+*/
+    
+    agents.findOne({agentName:"Siri"})
+        .then((data, err) => {
+            
+            if(!err){
 
+                agents.updateOne({agentName:"Siri"},
+                    {
+                        losses: data.losses + 1, 
+                        points: data.points + 1, 
+                        botLosses: data.botLosses + 1, 
+                        botPoints: data.botPoints + 1
+                    }, 
+                    {useFindAndModify:false}).then((data, err) => {
+                        console.log(data)
+                })
+
+            }
+
+        })
+
+    res.send("Jee")
+
+})
 
 app.post('/add_agents', (req, res) =>{
 

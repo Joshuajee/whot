@@ -36,4 +36,15 @@ if this value is true any card with the a number 20, gives the player the abilit
 The agent learns from its interations with other agents and users that play against it this improve the angents experience
 
 
+# config
+goto the Config forder create a file dev.js under the forder and insert the code below into the file dev.js
+
+```javascript
+
+module.exports = {
+    DataBaseURI: "your mongodb uri",
+}
+
+```
+
 

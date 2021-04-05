@@ -106,29 +106,45 @@ class GameEngine extends EventEmitter{
 
     updatePlayer(winnerName, losserName, winnerPoints, losserPoints){
 
-        agents.updateOne({agentName:winnerName},
-                    {
-                        wins: 1,
-                        points: winnerPoints,
-                        botWins: 1,
-                        botPoints: winnerPoints,
-                    }).then(err => {
-                        console.log(err)
-                    })
-                    
+        agents.findOne({agentName: winnerName})
+            .then((data, err) => {
+                
+                if(!err){
 
-        agents.updateOne({agentName:losserName}, 
-                    {
-                        losses: 1,
-                        points: losserPoints,
-                        botLosses: 1,
-                        botPoints: losserPoints,
-                    }).then(err => {
-                        console.log(err)
+                    agents.updateOne({agentName: winnerName},
+                        {
+                            "wins": data.wins + 1,
+                            "points": data.points + winnerPoints, 
+                            "botWins": data.botWins + 1, 
+                            "botPoints": data.botPoints + winnerPoints
+                        }, 
+                        {useFindAndModify:false}).then((data, err) => {
+                            console.log(data)
                     })
 
-                    console.log("yyyyyyyyyyyyyyyyyyyyy")
+                }
 
+            })
+
+        agents.findOne({agentName: losserName})
+            .then((data, err) => {
+                
+                if(!err){
+
+                    agents.updateOne({agentName: losserName},
+                        {
+                            "losses": data.losses + 1, 
+                            "points": data.points + losserPoints, 
+                            "botLosses": data.botLosses + 1, 
+                            "botPoints": data.botPoints + losserPoints
+                        }, 
+                        {useFindAndModify:false}).then((data, err) => {
+                            console.log(data)
+                    })
+
+                }
+
+            })
 
 
     }
