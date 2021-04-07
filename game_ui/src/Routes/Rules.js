@@ -9,7 +9,7 @@
 import Whot from "../Componets/Background/Whot"
 
 
-function Settings() {
+function Rules() {
 
 
     return(
@@ -46,4 +46,4 @@ function Settings() {
 
 }
 
-export default Settings
+export default Rules

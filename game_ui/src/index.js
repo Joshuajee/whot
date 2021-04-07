@@ -20,14 +20,14 @@ import {BrowserRouter, Route} from 'react-router-dom'
 //import reducers from "./Reducers";
 
 import Home from "./Routes/Home";
-import Options from "./Routes/Options";
+import Rules from "./Routes/Rules";
 import Leaderboard from "./Routes/Leaderboard";
 import Settings from "./Routes/Settings";
 import GamePlay from "./Routes/GamePlay";
 
 
 const home =  () => <Home />
-const options =  () => <Options />
+const rules =  () => <Rules />
 const leaderboard = () => <Leaderboard />
 const settings = () => <Settings />
 const game = () => <GamePlay />
@@ -42,7 +42,7 @@ ReactDOM.render(
       <BrowserRouter>
         <Route path="/" exact={true} component={home} />
         <Route path="/home" exact={true} component={home} />
-        <Route path="/options" exact={true} component={options} />
+        <Route path="/rules" exact={true} component={rules} />
         <Route path="/leaderboard" exact={true} component={leaderboard} />
         <Route path="/settings" exact={true} component={settings} />
         <Route path="/game" exact={false} component={game}/>

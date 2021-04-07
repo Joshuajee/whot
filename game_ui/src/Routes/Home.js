@@ -29,7 +29,7 @@ function Home() {
 
                 <Button text={"Play Game"} link={"/leaderboard"} class={"btn-start"}/>
 
-                <Button text={"Options"} link={"/options"}  class={"btn-options"}/>
+                <Button text={"Rules"} link={"/rules"}  class={"btn-rules"}/>
 
                 <Button text={"Leaderboard"} link={"/leaderboard"} class={"btn-leader"}/>
 

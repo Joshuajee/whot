@@ -13,7 +13,7 @@ body{
   margin-bottom: 1vh;
 }
 
-.btn-options{
+.btn-rules{
   color: white;
   background-color: gold;
   border-radius: 5%;
@@ -137,6 +137,12 @@ body{
   z-index: 20;
 }
 
+.whot-background{
+  z-index: -10;
+  position: fixed;
+  left: 35vw;
+}
+
 @keyframes rotates {
     0%{
       transform: rotate(0deg);
@@ -146,3 +152,14 @@ body{
     }
   }
 
+
+
+  table {
+    border-collapse: collapse;
+  }
+  
+  td, th {
+    text-align: left;
+    padding: 8px;
+    color: darkblue;
+  }
