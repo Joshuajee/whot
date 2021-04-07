@@ -11,7 +11,7 @@ var actionOneOld = []
 var actionTwoNew = []
 var actionTwoOld = []
 
-var MOVE_WAITING_PERIOD = 1000
+var MOVE_WAITING_PERIOD = 1500
 
 
 

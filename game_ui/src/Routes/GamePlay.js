@@ -38,8 +38,6 @@ class GamePlay extends React.Component{
 
         super()
 
-        //for Agent
-
         this.state = {
             isLoading:true,
             opponetIsPlaying:false,
@@ -185,7 +183,12 @@ class GamePlay extends React.Component{
 
                     checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market, this.events)
                     
+                }).catch((error) =>{
+
+                    alert(error)
+
                 })
+
 
         }else{
 
@@ -208,7 +211,7 @@ class GamePlay extends React.Component{
                 }else{
                     
                     let sendMove = referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
-
+                   
                     let request = {"gameState":this.state.gameState, "playerMove":card[0], rules:rules}
                     
                     if(sendMove){
@@ -230,6 +233,8 @@ class GamePlay extends React.Component{
      
                             
                         }).catch((error) =>{
+
+                            this.state.gameState.playerOne.cardAtHand.push(card[0])
 
                             alert(error)
 
