@@ -136,8 +136,6 @@ class GamePlay extends GameEngine{
             console.log("hold On")
 
             this.play(this.state)
-
-           //this.res.send(this.moves)
           
         }else if(rules.pickTwo.active && number == rules.pickTwo.card){
 
@@ -145,7 +143,7 @@ class GamePlay extends GameEngine{
 
             this.play(this.state)
 
-            //this.res.send(this.moves)
+            this.goMarket(this.playerOneCard, 2) 
 
         }else if(rules.pickThree.active && number == rules.pickThree.card){
 
@@ -153,7 +151,7 @@ class GamePlay extends GameEngine{
 
             this.play(this.state)
 
-            //this.res.send(this.moves)
+            this.goMarket(this.playerOneCard, 3) 
 
         }else if(rules.suspension.active && number == rules.suspension.card){
 
@@ -161,15 +159,13 @@ class GamePlay extends GameEngine{
 
             this.play(this.state)
 
-            //this.res.send(this.moves)
-
         }else if(rules.generalMarket.active && number == rules.generalMarket.card){
 
             console.log("general market")
 
             this.play(this.state)
 
-            //this.res.send(this.moves)
+            this.goMarket(this.playerOneCard, 1) 
 
         }else if(number == 20){
 
@@ -183,13 +179,16 @@ class GamePlay extends GameEngine{
 
             //send the move made to the client
             this.res.send(this.moves)
+
         }
 
     }
 
     close(){
+
         console.log("round : " + super.roundVal)
         console.log("---------------------------------")
+        
     }
 
 
@@ -204,6 +203,12 @@ class GamePlay extends GameEngine{
         this.market = gameState.market
         this.cardPlayed = gameState.cardPlayed
 
+        //get player details
+        this.playerOne = gameState.playerOne
+        this.playerOneName = this.playerOne.name
+        this.playerOneCard = this.playerOne.cardAtHand
+
+        //get agents details
         this.playerTwo = gameState.playerTwo
         this.playerTwoName = this.playerTwo.name
         this.playerTwoCard = this.playerTwo.cardAtHand
@@ -275,7 +280,7 @@ class GamePlay extends GameEngine{
             //console.log(playerName) 
             //console.log(this.playerTwoCard)
             //console.log(" in play " + this.inPlay[this.inPlay.length - 1])
-            //this.goMarket(playerTwoCard) 
+            this.goMarket(this.playerTwoCard, 1) 
             this.moves.push(["z:goMarket", -1])
 
             this.res.send(this.moves)
