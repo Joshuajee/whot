@@ -120,7 +120,7 @@ class GamePlay extends GameEngine{
 
         console.log(playerName) 
         console.log(playerTwoCard)
-        console.log(" in play " + this.inPlay[this.inPlay.length - 1])
+        //console.log(" in play " + this.inPlay[this.inPlay.length - 1])
         
         let card = this.chooseAction(action, avialableMove)
 
@@ -130,6 +130,8 @@ class GamePlay extends GameEngine{
         this.playGame(playerTwoCard, card)
 
         this.moves.push(card)
+
+        this.state.playerMove = card[0]
 
         if(rules.holdOn.active && number == rules.holdOn.card){
 
