@@ -41,7 +41,9 @@ app.post('/api/game', (req, res) =>{
 
     gameStart = new GamePlaying(req.body.user, req.body.agentName, req.body.rules, false, false)
 
-    let response = gameStart.startGame()
+    console.log(req.body.rules)
+
+    let response = gameStart.startGame(req.body.rules)
 
     console.log(response)
 

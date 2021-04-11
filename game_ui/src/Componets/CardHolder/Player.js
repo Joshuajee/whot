@@ -41,18 +41,20 @@ class Player extends React.Component {
         let cardSpaceAvailable = width - margin * 2 - cardSize
         let noOfCardsThatCanBeDisplayed = cardSpaceAvailable / (cardSize * 1.1)
 
-        const style = {
-            position:"absolute",
-            top:top,
+        let style = {
+            position: "absolute",
+            top: top,
             left: margin,
-            align:"center",
-            width: (width - margin * 2),  
-            height:  cardSize 
+            align: "center",
+            width: width - margin * 2,  
+            height: cardSize,
         }
 
-        const navStyle = {
-            height:cardSize * 1.5 * 1.1
+        let navStyle = {
+            height: cardSize * 1.5 * 1.1
         }
+        
+        
 
         let left = null
         let right = null

@@ -54,7 +54,7 @@ class GamePlay extends GameEngine{
         return this.moves
     }
 
-    startGame(){
+    startGame(rules){
 
         //class variables to hold game variables
         this.player1 = []
@@ -92,7 +92,8 @@ class GamePlay extends GameEngine{
                         "name":this.playerTwoName
                         },
                     "market":this.market,
-                    "cardPlayed":this.inPlay
+                    "cardPlayed":this.inPlay,
+                    rules : rules
                     }
 
         return state
@@ -120,7 +121,6 @@ class GamePlay extends GameEngine{
 
         console.log(playerName) 
         console.log(playerTwoCard)
-        //console.log(" in play " + this.inPlay[this.inPlay.length - 1])
         
         let card = this.chooseAction(action, avialableMove)
 

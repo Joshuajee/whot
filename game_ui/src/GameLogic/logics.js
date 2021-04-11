@@ -5,13 +5,9 @@
  * This program is distributed under the MIT license
  */
 
-var actionOneNew = []
-var actionOneOld = []
 
-var actionTwoNew = []
-var actionTwoOld = []
 
-var MOVE_WAITING_PERIOD = 1500
+var MOVE_WAITING_PERIOD = 1000
 
 
 
@@ -28,6 +24,8 @@ export function goMarket(player,  market, times = 1){
         if(market.length > 0){
 
             player.push(market[market.length - 1])
+
+            console.log(market[market.length - 1])
 
             market.pop()
 
@@ -203,11 +201,11 @@ export function checkGameState(gameState){
     
     if(gameState.playerOne.cardAtHand.length < 1 || gameState.playerOne.cardAtHand.length < 1){
 
-        rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
+        //rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
 
     }else if(gameState.market.length < 1){
 
-        rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
+        //rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
  
         // 
         let inPlay = sanitizeCardPlayed(gameState.cardPlayed)
@@ -272,7 +270,7 @@ export function sanitizeCardPlayed(cards){
 }
 
 
-function rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld){
+export function rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld){
 
     if(gameState.playerOne.cardAtHand < 1) alert(gameState.playerOne.name + " Wins ")
 
@@ -302,4 +300,76 @@ export function checkGameChanges(gameState, cardPlayed, market){
 
     return false
 
+}
+
+
+export function availableMove(playerCard, inPlayCard){
+
+    let index_in = inPlayCard.indexOf(":") + 1
+    let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
+    let shape_in = inPlayCard.slice(0, index_in)
+
+    let availableMove = ["z:goMarket"]
+
+    for(let i = 0; i < playerCard.length; i++){
+         
+        let index = playerCard[i].indexOf(":") + 1
+        let number = parseInt(playerCard[i].slice(index, playerCard[i].length))
+        let shape = playerCard[i].slice(0, index)
+
+        if(number === number_in){
+
+            availableMove.push(playerCard[i])
+
+        }else if(shape === shape_in){
+        
+            availableMove.push(playerCard[i])
+
+        }else if(number === 20){
+
+            availableMove.push("whot:20")
+
+        }
+
+    }
+
+
+    return availableMove
+
+}
+
+
+
+export function createState(gameState,  availableMoves, isPlayerOne){
+
+    if(isPlayerOne)
+        return { 
+            agentName: gameState.playerOne.name,
+            cardAtHand: gameState.playerOne.cardAtHand,
+            cardInPlay: gameState.cardPlayed[gameState.cardPlayed.length - 1],
+            cardPlayed: gameState.cardPlayed,
+            noOfCardsInMarket: gameState.market.length,
+            noOfCardsWithOpponent: gameState.playerTwo.cardAtHand.length,
+            availableMove: availableMoves,
+            actions:[],
+            rules: gameState.rules, 
+            createdOn : Date.now(), 
+            lastUpdatedOn : Date.now(),
+        }
+    else
+        return { 
+            agentName:"",
+            cardAtHand:[],
+            cardInPlay:"",
+            cardPlayed:[],
+            noOfCardsInMarket:0,
+            noOfCardsWithOpponent:0,
+            availableMove: availableMoves,
+            actions:[],
+            rules: gameState.rules, 
+            createdOn : Date.now(), 
+            lastUpdatedOn : Date.now(),
+        }
+        
+    
 }

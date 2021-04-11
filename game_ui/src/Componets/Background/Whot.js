@@ -6,11 +6,8 @@
  */
 
 
-//import Start from "../Componets/Background/Start";
-//import Button from "../Componets/Button";
 import chooseCard from "../../GameLogic/chooseCard"
 
-//import Loader from "../Componets/Loader"
 
 function Whot() {
 
