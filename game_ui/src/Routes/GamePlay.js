@@ -19,6 +19,7 @@ import Player from "../Componets/CardHolder/Player";
 
 import Need from "../Componets/Need"
 import Loader from "../Componets/Loader"
+import Modal from "../Componets/Modal"
 
 import {EventEmitter} from "events"
 
@@ -61,7 +62,7 @@ class GamePlay extends React.Component{
             change : true,
             playerOneStates : [],
             playerTwoStates : [],
-            
+            visibility : "hide-modal",   
         }
 
 
@@ -125,7 +126,7 @@ class GamePlay extends React.Component{
         }).catch((error) =>{
 
             //remove loader from the screen and transfer game control back to player
-            this.setState({isLoading : false, opponetIsPlaying : false})
+            this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
 
             alert(error)
 
@@ -166,6 +167,7 @@ class GamePlay extends React.Component{
                 
                 referee([card, this.state.gameState.playerOne.cardAtHand + 1], rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
+                //check the type of response gotten from server
                 checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market, this.events)
                 
             }).catch((error) =>{
@@ -180,7 +182,7 @@ class GamePlay extends React.Component{
                 this.state.playerOneStates.pop()
 
                 //remove loader from the screen and transfer game control back to player
-                this.setState({isLoading : false, opponetIsPlaying : false})
+                this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
 
                 alert(error)
 
@@ -229,7 +231,7 @@ class GamePlay extends React.Component{
                             this.state.playerOneStates.pop()
 
                             //remove loader and transfer game control back to player
-                            this.setState({isLoading : false, opponetIsPlaying : false})
+                            this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
 
                             alert(error)
 
@@ -297,9 +299,14 @@ class GamePlay extends React.Component{
 
         return(
             <div>
-                
+
+                {
+                    //<Modal text={"Network Error"} state={this.state}/>
+                }
                 <center id="game-table" style={style} className="game-table">
+
                     {gameObjects}
+
                 </center>
 
             </div>
