@@ -43,16 +43,16 @@ class GameEngine extends EventEmitter{
         
         super.on("actionOutput", ()=>{
 
-            const state = {
-                            "agentName":this.playerName,
-                            "cardAtHand":this.cardAtHand, 
-                            "noOfCardsWithOpponent": this.noOfCardsWithOpponent,
-                            "cardInPlay":this.inPlayCards,
-                            "cardPlayed": this.cardPlayed, 
-                            "noOfCardsInMarket":this.noOfCardsInMarket,
-                            "availableMove":this.availableMove,
-                            "actions":this.actionOutput,
-                            "rules":this.rules
+            let state = {
+                            "agentName" :   this.playerName,
+                            "cardAtHand"    :   [...this.cardAtHand], 
+                            "noOfCardsWithOpponent" : this.noOfCardsWithOpponent,
+                            "cardInPlay"    :   this.inPlayCards,
+                            "cardPlayed"    : [...this.cardPlayed], 
+                            "noOfCardsInMarket" :    this.noOfCardsInMarket,
+                            "availableMove" :   [...this.availableMove],
+                            "actions"   :   [...this.actionOutput],
+                            "rules" :   this.rules
                         }
                     
             this.action = [true, this.actionOutput]
@@ -62,7 +62,7 @@ class GameEngine extends EventEmitter{
                 this.playerOneStateRoundNew.push(state)
             else
                 this.playerTwoStateRoundNew.push(state)
-
+           
             super.emit(this.eventString)
 
         })
@@ -91,8 +91,6 @@ class GameEngine extends EventEmitter{
 
         })
     
-
-        
     }
 
     get roundVal(){
@@ -159,7 +157,7 @@ class GameEngine extends EventEmitter{
 
             statesNew[i].actions[actionsNew[i][1]] = statesNew[i].actions[actionsNew[i][1]] + point
             this.playerStateNew.push(statesNew[i])
-
+        
         }
 
         for(let i = 0; i < statesOld.length; i++){
@@ -375,12 +373,12 @@ class GameEngine extends EventEmitter{
             }else{
 
                 this.action = [false, data.action]
-    
+                
                 if(playerName === this.playerOneName)
                     this.playerOneStateRoundOld.push(data)
                 else
                     this.playerTwoStateRoundOld.push(data)
-                
+            
                 super.emit(eventString)
 
             }
@@ -431,6 +429,8 @@ class GameEngine extends EventEmitter{
 
         this.states = []
 
+
+        //find state with similar cars and moves
         states.find(query, (error, data) =>{
 
             this.states = data

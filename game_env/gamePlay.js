@@ -169,14 +169,6 @@ class GamePlay extends GameEngine{
 
             this.goMarket(this.playerOneCard, 1) 
 
-        }else if(number == 20){
-
-            this.need = true
-            
-            this.needOption = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
-
-            super.stateFinder(playerName, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.needOption, this.inPlay[this.inPlay.length - 1], this.market.length, rules, "need")
-            
         }else{
 
             //send the move made to the client
@@ -224,59 +216,28 @@ class GamePlay extends GameEngine{
         
         this.gameRules = state.rules
 
-        this.need = state.need
-
-        this.neededCard = state.neededCard
-
-        if(this.need){
-
-            for(let i = 0; i < this.playerTwoCard.length; i++){
-
-                let index_in = this.neededCard.indexOf(":") + 1
-                let shape_in = this.neededCard.slice(0, index_in)
-
-                let index = this.playerTwoCard[i].indexOf(":") + 1
-                let number = this.playerTwoCard[i].slice(index, this.playerTwoCard[i].length)
-                let shape = this.playerTwoCard[i].slice(0, index)
-                
-                if(shape == shape_in){
-                
-                    this.availableMove.push(this.playerTwoCard[i])
-
-                }else if(number == 20){
-
-                    this.availableMove.push("whot:20")
-
-                }
-
-            }
+        for(let i = 0; i < this.playerTwoCard.length; i++){
+        
+            let index = this.playerTwoCard[i].indexOf(":") + 1
+            let number = parseInt(this.playerTwoCard[i].slice(index, this.playerTwoCard[i].length))
+            let shape = this.playerTwoCard[i].slice(0, index)
             
-        }else{
 
-            for(let i = 0; i < this.playerTwoCard.length; i++){
-         
-                let index = this.playerTwoCard[i].indexOf(":") + 1
-                let number = parseInt(this.playerTwoCard[i].slice(index, this.playerTwoCard[i].length))
-                let shape = this.playerTwoCard[i].slice(0, index)
-                
-                if(number === number_in){
+            if(number === 20){
 
-                    this.availableMove.push(this.playerTwoCard[i])
+                this.availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
 
-                }else if(shape === shape_in){
-                
-                    this.availableMove.push(this.playerTwoCard[i])
+            }else if(number === number_in){
 
-                }else if(number === 20){
+                this.availableMove.push(this.playerTwoCard[i])
 
-                    this.availableMove.push("whot:20")
-
-                }
+            }else if(shape === shape_in){
+            
+                this.availableMove.push(this.playerTwoCard[i])
 
             }
 
         }
-
 
         if(this.availableMove.length == 1){
             //console.log(playerName) 
@@ -346,6 +307,7 @@ class GamePlay extends GameEngine{
         //|     subracts it from the player card at hand                              |
         //+---------------------------------------------------------------------------+
 
+        /*
         console.log("game played " + card[0])
 
         if(card[0] === "z:goMarket"){
@@ -376,6 +338,45 @@ class GamePlay extends GameEngine{
             }
 
         }
+
+        */
+
+
+        console.log("game played " + card[0])
+
+        let index = card[0].indexOf(":") + 1
+        let number = card[0].slice(index, card[0].length)
+
+        if(number == 20){
+        
+            this.cardPlayed.push(card[0])
+            
+            for(let i = 0; i < player.length; i++){
+             
+                if(player[i] == "whot:20") player.splice(i, 1)
+            
+            }
+
+        }else if(card[0] === "z:goMarket"){
+
+            this.goMarket(player)
+
+        }else{
+
+            this.cardPlayed.push(card[0])
+            
+            for(let i = 0; i < player.length; i++){
+
+                if(player[i] == card[0]) player.splice(i, 1)
+
+            }
+
+        }
+
+
+
+
+        
 
     }
 

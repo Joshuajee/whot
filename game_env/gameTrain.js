@@ -40,40 +40,6 @@ class GameTrain extends GameEngine{
                 this.play(this.player2, this.player1, this.playerTwoName, this.playerOneName)
         })
 
-
-        super.on("need", ()=>{
-     
-            const action = super.getAction
-
-            this.neededAction =  action[1]
-
-            this.neededCard = this.chooseAction(action, this.needOption)
-
-            if(this.currentPlayerName == this.playerOneName){
-
-                if(action[0])
-                    this.actionOneNew.push(this.neededCard)
-                else
-                    this.actionOneOld.push(this.neededCard)
-
-            }else{
-
-                if(action[0])
-                    this.actionTwoNew.push(this.neededCard)
-                else
-                    this.actionTwoOld.push(this.neededCard)
-                
-            }
-
-            this.cardNeeded(this.neededCard)
-
-            console.log("needed card " + this.neededCard[0])
-
-            this.close()
-
-            this.playerController(true)
-        })
-
         super.on("received", ()=>{
             let action = super.getAction
             this.referee(action, this.rules, this.availableMove.sort(), this.cardAtHand.sort(), this.playerName, this.opponent)
@@ -193,12 +159,6 @@ class GameTrain extends GameEngine{
 
             this.playerController()
 
-        }else if(card[0] === "whot:20"){
-
-            this.needOption = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
-
-            super.stateFinder(playerName, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.needOption, this.inPlay[this.inPlay.length - 2], this.market.length, rules, "need")
-            
         }else{
 
             this.playerController(true)
@@ -264,17 +224,17 @@ class GameTrain extends GameEngine{
             let number = playerCardAtHand[i].slice(index, playerCardAtHand[i].length)
             let shape = playerCardAtHand[i].slice(0, index)
             
-            if(number == number_in){
+            if(number == 20){
+
+                this.availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+
+            }else if(number == number_in){
 
                 this.availableMove.push(playerCardAtHand[i])
 
             }else if(shape == shape_in){
             
                 this.availableMove.push(playerCardAtHand[i])
-
-            }else if(number == 20){
-
-                this.availableMove.push("whot:20")
 
             }
 
@@ -290,8 +250,10 @@ class GameTrain extends GameEngine{
             this.playerController(true)
 
         }else{
+
             //search for states
             super.stateFinder(this.playerName, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove.sort(), this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
+        
         }
     
     }
@@ -341,9 +303,18 @@ class GameTrain extends GameEngine{
       
         console.log("game played " + card[0])
 
-        if(card[0] === "whot:20"){
+        let index = card[0].indexOf(":") + 1
+        let number = card[0].slice(index, card[0].length)
+
+        if(number == 20){
         
-            for(let i = 0; i < player.length; i++) if(player[i] == card[0]) player.splice(i, 1)
+            this.inPlay.push(card[0])
+            
+            for(let i = 0; i < player.length; i++){
+             
+                if(player[i] == "whot:20") player.splice(i, 1)
+            
+            }
 
         }else if(card[0] === "z:goMarket"){
 
@@ -406,8 +377,6 @@ class GameTrain extends GameEngine{
             super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
 
         }else if(this.market.length < 1){
-
-            console.log(this.inPlay)
    
             super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
@@ -425,6 +394,15 @@ class GameTrain extends GameEngine{
 
             //shuffles the cards
             this.market = shuffle(this.market)
+
+            console.log("Fopppppppppppdssssss")
+            console.log(this.market)
+            console.log(this.inPlay)
+            console.log(this.player1)
+            console.log(this.player2)
+
+            if(this.market.length + this.inPlay + this.player1 + this.player2 > 56)
+                ggggggggg
         }
 
     }
