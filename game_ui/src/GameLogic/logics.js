@@ -6,9 +6,7 @@
  */
 
 
-
-var MOVE_WAITING_PERIOD = 1000
-
+var MOVE_WAITING_PERIOD = 2000
 
 
 
@@ -156,12 +154,18 @@ export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCa
 
 
 function handleResponse(index, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events){
+
+    //+----------------------------------------------------------------------+
+    //|     Recursive function that loop through the server response and     |
+    //|     handle them appropriately it calls the setTimeout function                                       |
+    //+----------------------------------------------------------------------+
    
-    
+    let cardIndex = response[index][0].indexOf(":") + 1
+    let number = parseInt(response[index][0].slice(cardIndex, response[index][0].length))
 
-    if(response[index][0] === "whot:20"){
+    if(number === 20){
 
-        cardPlayed.push("whot:20")
+        cardPlayed.push(response[index][0])
 
         for(let i = 0; i < playerCardAtHand.length; i++){
 
@@ -358,18 +362,17 @@ export function createState(gameState,  availableMoves, isPlayerOne){
         }
     else
         return { 
-            agentName:"",
-            cardAtHand:[],
-            cardInPlay:"",
-            cardPlayed:[],
-            noOfCardsInMarket:0,
-            noOfCardsWithOpponent:0,
+            agentName: gameState.playerTwo.name,
+            cardAtHand: gameState.playerTwo.cardAtHand,
+            cardInPlay: gameState.cardPlayed[gameState.cardPlayed.length - 1],
+            cardPlayed: gameState.cardPlayed,
+            noOfCardsInMarket: gameState.market.length,
+            noOfCardsWithOpponent: gameState.playerOne.cardAtHand.length,
             availableMove: availableMoves,
             actions:[],
             rules: gameState.rules, 
             createdOn : Date.now(), 
             lastUpdatedOn : Date.now(),
-        }
-        
+        }   
     
 }

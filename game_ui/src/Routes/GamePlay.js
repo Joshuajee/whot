@@ -105,6 +105,10 @@ class GamePlay extends React.Component{
 
     needed(card){
 
+        let availableMoves = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
+
+        this.state.playerTwoStates.push(createState(this.state.gameState, availableMoves, true))
+
         this.setState({isNeeded : false, isLoading : true})
 
         let request = {"gameState":this.state.gameState, "playerMove":card, rules:rules}
