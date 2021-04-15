@@ -146,22 +146,37 @@ export function checkGame(card, inPlay) {
 
 }
 
-export function checkPlayResponse(response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events){
+export function checkPlayResponse(response, gameState, events, playerTwoState){
 
-    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events)
+    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, gameState, events, playerTwoState)
 
 }
 
 
-function handleResponse(index, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events){
+function handleResponse(index, response, gameState, events, playerTwoState){
 
     //+----------------------------------------------------------------------+
     //|     Recursive function that loop through the server response and     |
-    //|     handle them appropriately it calls the setTimeout function                                       |
+    //|     handle them appropriately it calls the setTimeout function       |
+    //|     it also update agent states                                      |
     //+----------------------------------------------------------------------+
+
+    
+    let playerCardAtHand = gameState.playerTwo.cardAtHand
+    let opponentsCardAtHand = gameState.playerOne.cardAtHand
+    let cardPlayed = gameState.cardPlayed
+    let market = gameState.market
+
+
+    let rules = gameState.rules
    
     let cardIndex = response[index][0].indexOf(":") + 1
     let number = parseInt(response[index][0].slice(cardIndex, response[index][0].length))
+
+    let availableMoves = availableMove(playerCardAtHand, cardPlayed[cardPlayed.length - 1])
+
+    playerTwoState.push(createState(gameState, availableMoves, false))
+
 
     if(number === 20){
 
@@ -185,7 +200,7 @@ function handleResponse(index, response, rules, playerCardAtHand, opponentsCardA
 
     events.emit("play")
 
-    if(index + 1 < response.length) setTimeout(handleResponse, MOVE_WAITING_PERIOD, index + 1, response, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market, events)
+    if(index + 1 < response.length) setTimeout(handleResponse, MOVE_WAITING_PERIOD, index + 1, response, gameState, events, playerTwoState)
     else events.emit("play-end")
 }
 

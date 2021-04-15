@@ -75,7 +75,7 @@ class GamePlay extends React.Component{
         this.events.on("play", ()=>{
 
             this.setState({ change : this.state.change ? false : true })
-
+  
         })
 
         this.events.on("play-end", ()=>{
@@ -107,7 +107,7 @@ class GamePlay extends React.Component{
 
         let availableMoves = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
 
-        this.state.playerTwoStates.push(createState(this.state.gameState, availableMoves, true))
+        this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true))
 
         this.setState({isNeeded : false, isLoading : true})
 
@@ -122,7 +122,7 @@ class GamePlay extends React.Component{
             this.state.gameState.cardPlayed.push(card)
         
             //check the type of response gotten from server
-            checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market, this.events)
+            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
 
             //remove loader from screen and transfer game control to player
             this.setState({opponetIsPlaying : false, isLoading : false })
@@ -148,9 +148,13 @@ class GamePlay extends React.Component{
 
         this.setState({ isLoading : true })
 
-        console.log("SSSSS==============SSSSS")
+        console.log("State 1")
 
         console.log(this.state.playerOneStates)
+
+        console.log("State 2")
+
+        console.log(this.state.playerTwoStates)
 
         if(card === "z:goMarket"){
 
@@ -172,7 +176,7 @@ class GamePlay extends React.Component{
                 referee([card, this.state.gameState.playerOne.cardAtHand + 1], rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
                 //check the type of response gotten from server
-                checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market, this.events)
+                checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
                 
             }).catch((error) =>{
 
@@ -221,7 +225,7 @@ class GamePlay extends React.Component{
                             this.setState({isLoading : false, opponetIsPlaying : true})
 
                             //handle response gotten from server 
-                            checkPlayResponse(response, rules, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed,  this.state.gameState.market, this.events)
+                            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
      
                         }).catch((error) =>{
 
