@@ -11,13 +11,13 @@ import axios from "axios"
 
 import {canPlay, checkPlayResponse, createState,
         referee, goMarket, checkGameState, 
-        checkGameChanges, availableMove} from  "../GameLogic/logics"
+        checkGameChanges, availableMove, cardIndex} from  "../GameLogic/logics"
 
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
 import Player from "../Componets/CardHolder/Player";
 
-import Need from "../Componets/Need"
+import Need from "../Componets/CardHolder/Need"
 import Loader from "../Componets/Loader"
 import Modal from "../Componets/Modal"
 
@@ -103,11 +103,21 @@ class GamePlay extends React.Component{
 
     }
 
+
+    close(close){
+
+        alert(this.state.visibility)
+        //this.setState({visibility : "hide-modal" })
+        //this.setState({isNeeded : false, isLoading : true})
+    }
+
     needed(card){
 
-        let availableMoves = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
+        let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
 
         this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true))
+
+        card.push(cardIndex(availableMoves, card[0]))
 
         this.setState({isNeeded : false, isLoading : true})
 
@@ -119,7 +129,7 @@ class GamePlay extends React.Component{
 
             let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
             this.state.gameState.playerOne.cardAtHand.splice(index, 1)
-            this.state.gameState.cardPlayed.push(card)
+            this.state.gameState.cardPlayed.push(card[0])
         
             //check the type of response gotten from server
             checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
@@ -140,10 +150,12 @@ class GamePlay extends React.Component{
 
     playCard(card) {
 
-       
-
-        let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
         
+       
+        let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
+
+        card.push(cardIndex(availableMoves, card[0]))
+
         this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true))
 
         this.setState({ isLoading : true })
@@ -156,7 +168,7 @@ class GamePlay extends React.Component{
 
         console.log(this.state.playerTwoStates)
 
-        if(card === "z:goMarket"){
+        if(card[0] === "z:goMarket"){
 
             this.setState({opponetIsPlaying : true})
 
@@ -172,8 +184,6 @@ class GamePlay extends React.Component{
 
                 //remove loader from screen and transfer game control back to opponent
                 this.setState({isLoading : false, opponetIsPlaying : true})
-                
-                referee([card, this.state.gameState.playerOne.cardAtHand + 1], rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
 
                 //check the type of response gotten from server
                 checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
@@ -208,6 +218,9 @@ class GamePlay extends React.Component{
                 if(playGame[1]){
 
                     this.setState({isNeeded : true, isLoading : false})
+
+                    //remove last state
+                    this.state.playerOneStates.pop()
 
                 }else{
                     
@@ -307,10 +320,9 @@ class GamePlay extends React.Component{
 
         return(
             <div>
-
-                {
-                    //<Modal text={"Network Error"} state={this.state}/>
-                }
+            {
+            //    <Modal text={"Network Error"} close={this.close} visibility={this.state.visibility} />
+            }
                 <center id="game-table" style={style} className="game-table">
 
                     {gameObjects}

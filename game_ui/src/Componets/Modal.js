@@ -2,27 +2,33 @@ import React from "react"
 
 import  "../Styles/modal.css"
 
-function Modal(props){
+class Modal extends React.Component{
 
-    let visibility = props.state.visibility
-    
-    return(
-        <div>
 
-            <div className={"modal " + visibility}>
+    render(){
+        let visibility = this.props.visibility
+        let close = this.props.close
 
-                <div className={"modal-content"}>
+        
+        return(
+            <div>
 
-                    <span className="close" onClick={() =>{ visibility = "hide-modal"; alert(visibility)}}>&times;</span>
+                <div className={"modal " + visibility}>
+
+                    <div className={"modal-content"}>
+
+                        <span className="close" onClick={() => close("cccc")}>&times;</span>
+                        
+                        <center>{this.props.text}</center>
                     
-                    <center>{props.text}</center>
-                
+                    </div>
+
                 </div>
 
             </div>
+        )
 
-        </div>
-    )
+    }
 
 }
 

@@ -173,6 +173,7 @@ function handleResponse(index, response, gameState, events, playerTwoState){
     let cardIndex = response[index][0].indexOf(":") + 1
     let number = parseInt(response[index][0].slice(cardIndex, response[index][0].length))
 
+    alert(response[index][0])
     let availableMoves = availableMove(playerCardAtHand, cardPlayed[cardPlayed.length - 1])
 
     playerTwoState.push(createState(gameState, availableMoves, false))
@@ -336,7 +337,17 @@ export function availableMove(playerCard, inPlayCard){
         let number = parseInt(playerCard[i].slice(index, playerCard[i].length))
         let shape = playerCard[i].slice(0, index)
 
-        if(number === number_in){
+        
+
+        if(number === 20){
+
+            availableMove.sort()
+
+            availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+            
+            return availableMove
+
+        }if(number === number_in){
 
             availableMove.push(playerCard[i])
 
@@ -344,16 +355,12 @@ export function availableMove(playerCard, inPlayCard){
         
             availableMove.push(playerCard[i])
 
-        }else if(number === 20){
-
-            availableMove.push("whot:20")
-
         }
 
     }
 
 
-    return availableMove
+    return availableMove.sort()
 
 }
 
@@ -370,10 +377,8 @@ export function createState(gameState,  availableMoves, isPlayerOne){
             noOfCardsInMarket: gameState.market.length,
             noOfCardsWithOpponent: gameState.playerTwo.cardAtHand.length,
             availableMove: availableMoves,
-            actions:[],
             rules: gameState.rules, 
-            createdOn : Date.now(), 
-            lastUpdatedOn : Date.now(),
+
         }
     else
         return { 
@@ -384,10 +389,15 @@ export function createState(gameState,  availableMoves, isPlayerOne){
             noOfCardsInMarket: gameState.market.length,
             noOfCardsWithOpponent: gameState.playerOne.cardAtHand.length,
             availableMove: availableMoves,
-            actions:[],
             rules: gameState.rules, 
-            createdOn : Date.now(), 
-            lastUpdatedOn : Date.now(),
         }   
     
+}
+
+export function cardIndex(availableMove, move){
+
+    if(availableMove.length === 0) return -1
+
+    for (let i = 0; i < availableMove.length; i++) if(availableMove[i] === move) return i   
+
 }

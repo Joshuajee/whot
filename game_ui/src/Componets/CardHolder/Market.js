@@ -24,7 +24,7 @@ function Market(props) {
     if(props.playable)
         return(
             <div style={style}>
-                    <span onClick={() => props.action("z:goMarket")}>{ chooseCard("ff", cardSize) }</span>
+                    <span onClick={() => props.action(["z:goMarket"])}>{ chooseCard("ff", cardSize) }</span>
                     <CardNumber cardNumber={props.cardNumber} />
             </div>
             )

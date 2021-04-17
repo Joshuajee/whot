@@ -111,7 +111,7 @@ class Player extends React.Component {
             if((i + 1 - start) * 1.1 * cardSize >= cardSpaceAvailable) break
             
             if(this.props.playable)
-                cardArray.push(<span onClick = {() => action([cards[i], i])}> { chooseCard(cards[i], cardSize) } </span>)
+                cardArray.push(<span onClick = {() => action([cards[i]])}> { chooseCard(cards[i], cardSize) } </span>)
             else
             cardArray.push(<span> { chooseCard(cards[i], cardSize) } </span>)
         }
