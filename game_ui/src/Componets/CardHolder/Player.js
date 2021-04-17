@@ -32,13 +32,14 @@ class Player extends React.Component {
 
         let width = window.innerWidth
         let height = window.innerHeight
-        let cardSize = height/10
+        let cardSize = height / (4 * 1.5)
 
-        let margin = (width / 2) - cardSize * 0.6666666667 - width * 0.2
+        let margin = width * 0.05
 
         let top = this.props.top * height - cardSize
 
-        let cardSpaceAvailable = width - margin * 2 - cardSize
+        let cardSpaceAvailable = width  - margin * 2
+
         let noOfCardsThatCanBeDisplayed = cardSpaceAvailable / (cardSize * 1.1)
 
         let style = {
@@ -46,12 +47,12 @@ class Player extends React.Component {
             top: top,
             left: margin,
             align: "center",
-            width: width - margin * 2,  
+            width: cardSpaceAvailable,  
             height: cardSize,
         }
 
         let navStyle = {
-            height: cardSize * 1.5 * 1.1
+            height: cardSize  * 1.5
         }
         
         
@@ -103,8 +104,9 @@ class Player extends React.Component {
         let cardArray = []
     
         let width = window.innerWidth
-        let margin = (width / 2) - cardSize * 0.6666666667 - width * 0.2
-        let cardSpaceAvailable = width - margin * 2 - cardSize
+        
+        let margin = width * 0.05
+        let cardSpaceAvailable = width  - margin * 2
     
         for(let i = start; i < cards.length; i++){
            

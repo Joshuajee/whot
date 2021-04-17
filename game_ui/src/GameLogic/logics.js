@@ -173,7 +173,6 @@ function handleResponse(index, response, gameState, events, playerTwoState){
     let cardIndex = response[index][0].indexOf(":") + 1
     let number = parseInt(response[index][0].slice(cardIndex, response[index][0].length))
 
-    alert(response[index][0])
     let availableMoves = availableMove(playerCardAtHand, cardPlayed[cardPlayed.length - 1])
 
     playerTwoState.push(createState(gameState, availableMoves, false))
@@ -324,6 +323,14 @@ export function checkGameChanges(gameState, cardPlayed, market){
 
 
 export function availableMove(playerCard, inPlayCard){
+
+    //+----------------------------------------------------------------------+
+    //|     This function receive two arguments, the first argument is the     |
+    //|     card in the player hand and the second argument is the last      |
+    //|     card played, the function loop through the first argument and    |
+    //|     return all the valid moves that can be made                      | 
+    //+----------------------------------------------------------------------+
+
 
     let index_in = inPlayCard.indexOf(":") + 1
     let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))

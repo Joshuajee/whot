@@ -106,7 +106,7 @@ class GamePlay extends React.Component{
 
     close(close){
 
-        alert(this.state.visibility)
+        //alert(this.state.visibility)
         //this.setState({visibility : "hide-modal" })
         //this.setState({isNeeded : false, isLoading : true})
     }
@@ -285,9 +285,7 @@ class GamePlay extends React.Component{
 
         let height = window.innerHeight
 
-        const style = {height: height * 0.9}
-
-        if(this.state.isLoading) return(<center id="game-table" style={style} className="game-table"><Loader /> </center>)
+        if(this.state.isLoading) return(<center id="game-table"  className="game-table"><Loader /> </center>)
 
         let playerCard = this.state.gameState.playerOne.cardAtHand
 
@@ -323,7 +321,7 @@ class GamePlay extends React.Component{
             {
             //    <Modal text={"Network Error"} close={this.close} visibility={this.state.visibility} />
             }
-                <center id="game-table" style={style} className="game-table">
+                <center id="game-table"  className="game-table">
 
                     {gameObjects}
 

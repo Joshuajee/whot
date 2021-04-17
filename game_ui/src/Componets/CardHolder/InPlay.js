@@ -17,7 +17,7 @@ function InPlay(props) {
     
     let width = window.innerWidth
     let height = window.innerHeight
-    let cardSize = height/10
+    let cardSize = height / (4 * 1.5)
 
     const style = {
         position:"absolute",

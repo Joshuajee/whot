@@ -107,7 +107,6 @@ body{
 .game-table{
   border: 1px solid brown;
   background-color: green;
-  margin: 5vh;
   border-radius: 4%;
   box-shadow: dimgrey 333;
 }
@@ -130,6 +129,7 @@ body{
   color: whitesmoke;
   background-color: blueviolet;
   width: 25px;
+  display: inline;
 }
 
 .loader{

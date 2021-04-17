@@ -13,12 +13,12 @@ function Market(props) {
     
     let width = window.innerWidth
     let height = window.innerHeight
-    let cardSize = height/10
+    let cardSize = height / (4 * 1.5)
 
     const style = {
         position:"absolute",
-        top:height/2 - cardSize,
-        left:width/2 - cardSize * 0.6666666667 - width * 0.2
+        top:    height / 2 - cardSize,
+        left:   width * 0.05
     }
 
     if(props.playable)
