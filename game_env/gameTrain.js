@@ -42,16 +42,12 @@ class GameTrain extends GameEngine{
 
         super.on("received", ()=>{
             let action = super.getAction
-            this.referee(action, this.rules, this.availableMove.sort(), this.cardAtHand.sort(), this.playerName, this.opponent)
+            this.referee(action, this.rules, this.availableMove, this.cardAtHand.sort(), this.playerName, this.opponent)
         })
 
 
     }
 
-    cardNeeded(need){
-
-        this.inPlay.push(need[0])
-    }
 
     startGame(){
 
@@ -199,6 +195,56 @@ class GameTrain extends GameEngine{
 
     }
 
+    availableMoves(playerCard, inPlayCard){
+
+        
+
+        //+----------------------------------------------------------------------+
+        //|     This method receive two arguments, the first argument is the     |
+        //|     card in the player hand and the second argument is the last      |
+        //|     card played, the method loop through the first argument and    |
+        //|     return all the valid moves that can be made                      | 
+        //+----------------------------------------------------------------------+
+
+        let index_in = inPlayCard.indexOf(":") + 1
+        let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
+        let shape_in = inPlayCard.slice(0, index_in)
+    
+        let availableMove = ["z:goMarket"]
+    
+        for(let i = 0; i < playerCard.length; i++){
+             
+            let index = playerCard[i].indexOf(":") + 1
+            let number = parseInt(playerCard[i].slice(index, playerCard[i].length))
+            let shape = playerCard[i].slice(0, index)
+    
+            
+    
+            if(number === 20){
+    
+                availableMove.sort()
+    
+                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+                
+                return availableMove
+    
+            }if(number === number_in){
+    
+                availableMove.push(playerCard[i])
+    
+            }else if(shape === shape_in){
+            
+                availableMove.push(playerCard[i])
+    
+            }
+    
+        }
+    
+    
+        return availableMove.sort()
+    
+    }
+
 
 
     play(playerCardAtHand, opponentsCardAtHand, playerName, opponentName){
@@ -206,10 +252,7 @@ class GameTrain extends GameEngine{
         console.log("Market " + this.market.length)
 
         let inPlayIndex = this.inPlay.length - 1
-        let index_in = this.inPlay[inPlayIndex].indexOf(":") + 1
-        let number_in = this.inPlay[inPlayIndex].slice(index_in, this.inPlay[inPlayIndex].length)
-        let shape_in = this.inPlay[inPlayIndex].slice(0, index_in)
-        this.availableMove = ["z:goMarket"]
+        let inPlayCard = this.inPlay[inPlayIndex]
         this.playerName = playerName
         this.opponent = opponentsCardAtHand
         this.cardAtHand = playerCardAtHand
@@ -219,26 +262,7 @@ class GameTrain extends GameEngine{
 
         this.currentPlayerName = playerName
 
-        for(let i = 0; i < playerCardAtHand.length; i++){
-            let index = playerCardAtHand[i].indexOf(":") + 1
-            let number = playerCardAtHand[i].slice(index, playerCardAtHand[i].length)
-            let shape = playerCardAtHand[i].slice(0, index)
-            
-            if(number == 20){
-
-                this.availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
-
-            }else if(number == number_in){
-
-                this.availableMove.push(playerCardAtHand[i])
-
-            }else if(shape == shape_in){
-            
-                this.availableMove.push(playerCardAtHand[i])
-
-            }
-
-        }
+        this.availableMove = this.availableMoves(this.cardAtHand, inPlayCard)
 
         if(this.availableMove.length === 1){
 
@@ -252,7 +276,7 @@ class GameTrain extends GameEngine{
         }else{
 
             //search for states
-            super.stateFinder(this.playerName, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove.sort(), this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
+            super.stateFinder(this.playerName, this.cardPlayed, this.cardAtHand.sort(), this.noOfCardsWithOpponent, this.availableMove, this.inPlay[this.inPlay.length - 1], this.market.length, this.rules)
         
         }
     

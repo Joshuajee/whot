@@ -44,8 +44,8 @@ class GamePlay extends GameEngine{
         super.on("received", ()=>{
             let action = super.getAction
             console.log(action)
-            console.log(this.availableMove.sort())
-            this.referee(action, this.gameRules, this.availableMove.sort(), this.playerTwoCard.sort(), this.playerTwoName, this.playerTwoCard)
+            console.log(this.availableMove)
+            this.referee(action, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, this.playerTwoCard)
         })  
 
     }
@@ -186,6 +186,55 @@ class GamePlay extends GameEngine{
     }
 
 
+    
+    availableMoves(playerCard, inPlayCard){
+
+        //+----------------------------------------------------------------------+
+        //|     This method receive two arguments, the first argument is the     |
+        //|     card in the player hand and the second argument is the last      |
+        //|     card played, the method loop through the first argument and    |
+        //|     return all the valid moves that can be made                      | 
+        //+----------------------------------------------------------------------+
+
+        let index_in = inPlayCard.indexOf(":") + 1
+        let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
+        let shape_in = inPlayCard.slice(0, index_in)
+    
+        let availableMove = ["z:goMarket"]
+    
+        for(let i = 0; i < playerCard.length; i++){
+             
+            let index = playerCard[i].indexOf(":") + 1
+            let number = parseInt(playerCard[i].slice(index, playerCard[i].length))
+            let shape = playerCard[i].slice(0, index)
+    
+            
+    
+            if(number === 20){
+    
+                availableMove.sort()
+    
+                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+                
+                return availableMove
+    
+            }if(number === number_in){
+    
+                availableMove.push(playerCard[i])
+    
+            }else if(shape === shape_in){
+            
+                availableMove.push(playerCard[i])
+    
+            }
+    
+        }
+    
+    
+        return availableMove.sort()
+    
+    }
+
 
 
 
@@ -207,39 +256,15 @@ class GamePlay extends GameEngine{
         this.playerTwoName = this.playerTwo.name
         this.playerTwoCard = this.playerTwo.cardAtHand
 
-        let index_in = this.playerMove.indexOf(":") + 1
-        let number_in = parseInt(this.playerMove.slice(index_in, this.playerMove.length))
-        let shape_in = this.playerMove.slice(0, index_in)
+        this.availableMove = this.availableMoves(this.playerTwoCard, this.cardPlayed[this.cardPlayed.length - 1])
 
-        this.availableMove = ["z:goMarket"]
         this.noOfCardsWithPlayerOne = gameState.playerOne.cardAtHand.length
         
         this.gameRules = state.rules
 
-        for(let i = 0; i < this.playerTwoCard.length; i++){
         
-            let index = this.playerTwoCard[i].indexOf(":") + 1
-            let number = parseInt(this.playerTwoCard[i].slice(index, this.playerTwoCard[i].length))
-            let shape = this.playerTwoCard[i].slice(0, index)
-            
 
-            if(number === 20){
-
-                this.availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
-
-            }else if(number === number_in){
-
-                this.availableMove.push(this.playerTwoCard[i])
-
-            }else if(shape === shape_in){
-            
-                this.availableMove.push(this.playerTwoCard[i])
-
-            }
-
-        }
-
-        if(this.availableMove.length == 1){
+        if(this.availableMove.length === 1){
             //console.log(playerName) 
             //console.log(this.playerTwoCard)
             //console.log(" in play " + this.inPlay[this.inPlay.length - 1])
@@ -250,7 +275,7 @@ class GamePlay extends GameEngine{
 
         }else{
             //search for states
-            super.stateFinder(this.playerTwoName, this.cardPlayed, this.playerTwoCard, this.noOfCardsWithPlayerOne, this.availableMove.sort(), this.playerMove, this.market.length, this.gameRules)
+            super.stateFinder(this.playerTwoName, this.cardPlayed, this.playerTwoCard, this.noOfCardsWithPlayerOne, this.availableMove, this.playerMove, this.market.length, this.gameRules)
         }
     
         console.log("available moves: "+ this.availableMove)
@@ -261,8 +286,6 @@ class GamePlay extends GameEngine{
 
 
     chooseAction(action, availableMove){
-
-        ///suspected of having bugs
 
         //+---------------------------------------------------------------------------+
         //|  This method receive action a vector of numbers and the availableMoves,   |
@@ -295,6 +318,8 @@ class GamePlay extends GameEngine{
 
     }
 
+    
+
 
 
 
@@ -306,41 +331,6 @@ class GamePlay extends GameEngine{
         //|     taken it takes it, if a card is played it adds it to gamePlayed and   |
         //|     subracts it from the player card at hand                              |
         //+---------------------------------------------------------------------------+
-
-        /*
-        console.log("game played " + card[0])
-
-        if(card[0] === "z:goMarket"){
-
-            this.goMarket(player)
-
-        }else if(!this.need){
-
-            this.cardPlayed.push(card[0])
-
-            for(let i = 0; i < player.length; i++){
-                if(player[i] === card[0]){
-                    player.splice(i, 1)
-                    //console.log(player)
-                    this.need = false
-                }
-            }
-
-        }else if(this.need){
-
-            this.cardPlayed.push(card[0])
-
-            for(let i = 0; i < player.length; i++){
-                if(player[i] === card[0]){
-                    player.splice(i, 1)
-                    this.need = false
-                }
-            }
-
-        }
-
-        */
-
 
         console.log("game played " + card[0])
 
