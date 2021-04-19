@@ -186,15 +186,13 @@ class GamePlay extends GameEngine{
     }
 
 
-    
+    /**
+     * This method search for valid moves           
+     * @param {*} playerCard cards of the player that is to make a move
+     * @param {*} inPlayCard last card played
+     * @returns an array all valid moves that can be mades
+     */    
     availableMoves(playerCard, inPlayCard){
-
-        //+----------------------------------------------------------------------+
-        //|     This method receive two arguments, the first argument is the     |
-        //|     card in the player hand and the second argument is the last      |
-        //|     card played, the method loop through the first argument and    |
-        //|     return all the valid moves that can be made                      | 
-        //+----------------------------------------------------------------------+
 
         let index_in = inPlayCard.indexOf(":") + 1
         let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
@@ -278,20 +276,20 @@ class GamePlay extends GameEngine{
             super.stateFinder(this.playerTwoName, this.cardPlayed, this.playerTwoCard, this.noOfCardsWithPlayerOne, this.availableMove, this.playerMove, this.market.length, this.gameRules)
         }
     
-        console.log("available moves: "+ this.availableMove)
+        console.log("available moves: " + this.availableMove)
 
     }
 
 
 
-
+    /**
+    * This method chooses the action taken by the agent
+    * @param {*} action an array where the first element is a boolean
+    * and the second element is an array of numbers
+    * @param {*} availableMove an array of all the moves that is available
+    * @returns an array which is the action picked by the agent
+    */
     chooseAction(action, availableMove){
-
-        //+---------------------------------------------------------------------------+
-        //|  This method receive action a vector of numbers and the availableMoves,   |
-        //|  and return the available move with highest corresponding action value    |
-        //|  or a random value of the maximums move if there is move than one maximum | 
-        //+---------------------------------------------------------------------------+
 
         let maxAction = Math.max(...action)
 
@@ -322,15 +320,13 @@ class GamePlay extends GameEngine{
 
 
 
-
+    /**
+     * This method handles move made by updating the appropriate variables, which are
+     * this.market, player and this.inPlay depending on the move 
+     * @param {*} player cards of the player that is to make a move
+     * @param {*} move move made by the player
+     */
     playGame(player, card){
-
-
-        //+---------------------------------------------------------------------------+
-        //|     This method takes in the player cards at hand an the action to be     |
-        //|     taken it takes it, if a card is played it adds it to gamePlayed and   |
-        //|     subracts it from the player card at hand                              |
-        //+---------------------------------------------------------------------------+
 
         console.log("game played " + card[0])
 
@@ -344,6 +340,7 @@ class GamePlay extends GameEngine{
             for(let i = 0; i < player.length; i++){
              
                 if(player[i] == "whot:20") player.splice(i, 1)
+                break
             
             }
 
@@ -372,13 +369,13 @@ class GamePlay extends GameEngine{
 
 
 
-
+    /**
+     * This method adds card to player and remove that same card from market
+     * for n number of times   
+     * @param {*} player cards of the player that is going to the market
+     * @param {*} times number of times the player goes to market has a default value of 1
+     */
     goMarket(player, times = 1){
-
-        //+---------------------------------------------------------------------------+
-        //|      This method adds card to player and remove that same card from       |  
-        //|      market for n number of times                                         |
-        //+---------------------------------------------------------------------------+
 
         console.log("card picked " +times)
 
@@ -399,17 +396,14 @@ class GamePlay extends GameEngine{
 
 
 
-
+    /**
+     * This method checks if any of the player cards or market is less than one then 
+     * it calls the reward method in GameEngine, if  any of the player cards is 
+     * finished that player wins the game and the game is over but if market is 
+     * finished, it adds all cards from card Played to market and shuffle them 
+     * while calling the reward method in GameEngine, but the game continues  
+     */
     checkGame(){
-
-        //+---------------------------------------------------------------------------+
-        //|      This method checks if any of the player cards or market is less      |  
-        //|      than one then it calls the reward method in GameEngine, if  any      |
-        //|      of the player cards is finished that player wins the game and the    |
-        //|      game is over but if market is finished, it adds all cards from       |
-        //|      card Played to market and shuffle them while calling the reward      |
-        //|      method in GameEngine, but the game continues                         |
-        //+---------------------------------------------------------------------------+
 
         if(this.player1.length < 1 || this.player2.length < 1){
 
@@ -441,7 +435,11 @@ class GamePlay extends GameEngine{
 
 
 
-
+/**
+ * This function shuffles an array
+ * @param {*} array array to be shuffled
+ * @returns shuffled array
+ */
 function shuffle(array){
 
     let currIndex = array.length
