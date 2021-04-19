@@ -1,8 +1,9 @@
-/*
- * Copyright (C) 2021 Joshua Evuetapha
- * Twitter : @evuetaphajoshua
- * Github : @Joshuajee
- * This program is distributed under the MIT license
+/**
+ * @author Joshua Emmanuel Evuetapha
+ * @copyright (C) 2021 Joshua Evuetapha
+ * @twitter  evuetaphajoshua
+ * @github   Joshuajee
+ * @license MIT This program is distributed under the MIT license
  */
 
 const GameEngine = require("./gameEngine")
@@ -113,8 +114,6 @@ class GamePlay extends GameEngine{
 
         return state
     }
-
-
 
     referee(action, rules, avialableMove, playerTwoCard, playerName, opponentsCardAtHand){
 
@@ -260,8 +259,6 @@ class GamePlay extends GameEngine{
         
         this.gameRules = state.rules
 
-        
-
         if(this.availableMove.length === 1){
             //console.log(playerName) 
             //console.log(this.playerTwoCard)
@@ -339,8 +336,10 @@ class GamePlay extends GameEngine{
             
             for(let i = 0; i < player.length; i++){
              
-                if(player[i] == "whot:20") player.splice(i, 1)
-                break
+                if(player[i] == "whot:20"){ 
+                    player.splice(i, 1)
+                    break
+                }
             
             }
 
@@ -359,11 +358,6 @@ class GamePlay extends GameEngine{
             }
 
         }
-
-
-
-
-        
 
     }
 

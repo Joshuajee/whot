@@ -1,3 +1,15 @@
+/**
+ * @author Joshua Emmanuel Evuetapha
+ * @copyright (C) 2021 Joshua Evuetapha
+ * @twitter  evuetaphajoshua
+ * @github   Joshuajee
+ * @license MIT This program is distributed under the MIT license
+ */
+
+
+/*
+
+
 const mongoose = require('mongoose')
 const config = require("../Config/config")
 const axios = require('axios')
@@ -63,3 +75,4 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'))
 })
 
 
+*/
