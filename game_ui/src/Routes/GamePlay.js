@@ -119,17 +119,18 @@ class GamePlay extends React.Component{
 
         card.push(cardIndex(availableMoves, card[0]))
 
-        this.setState({isNeeded : false, isLoading : true})
-
+        this.setState({isNeeded : false, isLoading : true, opponetIsPlaying : true})
+ 
         let request = {"gameState":this.state.gameState, "playerMove":card, rules:rules}
     
+        let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
+        this.state.gameState.playerOne.cardAtHand.splice(index, 1)
+        this.state.gameState.cardPlayed.push(card[0])
+
         axios.post("/api/play", request).then((res)=>{
             
             let response = res.data
 
-            let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
-            this.state.gameState.playerOne.cardAtHand.splice(index, 1)
-            this.state.gameState.cardPlayed.push(card[0])
         
             //check the type of response gotten from server
             checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
@@ -139,8 +140,15 @@ class GamePlay extends React.Component{
     
         }).catch((error) =>{
 
+            //remove the last card played
+            this.state.gameState.cardPlayed.pop()
+
+            //return whot back to player
+            this.state.gameState.playerOne.cardAtHand.push("whot:20")
+
             //remove loader from the screen and transfer game control back to player
             this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
+
 
             alert(error)
 
@@ -151,7 +159,6 @@ class GamePlay extends React.Component{
     playCard(card) {
 
         
-       
         let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
 
         card.push(cardIndex(availableMoves, card[0]))
@@ -293,7 +300,7 @@ class GamePlay extends React.Component{
 
         let inPlay = this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1]
 
-        let gameObjects = null
+        let gameObjects = null 
 
         let checkChanges = checkGameChanges(this.state.gameState, cardPlayedCards, marketCards)
 
