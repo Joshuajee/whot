@@ -6,18 +6,14 @@
  * @license MIT This program is distributed under the MIT license
  */
 
-
 const GameEngine = require("./gameEngine")
 
 const cards = require("../cards").cards
 
 const inGameCards = [...cards]
 
-
-
-
 class GameTrain extends GameEngine{
-    
+
     constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
 
         super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
@@ -47,10 +43,11 @@ class GameTrain extends GameEngine{
             this.referee(action, this.rules, this.availableMove, this.cardAtHand.sort(), this.playerName, this.opponent)
         })
 
-
     }
 
-
+    /**
+     * This method starts the game and set all the class variables
+     */
     startGame(){
 
         //class variables to hold game variables
@@ -83,9 +80,19 @@ class GameTrain extends GameEngine{
 
     }
 
-
+    /**
+     * This method controls the game with the game rules, actions, availableMove,
+     * playerName and opponentCard at hand. It evualuate rules with player actions
+     * @param {*} action array of agent actions
+     * @param {*} rules game rules
+     * @param {*} avialableMove moves available to the playing agent
+     * @param {*} playerCardAtHand arrays of cards wih agent
+     * @param {*} playerName current agent name
+     * @param {*} opponentsCardAtHand arrays of cards with opponent
+     */
     referee(action, rules, avialableMove, playerCardAtHand, playerName, opponentsCardAtHand){
 
+        console.log("Market " + this.market.length)
         console.log(playerName) 
         console.log(playerCardAtHand)
         console.log(" in play " + this.inPlay[this.inPlay.length - 1])
@@ -172,10 +179,9 @@ class GameTrain extends GameEngine{
 
     }
 
-
     /**
      * This method decide which player makes the next move.
-     * @param changePlayer boolean with a defalut value of false, if the value true
+     * @param {*} changePlayer boolean with a defalut value of false, if the value true
      * the next player make a move if it is false the current player continue playing
      */
     playerController(changePlayer = false){
@@ -245,9 +251,14 @@ class GameTrain extends GameEngine{
     
     }
 
-    play(playerCardAtHand, opponentsCardAtHand, playerName, opponentName){
-
-        console.log("Market " + this.market.length)
+    /**
+     * This Methods set different class variables and call the stateFinder
+     * method from the GameEngine class
+     * @param {*} playerCardAtHand cards with the current playing agent
+     * @param {*} opponentsCardAtHand cards with the other agent
+     * @param {*} playerName current agent name
+     */
+    play(playerCardAtHand, opponentsCardAtHand, playerName){
 
         let inPlayIndex = this.inPlay.length - 1
         let inPlayCard = this.inPlay[inPlayIndex]
@@ -279,7 +290,6 @@ class GameTrain extends GameEngine{
         }
     
     }
-
 
     /**
     * This method chooses the action taken by the agent
@@ -313,7 +323,6 @@ class GameTrain extends GameEngine{
         return pickedAction[Math.floor(Math.random() * (pickedAction.length))]
 
     }
-
 
     /**
      * This method handles move made by updating the appropriate variables, which are
@@ -351,21 +360,28 @@ class GameTrain extends GameEngine{
             
             for(let i = 0; i < player.length; i++){
 
-                if(player[i] == move[0]) player.splice(i, 1)
+                if(player[i] == move[0]){
+
+                    player.splice(i, 1)
+                    break
+
+                }
 
             }
 
         }
+
         console.log(this.market.length + this.inPlay.length + this.player1.length + this.player2.length)
 
-        
-        if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length != 56){
-            //bbbbbbbbbbbbbbbb
-        }
+        //console.log("Market ", this.market)
+        //console.log("InPlay ", this.inPlay)
+        //console.log("Player 1 ", this.player1)
+        //console.log("Player 2 ", this.player2)
+
+        if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length !== 56) nnnnnnn
 
     }
 
-  
     /**
      * This method adds card to player and remove that same card from market
      * for n number of times   
@@ -420,21 +436,13 @@ class GameTrain extends GameEngine{
             this.market.pop()
 
             //shuffles the cards
-            this.market = shuffle(this.market)
-
-            console.log("Micro Reward")
-            console.log(this.market)
-            console.log(this.inPlay)
-            console.log(this.player1)
-            console.log(this.player2)
-
+            shuffle(this.market)
+                 
         }
 
     }
 
 }
-
-
 
 /**
  * This function shuffles an array
@@ -461,10 +469,8 @@ function shuffle(array){
     return array
 }
 
-
-
 /**
- * This function changes all cards with a number of 20 to whot 
+ * This function changes all cards with a number of 20 to whot:20 
  * @param {*} cards array of cards
  * @returns array of transformed cards
  */

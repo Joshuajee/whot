@@ -40,7 +40,6 @@ class GameEngine extends EventEmitter{
         this.playerOnePoints = 0
         this.playerTwoPoints = 0
 
-        
         this.round = 1
         
         super.on("actionOutput", ()=>{
@@ -71,13 +70,16 @@ class GameEngine extends EventEmitter{
 
         super.on("action", () => {
 
+            /*
             for(let i = 0; i < this.states.length; i++){
 
                 //get an aggregated sum of similar actions
                 this.output = this.sumArray(this.output, this.states[i].actions)
             
             }
- 
+            */
+            
+            /*
             //get arithmentic mean of all the state action
             if(this.states.length > 0){
 
@@ -88,6 +90,10 @@ class GameEngine extends EventEmitter{
                 this.actionOutput = this.output
             
             }
+
+            */
+
+            this.actionOutput = this.output
             
             super.emit("actionOutput")
 
@@ -95,15 +101,27 @@ class GameEngine extends EventEmitter{
     
     }
 
+    /**
+     * getter for the current round
+     */
     get roundVal(){
         return this.round
     }
 
+    /**
+     * getter for the last action taken
+     */
     get getAction(){
         return this.action
     }
 
-
+    /**
+     * Update existing states
+     * @param {*} winnerName name of winner
+     * @param {*} losserName name of loser
+     * @param {*} winnerPoints points to be added to winner
+     * @param {*} losserPoints points to be substracted from loser
+     */
     updatePlayer(winnerName, losserName, winnerPoints, losserPoints){
 
         agents.findOne({agentName: winnerName})
@@ -149,11 +167,15 @@ class GameEngine extends EventEmitter{
 
     }
 
+    /**
+     * 
+     * @param {*} point points to reward player with
+     * @param {*} statesOld states that already exists in database
+     * @param {*} statesNew states that are newly created
+     * @param {*} actionsOld actions of old states
+     * @param {*} actionsNew actions of new states
+     */
     addReward(point, statesOld, statesNew, actionsOld, actionsNew){
-
-        //+-----------------------------------------------------------------+
-        //|   This method is used to add rewards to the agent in question   |                                                   |    
-        //+-----------------------------------------------------------------+
 
         for(let i = 0; i < statesNew.length; i++){
 
@@ -172,18 +194,27 @@ class GameEngine extends EventEmitter{
     }
 
 
+    /**
+     * This method is called when the game ends it reward the agents according 
+     * to the reward policy   
+     * @param {*} playerOneName agent one name
+     * @param {*} playerTwoName agent two name
+     * @param {*} playerOneCardAtHand player one card at hand
+     * @param {*} playerTwoCardAtHand player two card at hand
+     * @param {*} playerOneActionsNew actions of player one that are new
+     * @param {*} playerOneActionsOld actions of player one that are gotten from database
+     * @param {*} playerTwoActionsNew actions of player two that are new
+     * @param {*} playerTwoActionsOld actions of player two that are gotten from database
+     */
     rewards(playerOneName, playerTwoName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActionsNew, playerOneActionsOld, playerTwoActionsNew, playerTwoActionsOld){
-
-        //+---------------------------------------------------------------------------+
-        //|  This method is called when the game ends it reward the agents according  |
-        //|  to the reward policy                                                     |    
-        //+---------------------------------------------------------------------------+
 
         this.round++
         
         let playerOneNumber = 0
         let playerTwoNumber = 0
 
+        //const playerOneStates = states(playerOneName)
+        //const playerTwoState = states(playerTwoName)
 
         //sum the card numbers if any is remaining for agent one
         if(playerOneCardAtHand.length > 0){
@@ -242,6 +273,8 @@ class GameEngine extends EventEmitter{
                 // rewards when player one has fewer card number than player two
                 this.addReward(5 - 1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+
+                
 
                 //save the new states
                 states.insertMany(this.playerStateNew, (error)=>{
@@ -341,12 +374,19 @@ class GameEngine extends EventEmitter{
   
     }
     
-
+    /**
+     * This method search for matching states in the database
+     * @param {*} playerName name of current agent
+     * @param {*} cardPlayed last card played
+     * @param {*} cardAtHand array of cards of current agent
+     * @param {*} noOfCardsWithOpponent number of cards with opponent
+     * @param {*} availableMove array moves that the player can make
+     * @param {*} inPlayCards array of cards played
+     * @param {*} noOfCardsInMarket number of cards in market 
+     * @param {*} rules game rules
+     * @param {*} eventString name of events
+     */
     stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString="received"){
-
-        //+---------------------------------------------------------------------+
-        //|  This method finds all the relevant states an angent has                  |
-        //+---------------------------------------------------------------------+
 
         this.playerName = playerName
 
@@ -363,6 +403,8 @@ class GameEngine extends EventEmitter{
                     "availableMove":availableMove,
                     "rules":rules
                 }
+
+        //const playerStates = states(playerName)
 
         states.find(query, (error, data) =>{
 
@@ -389,14 +431,21 @@ class GameEngine extends EventEmitter{
 
     }
 
-
+    /**
+     * This method creates a state and save it to an angent in the database 
+     * it also save it to the correspondingn state array 
+     * @param {*} playerName name of current agent
+     * @param {*} cardPlayed last card played
+     * @param {*} cardAtHand array of cards of current agent
+     * @param {*} noOfCardsWithOpponent number of cards with opponent
+     * @param {*} availableMove array moves that the player can make
+     * @param {*} inPlayCards array of cards played
+     * @param {*} noOfCardsInMarket number of cards in market 
+     * @param {*} rules game rules
+     * @param {*} eventString name of events
+     */
     stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString){
         
-        //+---------------------------------------------------------------------------+
-        //|  This method creates a state and save it to an angent in the database     |
-        //|  it also save it to the correspondingn state array                        |
-        //+---------------------------------------------------------------------------+
-
         this.cardAtHand = cardAtHand
         this.noOfCardsWithOpponent = noOfCardsWithOpponent
         this.inPlayCards = inPlayCards
@@ -406,17 +455,45 @@ class GameEngine extends EventEmitter{
         this.rules = rules
         this.eventString = eventString
 
-        this.actionCreater(availableMove, playerName)
+        this.output = []
+        
+        //set inital values of zeros for output
+        for(let i = 0; i < availableMove.length; i++){
+            this.output.push(0)
+        }
+
+        let state = {
+            "agentName" :   this.playerName,
+            "cardAtHand"    :   [...this.cardAtHand], 
+            "noOfCardsWithOpponent" : this.noOfCardsWithOpponent,
+            "cardInPlay"    :   this.inPlayCards,
+            "cardPlayed"    : [...this.cardPlayed], 
+            "noOfCardsInMarket" :    this.noOfCardsInMarket,
+            "availableMove" :   [...this.availableMove],
+            "actions"   :   [...this.output],
+            "rules" :   this.rules
+        }
+
+        this.action = [true, this.output]
+                
+        if(playerName === this.playerOneName)
+            this.playerOneStateRoundNew.push(state)
+        else
+            this.playerTwoStateRoundNew.push(state)
+            
+        super.emit(eventString)
+
+        //this.actionCreater(availableMove, playerName)
         
     }
 
-
+    /**
+     * This method initialise actions for newly created states 
+     * @param {*} availableMove array of moves for playing agent
+     * @param {*} playerName name of playing agent
+     */
     actionCreater(availableMove, playerName){
-
-        //+---------------------------------------------------------------------------+
-        //|  This method initialise actions for newly created states                  |
-        //+---------------------------------------------------------------------------+
-
+        
         let query = {
             "agentName":playerName,
             "availableMove":availableMove
@@ -431,6 +508,7 @@ class GameEngine extends EventEmitter{
 
         this.states = []
 
+        const playerStates = states(playerName)
 
         //find state with similar cars and moves
         states.find(query, (error, data) =>{
@@ -442,16 +520,16 @@ class GameEngine extends EventEmitter{
             super.emit('action')
 
         })
-
         
     }
 
-
+    /**
+     * This method adds the elements two arrays and return the sum
+     * @param {*} array1 first array
+     * @param {*} array2 second array
+     * @returns  sum of array
+     */
     sumArray(array1, array2){
-
-        //+---------------------------------------------------------------------------+
-        //|    This method adds two arrays and return the sum                         |
-        //+---------------------------------------------------------------------------+
 
         let result = []
 
@@ -462,13 +540,13 @@ class GameEngine extends EventEmitter{
         return result
     }
 
-
+    /**
+     * This method multiply an array with a scaler value
+     * @param {*} array array to be multiplied
+     * @param {*} num number to multiply array with
+     * @returns array of results
+     */
     multiplyArray(array, num){
-
-        //+---------------------------------------------------------------------------+
-        //|    This method multiply an array with a scaler value, it receive an       |
-        //|    array as the first argument and the scalar value as the second         |
-        //+---------------------------------------------------------------------------+
 
         let result = []
 
@@ -479,7 +557,7 @@ class GameEngine extends EventEmitter{
         return result
     }
 
-
+/*
     findState(states, state) {
 
         //+---------------------------------------------------------------------------+
@@ -520,28 +598,25 @@ class GameEngine extends EventEmitter{
         })
 
     }
-   
+
+*/
 
 }
 
 
-function compareArray(array1, array2){
+/**
+ * This function compares two one dimensional arrays
+ * @param {*} array1 one dimensional array to be compared
+ * @param {*} array2 two dimensional array to ne compared
+ * @returns boolean true if they are same else false
+ */
 
-    //+---------------------------------------------------------------------------+
-    //|    This function compares two one dimensional arrays and return true if   |
-    //|    they are thesame else false it takes an arrays as the first and        |
-    //|    second argument                                                        |
-    //+---------------------------------------------------------------------------+ 
+/*
+function compareArray(array1, array2){
 
     if(array1.length == array2.length){
 
-        for(let i = 0; i < array1.length; i++){
-
-            if(array1[i] != array2[i]){
-                return false;
-            }
-
-        }
+        for(let i = 0; i < array1.length; i++) if(array1[i] != array2[i]) return false;
 
     }else{
         return false
@@ -550,6 +625,6 @@ function compareArray(array1, array2){
     return true
 
 }
-
+*/
 
 module.exports = GameEngine

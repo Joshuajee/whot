@@ -12,7 +12,6 @@ const cards = require("../cards").cards
 
 const inGameCards = [...cards]
 
-
 class GamePlay extends GameEngine{
     
     constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
@@ -51,10 +50,16 @@ class GamePlay extends GameEngine{
 
     }
 
+    /**
+     * getter get the move made
+     */
     get move(){
         return this.moves
     }
 
+    /**
+    * This method starts the game and set all the class variables
+    */
     startGame(rules){
 
         //class variables to hold game variables
@@ -99,7 +104,13 @@ class GamePlay extends GameEngine{
 
         return state
     }
-
+    
+    /**
+     * 
+     * @param {*} state game state gotten from client
+     * @param {*} res response object to be sent to client
+     * @returns state gotten from client
+     */
     humanPlay(state, res){
 
         this.state = state
@@ -115,6 +126,16 @@ class GamePlay extends GameEngine{
         return state
     }
 
+    /**
+     * This method controls the game with the game rules, actions, availableMove,
+     * playerName and opponentCard at hand. It evualuate rules with player actions
+     * @param {*} action array of agent actions
+     * @param {*} rules game rules
+     * @param {*} avialableMove moves available to the playing agent
+     * @param {*} playerCardAtHand arrays of cards wih agent
+     * @param {*} playerName current agent name
+     * @param {*} opponentsCardAtHand arrays of cards with opponent
+     */
     referee(action, rules, avialableMove, playerTwoCard, playerName, opponentsCardAtHand){
 
 
@@ -184,7 +205,6 @@ class GamePlay extends GameEngine{
         
     }
 
-
     /**
      * This method search for valid moves           
      * @param {*} playerCard cards of the player that is to make a move
@@ -232,9 +252,11 @@ class GamePlay extends GameEngine{
     
     }
 
-
-
-
+    /**
+     * This Methods set different class variables and call the stateFinder
+     * method from the GameEngine class
+     * @param {*} state current game state gotten from the client
+     */
     play(state){
         
         let gameState = state.gameState
@@ -277,8 +299,6 @@ class GamePlay extends GameEngine{
 
     }
 
-
-
     /**
     * This method chooses the action taken by the agent
     * @param {*} action an array where the first element is a boolean
@@ -312,10 +332,6 @@ class GamePlay extends GameEngine{
         return pickedAction[Math.floor(Math.random() * (pickedAction.length))]
 
     }
-
-    
-
-
 
     /**
      * This method handles move made by updating the appropriate variables, which are
@@ -361,8 +377,6 @@ class GamePlay extends GameEngine{
 
     }
 
-
-
     /**
      * This method adds card to player and remove that same card from market
      * for n number of times   
@@ -387,8 +401,6 @@ class GamePlay extends GameEngine{
         }
 
     }
-
-
 
     /**
      * This method checks if any of the player cards or market is less than one then 
@@ -427,8 +439,6 @@ class GamePlay extends GameEngine{
 
 }
 
-
-
 /**
  * This function shuffles an array
  * @param {*} array array to be shuffled
@@ -454,9 +464,6 @@ function shuffle(array){
     return array
 }
 
-
-
-
 function copyArray(array){
 
     let result = []
@@ -468,7 +475,5 @@ function copyArray(array){
     return result
 
 }
-
-
 
 module.exports = GamePlay
