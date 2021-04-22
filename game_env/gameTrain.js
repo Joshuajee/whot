@@ -417,11 +417,11 @@ class GameTrain extends GameEngine{
 
         if(this.player1.length < 1 || this.player2.length < 1){
 
-            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
 
         }else if(this.market.length < 1){
    
-            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
             //santize the card
             let inPlay = sanitizeCardPlayed(this.inPlay)
@@ -493,7 +493,5 @@ function sanitizeCardPlayed(cards){
     return result
 
 }
-
-
 
 module.exports = {GameTrain, shuffle}

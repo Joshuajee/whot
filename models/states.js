@@ -31,6 +31,4 @@ var stateSchema = new mongoose.Schema({
     }
 })
 
-
-
-module.exports =  mongoose.model("states", stateSchema) 
+module.exports = (name) => mongoose.model(name + "_states", stateSchema)

@@ -115,6 +115,46 @@ class GameEngine extends EventEmitter{
         return this.action
     }
 
+    updateAgentWithNewStates(playerOneStates, playerTwoStates){
+
+        //save the new states for player one
+        playerOneStates.insertMany(this.playerOneStateRoundNew, (error)=>{
+
+            if(error) console.log("error: " + error)
+
+        })
+
+        //save the new states for player two
+        playerTwoStates.insertMany(this.playerTwoStateRoundNew, (error)=>{
+
+            if(error) console.log("error: " + error)
+
+        })
+
+    }
+
+
+
+    updateAgentWithOldStates(playerOneStates, playerTwoStates){
+
+        //save the new states for player one
+        playerOneStates.updateMany(this.playerOneStateRoundOld, (error)=>{
+
+            if(error) console.log("error: " + error)
+
+        })
+
+        //save the new states for player two
+        playerTwoStates.updateMany(this.playerTwoStateRoundOld, (error)=>{
+
+            if(error) console.log("error: " + error)
+
+        })
+
+        //playerOneStates.updateMany()
+
+    }
+
     /**
      * Update existing states
      * @param {*} winnerName name of winner
@@ -180,14 +220,12 @@ class GameEngine extends EventEmitter{
         for(let i = 0; i < statesNew.length; i++){
 
             statesNew[i].actions[actionsNew[i][1]] = statesNew[i].actions[actionsNew[i][1]] + point
-            this.playerStateNew.push(statesNew[i])
-        
+
         }
 
         for(let i = 0; i < statesOld.length; i++){
 
             statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
-            this.playerStateOld.push(statesOld[i])
 
         }
 
@@ -213,8 +251,8 @@ class GameEngine extends EventEmitter{
         let playerOneNumber = 0
         let playerTwoNumber = 0
 
-        //const playerOneStates = states(playerOneName)
-        //const playerTwoState = states(playerTwoName)
+        const playerOneStates = states(playerOneName)
+        const playerTwoStates = states(playerTwoName)
 
         //sum the card numbers if any is remaining for agent one
         if(playerOneCardAtHand.length > 0){
@@ -239,7 +277,6 @@ class GameEngine extends EventEmitter{
             }
             
         }
-
 
         //sum the card numbers if any is remaining for agent two
         if(playerTwoCardAtHand.length > 0){
@@ -274,14 +311,8 @@ class GameEngine extends EventEmitter{
                 this.addReward(5 - 1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
-                
-
-                //save the new states
-                states.insertMany(this.playerStateNew, (error)=>{
-
-                    if(error) console.log("error: " + error)
-
-                })
+                //save new states
+                this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
 
                 this.playerOnePoints += 5 - 1 * playerOneNumber / 100
                 this.playerTwoPoints += -1 * playerTwoNumber / 100
@@ -292,12 +323,8 @@ class GameEngine extends EventEmitter{
                 this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(5 - 1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
-                //save the new states
-                states.insertMany(this.playerStateNew, (error)=>{
-
-                    if(error) console.log("error: " + error)
-
-                })
+                //save new states
+                this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
 
                 this.playerOnePoints += -1 * playerOneNumber / 100
                 this.playerTwoPoints += 5 -1 * playerTwoNumber / 100
@@ -308,12 +335,8 @@ class GameEngine extends EventEmitter{
                 this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
-                //save the new states
-                states.insertMany(this.playerStateNew, (error)=>{
-
-                    if(error) console.log("error: " + error)
-
-                })
+                //save new states
+                this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
 
                 this.playerOnePoints += -1 * playerOneNumber / 100
                 this.playerTwoPoints += -1 * playerTwoNumber / 100
@@ -332,12 +355,8 @@ class GameEngine extends EventEmitter{
             //penalise player two
             this.addReward(playerTwoName, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
-            //save the new states
-            states.insertMany(this.playerStateNew, (error)=>{
-
-                if(error) console.log("error: " + error)
-
-            })
+            //save new states
+            this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
 
             this.updatePlayer(playerOneName, playerTwoName, 5, -2 - 1 * playerTwoNumber / 10)
 
@@ -349,20 +368,14 @@ class GameEngine extends EventEmitter{
             //reward player two
             this.addReward(playerTwoName, 5, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
             
-            //save the new states
-            states.insertMany(this.playerStateNew, (error)=>{
-
-                if(error) console.log("error: " + error)
-       
-            })
+            //save new states
+            this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
 
             this.updatePlayer(playerOneName, playerTwoName, -2 - 1 * playerOneNumber / 10, 5)
 
-    
         }
 
         //empty the StateRound array after one round
-
         this.playerOneStateRoundNew = []
         this.playerOneStateRoundOld = []
 
@@ -404,9 +417,9 @@ class GameEngine extends EventEmitter{
                     "rules":rules
                 }
 
-        //const playerStates = states(playerName)
+        const playerStates = states(playerName)
 
-        states.find(query, (error, data) =>{
+        playerStates.find(query, (error, data) =>{
 
             if(data.length === 0){
 
@@ -489,6 +502,7 @@ class GameEngine extends EventEmitter{
 
     /**
      * This method initialise actions for newly created states 
+     * @deprecated
      * @param {*} availableMove array of moves for playing agent
      * @param {*} playerName name of playing agent
      */
@@ -511,7 +525,7 @@ class GameEngine extends EventEmitter{
         const playerStates = states(playerName)
 
         //find state with similar cars and moves
-        states.find(query, (error, data) =>{
+        playerStates.find(query, (error, data) =>{
 
             this.states = data
 
@@ -557,74 +571,6 @@ class GameEngine extends EventEmitter{
         return result
     }
 
-/*
-    findState(states, state) {
-
-        //+---------------------------------------------------------------------------+
-        //|    This method receives two arguments states and state, and uses the      |
-        //|    state object to search the states array return the state object        |
-        //|    if found                                                               |
-        //+---------------------------------------------------------------------------+
-
-        return states.find(function(el) {
-
-            let condition = compareArray(el.cardAtHand, state.cardAtHand)           && 
-                            compareArray(el.cardPlayed, state.cardPlayed)           && 
-                            compareArray(el.availableMove, state.availableMove)     &&
-                            el.cardInPlay == state.cardInPlay                          &&
-                            el.noOfCardsInMarket == state.noOfCardsInMarket             &&
-                            el.noOfCardsWithOpponent == state.noOfCardsWithOpponent           
-
-            return condition
-
-        })
-
-    }
-
-
-    filterState(states, state) {
-
-        //+---------------------------------------------------------------------------+
-        //|    This method receives two arguments states and state, and uses the      |
-        //|    state object to search the states array return an array of state       |
-        //|    objects that was found                                                 |
-        //+---------------------------------------------------------------------------+
-
-
-        return states.filter(function(el) {
-
-            return compareArray(el.availableMove, state)
-
-        })
-
-    }
-
-*/
-
 }
-
-
-/**
- * This function compares two one dimensional arrays
- * @param {*} array1 one dimensional array to be compared
- * @param {*} array2 two dimensional array to ne compared
- * @returns boolean true if they are same else false
- */
-
-/*
-function compareArray(array1, array2){
-
-    if(array1.length == array2.length){
-
-        for(let i = 0; i < array1.length; i++) if(array1[i] != array2[i]) return false;
-
-    }else{
-        return false
-    }
-
-    return true
-
-}
-*/
 
 module.exports = GameEngine

@@ -16,6 +16,7 @@ const app = express()
 
 const agents = require("./models/agents")
 //const states = require("./models/states")
+let test = require("./models/test")
 
 const {GamePlaying, shuffle}  = require("./game_env/gameStart")
 
@@ -93,6 +94,16 @@ app.get('/agents', (req, res) =>{
 app.get('/add_agents', (req, res) =>{
 
     let age = new agents()
+    age.agentName = "Jee"
+    age.save()
+
+    res.send("Jee")
+
+})
+
+app.get('/add', (req, res) =>{
+    const tests = test("Jee")
+    let age = new test("joe")
     age.agentName = "Jee"
     age.save()
 
