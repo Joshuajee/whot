@@ -15,8 +15,6 @@ const bodyParser = require('body-parser')
 const app = express()
 
 const agents = require("./models/agents")
-//const states = require("./models/states")
-let test = require("./models/test")
 
 const {GamePlaying, shuffle}  = require("./game_env/gameStart")
 
@@ -101,15 +99,6 @@ app.get('/add_agents', (req, res) =>{
 
 })
 
-app.get('/add', (req, res) =>{
-    const tests = test("Jee")
-    let age = new test("joe")
-    age.agentName = "Jee"
-    age.save()
-
-    res.send("Jee")
-
-})
 
 app.get('/jee', (req, res) =>{
     /*

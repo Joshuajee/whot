@@ -44,6 +44,8 @@ class GameEngine extends EventEmitter{
         
         super.on("actionOutput", ()=>{
 
+            /*
+
             let state = {
                             "agentName" :   this.playerName,
                             "cardAtHand"    :   [...this.cardAtHand], 
@@ -56,6 +58,14 @@ class GameEngine extends EventEmitter{
                             "rules" :   this.rules
                         }
                     
+            */
+
+            let state = {
+                "agentName" :   this.playerName,
+                "availableMove" :   [...this.availableMove],
+                "actions"   :   [...this.actionOutput],
+            }
+
             this.action = [true, this.actionOutput]
 
             //add this state to the right player
@@ -135,23 +145,14 @@ class GameEngine extends EventEmitter{
 
 
 
-    updateAgentWithOldStates(playerOneStates, playerTwoStates){
+    updateAgentWithOldStates(playerStates, playerRound){
 
         //save the new states for player one
-        playerOneStates.updateMany(this.playerOneStateRoundOld, (error)=>{
+        playerStates.updateOne(playerRound, (error)=>{
 
             if(error) console.log("error: " + error)
 
         })
-
-        //save the new states for player two
-        playerTwoStates.updateMany(this.playerTwoStateRoundOld, (error)=>{
-
-            if(error) console.log("error: " + error)
-
-        })
-
-        //playerOneStates.updateMany()
 
     }
 
@@ -375,6 +376,24 @@ class GameEngine extends EventEmitter{
 
         }
 
+        
+
+        if(this.playerOneStateRoundOld.length > 0){
+            console.log("pa 1")
+            console.log(this.playerOneStateRoundOld.length)
+            console.log(this.playerOneStateRoundOld)
+            fffffffff
+            //this.updateAgentWithOldStates(playerOneStates)
+        }
+
+        if(this.playerTwoStateRoundOld.length > 0){
+            console.log("pa 2")
+            console.log(this.playerTwoStateRoundOld.length)
+            console.log(this.playerOneStateRoundNew)
+            fffffffff
+            //this.updateAgentWithOldStates(playerTwoStates)
+        }
+
         //empty the StateRound array after one round
         this.playerOneStateRoundNew = []
         this.playerOneStateRoundOld = []
@@ -406,6 +425,7 @@ class GameEngine extends EventEmitter{
         //make sure action array is empty for every play
         this.action = []
 
+        /*
         let query = {
                     "agentName":playerName,
                     "cardAtHand":cardAtHand, 
@@ -416,6 +436,13 @@ class GameEngine extends EventEmitter{
                     "availableMove":availableMove,
                     "rules":rules
                 }
+                */
+
+        let query = {
+                    "agentName":playerName,
+                    "availableMove":availableMove,
+                }
+
 
         const playerStates = states(playerName)
 
@@ -429,12 +456,13 @@ class GameEngine extends EventEmitter{
 
             }else{
 
-                this.action = [false, data.action]
+                console.log(data)
+                this.action = [false, data[0].actions]
                 
                 if(playerName === this.playerOneName)
-                    this.playerOneStateRoundOld.push(data)
+                    this.playerOneStateRoundOld.push(data[0])
                 else
-                    this.playerTwoStateRoundOld.push(data)
+                    this.playerTwoStateRoundOld.push(data[0])
             
                 super.emit(eventString)
 
@@ -475,6 +503,7 @@ class GameEngine extends EventEmitter{
             this.output.push(0)
         }
 
+        /*
         let state = {
             "agentName" :   this.playerName,
             "cardAtHand"    :   [...this.cardAtHand], 
@@ -485,6 +514,14 @@ class GameEngine extends EventEmitter{
             "availableMove" :   [...this.availableMove],
             "actions"   :   [...this.output],
             "rules" :   this.rules
+        }
+
+        */
+
+        let state = {
+            "agentName" :   this.playerName,
+            "availableMove" :   [...this.availableMove],
+            "actions"   :   [...this.output],
         }
 
         this.action = [true, this.output]
