@@ -8,6 +8,7 @@
 
 
 const { EventEmitter } = require("events")
+const { query } = require("express")
 const agents = require("../models/agents")
 const states = require("../models/states")
 
@@ -66,7 +67,7 @@ class GameEngine extends EventEmitter{
                 "actions"   :   [...this.actionOutput],
             }
 
-            this.action = [true, this.actionOutput]
+            this.action = [true, ...this.actionOutput]
 
             //add this state to the right player
             if(this.playerName === playerOneName)
@@ -143,14 +144,71 @@ class GameEngine extends EventEmitter{
 
     }
 
+    /**
+     * This method sum the actions of different states
+     * @param {*} states states array of objects
+     * @returns states with summed actions without duplicate 
+     */
+    moderateState(states){
 
+        let result = []
+
+        states.forEach(state => {
+
+            let currentState = []
+
+            if(this.filterState(result, state).length === 0){
+
+                this.filterState(states, state).forEach(element =>{
+                    currentState.push(element)
+                }) 
+
+                if(currentState.length > 1){
+
+                    let action = []
+
+                    for(let i = 0; i < currentState.length - 1; i++){
+
+                        if(i === 0)
+                            action = this.sumArray(currentState[i].actions, currentState[i + 1].actions)
+                        else
+                            action = this.sumArray(action, currentState[i + 1].actions)
+
+                    }
+
+                    currentState[0].actions = action
+
+                    result.push(currentState[0])
+
+                }else{
+
+                    result.push(currentState[0])
+
+                }
+
+            }
+
+        })
+
+        return result
+
+    }
 
     updateAgentWithOldStates(playerStates, playerRound){
 
         //save the new states for player one
-        playerStates.updateOne(playerRound, (error)=>{
+        playerRound.forEach(state => {
 
-            if(error) console.log("error: " + error)
+            let query = {
+                "agentName": state.agentName,
+                "availableMove": state.availableMove,
+            }
+
+            playerStates.updateOne(query, {actions : state.actions}, (error)=>{
+
+                if(error) console.log("error: " + error)
+    
+            })
 
         })
 
@@ -217,6 +275,11 @@ class GameEngine extends EventEmitter{
      * @param {*} actionsNew actions of new states
      */
     addReward(point, statesOld, statesNew, actionsOld, actionsNew){
+
+        statesOld = [...statesOld]
+        statesNew  = [...statesNew]
+        actionsOld = [...actionsOld]
+        actionsNew = [...actionsNew]
 
         for(let i = 0; i < statesNew.length; i++){
 
@@ -312,9 +375,6 @@ class GameEngine extends EventEmitter{
                 this.addReward(5 - 1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
-                //save new states
-                this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
-
                 this.playerOnePoints += 5 - 1 * playerOneNumber / 100
                 this.playerTwoPoints += -1 * playerTwoNumber / 100
 
@@ -324,9 +384,6 @@ class GameEngine extends EventEmitter{
                 this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(5 - 1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
-                //save new states
-                this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
-
                 this.playerOnePoints += -1 * playerOneNumber / 100
                 this.playerTwoPoints += 5 -1 * playerTwoNumber / 100
 
@@ -335,9 +392,6 @@ class GameEngine extends EventEmitter{
                 //rewards when player two has same card number as player one
                 this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
                 this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
-
-                //save new states
-                this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
 
                 this.playerOnePoints += -1 * playerOneNumber / 100
                 this.playerTwoPoints += -1 * playerTwoNumber / 100
@@ -351,13 +405,10 @@ class GameEngine extends EventEmitter{
             console.log("Player One Win")
             
             //reward player one
-            this.addReward(playerOneName, 5, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+            this.addReward(5, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
            
             //penalise player two
-            this.addReward(playerTwoName, -2 - 1 * playerTwoNumber / 10, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
-
-            //save new states
-            this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
+            this.addReward(-2 - 1 * playerTwoNumber / 10, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
 
             this.updatePlayer(playerOneName, playerTwoName, 5, -2 - 1 * playerTwoNumber / 10)
 
@@ -365,34 +416,37 @@ class GameEngine extends EventEmitter{
 
             console.log("Player Two Win")
             //penalise player one
-            this.addReward(playerOneName, -2 - 1 * playerOneNumber / 10, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+            this.addReward(-2 - 1 * playerOneNumber / 10, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
             //reward player two
-            this.addReward(playerTwoName, 5, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+            this.addReward(5, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
             
-            //save new states
-            this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
-
             this.updatePlayer(playerOneName, playerTwoName, -2 - 1 * playerOneNumber / 10, 5)
 
         }
 
-        
-
         if(this.playerOneStateRoundOld.length > 0){
-            console.log("pa 1")
-            console.log(this.playerOneStateRoundOld.length)
-            console.log(this.playerOneStateRoundOld)
-            fffffffff
-            //this.updateAgentWithOldStates(playerOneStates)
+
+            // remove duplicate states
+            this.playerOneStateRoundOld = this.moderateState(this.playerOneStateRoundOld)
+            
+            this.updateAgentWithOldStates(playerOneStates, this.playerOneStateRoundOld)
         }
 
         if(this.playerTwoStateRoundOld.length > 0){
-            console.log("pa 2")
-            console.log(this.playerTwoStateRoundOld.length)
-            console.log(this.playerOneStateRoundNew)
-            fffffffff
-            //this.updateAgentWithOldStates(playerTwoStates)
+
+            // remove duplicate states
+            this.playerTwoStateRoundOld = this.moderateState(this.playerTwoStateRoundOld)
+            
+            this.updateAgentWithOldStates(playerTwoStates, this.playerTwoStateRoundOld)
         }
+
+    
+        // remove duplicate states
+        this.playerOneStateRoundNew = this.moderateState(this.playerOneStateRoundNew)
+        this.playerTwoStateRoundNew = this.moderateState(this.playerTwoStateRoundNew)
+
+        //save new states
+        this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
 
         //empty the StateRound array after one round
         this.playerOneStateRoundNew = []
@@ -401,9 +455,10 @@ class GameEngine extends EventEmitter{
         this.playerTwoStateRoundNew = []
         this.playerTwoStateRoundOld = []
 
-        this.playerStateNew = []
-        this.playerStateOld = []
-  
+        playerOneActionsNew = []
+        playerOneActionsOld = []
+        playerTwoActionsNew = []
+        playerTwoActionsOld = []
     }
     
     /**
@@ -456,8 +511,10 @@ class GameEngine extends EventEmitter{
 
             }else{
 
-                console.log(data)
+                //console.log(data)
                 this.action = [false, data[0].actions]
+
+                console.log(this.action)
                 
                 if(playerName === this.playerOneName)
                     this.playerOneStateRoundOld.push(data[0])
@@ -539,7 +596,7 @@ class GameEngine extends EventEmitter{
 
     /**
      * This method initialise actions for newly created states 
-     * @deprecated
+     * @deprecated not used
      * @param {*} availableMove array of moves for playing agent
      * @param {*} playerName name of playing agent
      */
@@ -607,6 +664,74 @@ class GameEngine extends EventEmitter{
 
         return result
     }
+
+    findState(states, state) {
+
+        //+---------------------------------------------------------------------------+
+        //|    This method receives two arguments states and state, and uses the      |
+        //|    state object to search the states array return the state object        |
+        //|    if found                                                               |
+        //+---------------------------------------------------------------------------+
+
+        return states.find(function(el) {
+
+            /*
+            let condition = compareArray(el.cardAtHand, state.cardAtHand)           && 
+                            compareArray(el.cardPlayed, state.cardPlayed)           && 
+                            compareArray(el.availableMove, state.availableMove)     &&
+                            el.cardInPlay == state.cardInPlay                          &&
+                            el.noOfCardsInMarket == state.noOfCardsInMarket             &&
+                            el.noOfCardsWithOpponent == state.noOfCardsWithOpponent           
+            */
+            let condition = compareArray(el.availableMove, state.availableMove)
+ 
+            return condition
+
+        })
+
+    }
+
+    /**
+     * This uses the state object to search the states
+     * @param {*} states array of states object
+     * @param {*} state state object
+     * @returns array of filtered state that matched the conditions
+     */
+    filterState(states, state) {
+
+        return states.filter(function(el) {
+
+            return compareArray(el.availableMove, state.availableMove)
+        
+        })
+
+    }
+
+}
+
+function compareArray(array1, array2){
+
+    //+---------------------------------------------------------------------------+
+    //|    This function compares two one dimensional arrays and return true if   |
+    //|    they are thesame else false it takes an arrays as the first and        |
+    //|    second argument                                                        |
+    //+---------------------------------------------------------------------------+ 
+
+    if(array1.length == array2.length){
+
+        for(let i = 0; i < array1.length; i++){
+
+            if(array1[i] != array2[i]){
+                return false;
+            }
+
+        }
+
+    }else{
+        return false
+    }
+
+    return true
 
 }
 

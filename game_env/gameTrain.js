@@ -300,6 +300,8 @@ class GameTrain extends GameEngine{
     */
     chooseAction(action, availableMove){
 
+        console.log(...action[1])
+
         let maxAction = Math.max(...action[1])
 
         let actionPicked = []
@@ -378,7 +380,7 @@ class GameTrain extends GameEngine{
         //console.log("Player 1 ", this.player1)
         //console.log("Player 2 ", this.player2)
 
-        if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length !== 56) nnnnnnn
+        //if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length !== 56) 
 
     }
 
@@ -418,7 +420,12 @@ class GameTrain extends GameEngine{
         if(this.player1.length < 1 || this.player2.length < 1){
 
             super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
-
+            
+            this.actionOneNew = []
+            this.actionOneOld = []
+            this.actionTwoNew = []
+            this.actionTwoOld = []
+            
         }else if(this.market.length < 1){
    
             super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
@@ -436,7 +443,12 @@ class GameTrain extends GameEngine{
             this.market.pop()
 
             //shuffles the cards
-            shuffle(this.market)
+            this.market = shuffle([...this.market])
+
+            this.actionOneNew = []
+            this.actionOneOld = []
+            this.actionTwoNew = []
+            this.actionTwoOld = []
                  
         }
 
@@ -481,9 +493,10 @@ function sanitizeCardPlayed(cards){
     for(let i = 0; i < cards.length; i++){
 
         let index = cards[i].indexOf(":") + 1
-        let number = cards[i].slice(index, cards.length)
+        let number = parseInt(cards[i].slice(index, cards.length))
 
-        if(number == 20)
+
+        if(number === 20)
             result.push("whot:20")
         else
             result.push(cards[i])
