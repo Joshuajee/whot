@@ -34,6 +34,8 @@ function Home() {
 
                 <Button text={"Leaderboard"} link={"/leaderboard"} class={"btn-leader"}/>
 
+                <Button text={"Create Agent"} link={"/create-agent"} class={"btn-create"}/>
+
                 <Button text={"Settings"} link={"/settings"} class={"btn-settings"}/>
                 
             </div>

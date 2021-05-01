@@ -89,11 +89,24 @@ app.get('/agents', (req, res) =>{
 
 
 
-app.get('/add_agents', (req, res) =>{
+app.post('/api/create-agent', (req, res) =>{
 
-    let age = new agents()
-    age.agentName = "Jee"
-    age.save()
+    console.log(req.body)
+
+    let agentData = req.body.agent 
+
+    console.log(agentData)
+    
+    let agent = new agents()
+    agent.agentName = agentData.agentName
+    agent.useCardAtHand = agentData.cardInPlay
+    agent.useCardPlayed = agentData.cardPlayed
+    agent.useNoOfCardsInMarket = agentData.noOfCardsInMarket
+    agent.useNoOfCardsWithOpponent =  agentData.noOfCardsWithOpponent
+    agent.useAvailableMove = agentData.availableMove
+    agent.useRules = agentData.rules
+
+    agent.save()
 
     res.send("Jee")
 

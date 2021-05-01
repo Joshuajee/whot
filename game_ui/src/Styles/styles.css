@@ -46,7 +46,6 @@ body{
   margin-bottom: 1vh;
 }
 
-
 .btn-play{
   color: white;
   background-color: rgb(47, 255, 210);
@@ -55,6 +54,17 @@ body{
   height: 30px;
   font-size: large;
   border: rgb(47, 255, 210);
+  margin-bottom: 1vh;
+}
+
+.btn-create{
+  color: white;
+  background-color: purple;
+  border-radius: 5%;
+  width: 250px;
+  height: 50px;
+  font-size: large;
+  border:blueviolet;
   margin-bottom: 1vh;
 }
 

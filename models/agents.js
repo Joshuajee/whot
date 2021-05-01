@@ -20,7 +20,14 @@ var agentSchema = new mongoose.Schema({
     botPoints: {type: Number, default: 0},  
     humanWins: {type: Number, default:0}, 
     humanLosses: {type: Number, default: 0},
-    humanPoints: {type: Number, default: 0},  
+    humanPoints: {type: Number, default: 0},
+    useCardAtHand: {type: Boolean, default: false},
+    useCardInPlay: {type: Boolean, default: false},
+    useCardPlayed: {type: Boolean, default: false},
+    useNoOfCardsInMarket: {type: Boolean, default: false},
+    useNoOfCardsWithOpponent: {type: Boolean, default: false},
+    useAvailableMove: {type: Boolean, default: true},
+    useRules: {type: Boolean, default: true},   
     createdOn: {type: Date, default: Date.now}, 
 });
 

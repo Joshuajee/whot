@@ -25,6 +25,7 @@ import Rules from "./Routes/Rules";
 import Leaderboard from "./Routes/Leaderboard";
 import Settings from "./Routes/Settings";
 import GamePlay from "./Routes/GamePlay";
+import CreateAgent from "./Routes/CreateAgent";
 
 
 const home =  () => <Home />
@@ -32,6 +33,7 @@ const rules =  () => <Rules />
 const leaderboard = () => <Leaderboard />
 const settings = () => <Settings />
 const game = () => <GamePlay />
+const createAgent = () => <CreateAgent />
 
 //const store = createStore(reducers, {}, applyMiddleware(reduxThunk))
 
@@ -46,6 +48,7 @@ ReactDOM.render(
         <Route path="/rules" exact={true} component={rules} />
         <Route path="/leaderboard" exact={true} component={leaderboard} />
         <Route path="/settings" exact={true} component={settings} />
+        <Route path="/create-agent" exact={false} component={createAgent}/>
         <Route path="/game" exact={false} component={game}/>
       </BrowserRouter>
     {//</Provider>  
