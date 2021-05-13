@@ -17,6 +17,7 @@ const app = express()
 const agents = require("./models/agents")
 
 const {GamePlaying, shuffle}  = require("./game_env/gameStart")
+const { error } = require("console")
 
 
 
@@ -95,20 +96,36 @@ app.post('/api/create-agent', (req, res) =>{
 
     let agentData = req.body.agent 
 
+    agents.findOne({agentName:agentData.agentName}, (err, data) => {
+
+        if(data===null){
+
+            let agent = new agents()
+            agent.agentName = agentData.agentName
+            agent.useCardAtHand = agentData.cardAtHand
+            agent.useNoOfCardAtHand = agentData.noOfCardAtHand
+            agent.useCardInPlay = agentData.cardInPlay
+            agent.useCardPlayed = agentData.cardPlayed
+            agent.useNoOfCardPlayed = agentData.noOfCardPlayed
+            agent.useNoOfCardsInMarket = agentData.noOfCardsInMarket
+            agent.useNoOfCardsWithOpponent =  agentData.noOfCardsWithOpponent
+            agent.useAvailableMove = agentData.availableMove
+            agent.useRules = agentData.rules
+
+            agent.save()
+
+            res.json({"msg": "Agent Saved", "success":true})
+
+        }else{
+            res.json({"msg": "Error Agent Name already exist choose another", success:false})
+        }
+
+    })
+
+    
+
     console.log(agentData)
     
-    let agent = new agents()
-    agent.agentName = agentData.agentName
-    agent.useCardAtHand = agentData.cardInPlay
-    agent.useCardPlayed = agentData.cardPlayed
-    agent.useNoOfCardsInMarket = agentData.noOfCardsInMarket
-    agent.useNoOfCardsWithOpponent =  agentData.noOfCardsWithOpponent
-    agent.useAvailableMove = agentData.availableMove
-    agent.useRules = agentData.rules
-
-    agent.save()
-
-    res.send("Jee")
 
 })
 

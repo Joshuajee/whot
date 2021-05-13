@@ -24,6 +24,8 @@ var agentSchema = new mongoose.Schema({
     useCardAtHand: {type: Boolean, default: false},
     useCardInPlay: {type: Boolean, default: false},
     useCardPlayed: {type: Boolean, default: false},
+    useNoOfCardAtHand: {type: Boolean, default: false},
+    useNoOfCardPlayed: {type: Boolean, default: false},
     useNoOfCardsInMarket: {type: Boolean, default: false},
     useNoOfCardsWithOpponent: {type: Boolean, default: false},
     useAvailableMove: {type: Boolean, default: true},

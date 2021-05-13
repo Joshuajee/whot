@@ -18,11 +18,13 @@ import axios from "axios"
  function CreateAgent() {
 
     let formData ={
-        agentName: null,
+        agentName: "",
         availableMove: true,
         cardAtHand: false,
+        noOfCardAtHand: false,
         cardInPlay: false,
         cardsPlayed: false,
+        noOfCardPlayed: false,
         noOfCardsInMarket: false,
         noOfCardsWithOpponent: false,
         rules: false
@@ -37,8 +39,10 @@ import axios from "axios"
             agentName: name === "agentName" ? value : formData.agentName,
             availableMove: name === "availableMove" ? value === "true" ? true : false : formData.availableMove,
             cardAtHand: name === "cardAtHand" ? value === "true" ? true : false : formData.cardAtHand,
+            noOfCardAtHand: name === "noOfCardAtHand" ? value === "true" ? true : false : formData.noOfCardAtHand,
             cardInPlay: name === "cardInPlay" ? value === "true" ? true : false : formData.cardInPlay,
-            cardPlayed: name === "cardPlayed" ? value === "true" ? true : false : formData.cardsPlayed,
+            cardPlayed: name === "cardPlayed" ? value === "true" ? true : false : formData.cardPlayed,
+            noOfCardPlayed: name === "noOfCardPlayed" ? value === "true" ? true : false : formData.noOfCardPlayed,
             noOfCardsInMarket: name === "noOfCardsInMarket" ? value === "true" ? true : false : formData.noOfCardsInMarket,
             noOfCardsWithOpponent: name === "noOfCardsWithOpponent" ? value === "true" ? true : false : formData.noOfCardsWithOpponent,
             rules: name === "rules" ? value === "true" ? true : false : formData.rules
@@ -57,8 +61,26 @@ import axios from "axios"
         axios.post('/api/create-agent', {agent: formData}).then((res)=>{
             
             //console.log(res)  
-            alert("agent save")
+            alert(res.data.msg)
 
+            if(res.data.success){
+                /*
+                formData ={
+                    agentName: name === "agentName" ? value : formData.agentName,
+                    availableMove: name === "availableMove" ? value === "true" ? true : false : formData.availableMove,
+                    cardAtHand: name === "cardAtHand" ? value === "true" ? true : false : formData.cardAtHand,
+                    noOfCardAtHand: name === "noOfCardAtHand" ? value === "true" ? true : false : formData.noOfCardAtHand,
+                    cardInPlay: name === "cardInPlay" ? value === "true" ? true : false : formData.cardInPlay,
+                    cardPlayed: name === "cardPlayed" ? value === "true" ? true : false : formData.cardPlayed,
+                    noOfCardPlayed: name === "noOfCardPlayed" ? value === "true" ? true : false : formData.noOfCardPlayed,
+                    noOfCardsInMarket: name === "noOfCardsInMarket" ? value === "true" ? true : false : formData.noOfCardsInMarket,
+                    noOfCardsWithOpponent: name === "noOfCardsWithOpponent" ? value === "true" ? true : false : formData.noOfCardsWithOpponent,
+                    rules: name === "rules" ? value === "true" ? true : false : formData.rules
+                }  
+
+                */
+
+            }
            // this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data})
 
         })
@@ -119,9 +141,13 @@ import axios from "axios"
 
                     <FormInput label="Cards At Hand" type={"select"} identifier={"cardAtHand"} onChange={handleEvent} />
 
+                    <FormInput label="No Cards At Hand" type={"select"} identifier={"noOfCardAtHand"} onChange={handleEvent} />
+
                     <FormInput label="Card In Play" type={"select"} identifier={"cardInPlay"} onChange={handleEvent} />
 
-                    <FormInput label="Cards Played" type={"select"} identifier={"cardPlayed"} onChange={handleEvent} />
+                    <FormInput label="Card Played" type={"select"} identifier={"cardPlayed"} onChange={handleEvent} />
+
+                    <FormInput label="No Cards Played" type={"select"} identifier={"noOfCardPlayed"} onChange={handleEvent} />
 
                     <FormInput label="Number Of Cards In Market" type={"select"} identifier={"noOfCardsInMarket"} onChange={handleEvent} />
 
