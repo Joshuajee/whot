@@ -476,6 +476,7 @@ class GameEngine extends EventEmitter{
     stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString="received"){
 
         this.playerName = playerName
+    
 
         //make sure action array is empty for every play
         this.action = []
@@ -503,21 +504,22 @@ class GameEngine extends EventEmitter{
                     "agentName":playerName,
                     "availableMove":availableMove,
                     }
+
                 
                 if(this.agent.useCardAtHand)
-                    query.cardAtHand = this.cardAtHand
+                    query.cardAtHand = cardAtHand
                 if(this.agent.useNoOfCardAtHand)
-                    query.noOfCardAtHand = this.cardAtHand.length
+                    query.noOfCardAtHand = cardAtHand.length
                 if(this.agent.useCardInPlay)
-                    query.cardInPlay = this.cardPlayed[this.cardPlayed.length - 1]
+                    query.cardInPlay = cardPlayed[cardPlayed.length - 1]
                 if(this.agent.useCardPlayed)
-                    query.cardPlayed = this.cardPlayed
+                    query.cardPlayed = cardPlayed
                 if(this.agent.useNoOfCardPlayed)
-                    query.noOfCardPlayed = this.cardPlayed.length
+                    query.noOfCardPlayed = cardPlayed.length
                 if(this.agent.useNoOfCardsInMarket)
-                    query.noOfCardsInMarket = this.noOfCardsInMarket
+                    query.noOfCardsInMarket = noOfCardsInMarket
                 if(this.agent.useNoOfCardsWithOpponent)
-                    query.noOfCardsWithOpponent = this.noOfCardsWithOpponent
+                    query.noOfCardsWithOpponent = noOfCardsWithOpponent
                  
 
        
@@ -612,19 +614,19 @@ class GameEngine extends EventEmitter{
         
         
         if(this.agent.useCardAtHand)
-            state.cardAtHand = this.cardAtHand
+            state.cardAtHand = cardAtHand
         if(this.agent.useNoOfCardAtHand)
-            state.noOfCardAtHand = this.cardAtHand.length
+            state.noOfCardAtHand = cardAtHand.length
         if(this.agent.useCardInPlay)
-            state.cardInPlay = this.cardPlayed[this.cardPlayed.length - 1]
+            state.cardInPlay = cardPlayed[cardPlayed.length - 1]
         if(this.agent.useCardPlayed)
-            state.cardPlayed = this.cardPlayed
+            state.cardPlayed = cardPlayed
         if(this.agent.useNoOfCardPlayed)
-            state.noOfCardPlayed = this.cardPlayed.length
+            state.noOfCardPlayed = cardPlayed.length
         if(this.agent.useNoOfCardsInMarket)
-            state.noOfCardsInMarket = this.noOfCardsInMarket
+            state.noOfCardsInMarket = noOfCardsInMarket
         if(this.agent.useNoOfCardsWithOpponent)
-            state.noOfCardsWithOpponent = this.noOfCardsWithOpponent
+            state.noOfCardsWithOpponent = noOfCardsWithOpponent
 
         this.action = [true, this.output]
                 
