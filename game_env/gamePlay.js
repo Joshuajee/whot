@@ -308,7 +308,10 @@ class GamePlay extends GameEngine{
     */
     chooseAction(action, availableMove){
 
-        let maxAction = Math.max(...action)
+        let maxAction = Math.max(...action[1])
+
+        console.log("ACTION", action[1])
+        console.log(maxAction)
 
         let actionPicked = []
         let pickedAction = []

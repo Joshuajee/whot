@@ -23,7 +23,7 @@ import axios from "axios"
         cardAtHand: false,
         noOfCardAtHand: false,
         cardInPlay: false,
-        cardsPlayed: false,
+        cardPlayed: false,
         noOfCardPlayed: false,
         noOfCardsInMarket: false,
         noOfCardsWithOpponent: false,

@@ -16,6 +16,8 @@ var stateSchema = new mongoose.Schema({
     cardAtHand: {type: Array},
     cardInPlay: {type: String},
     cardPlayed: {type: Array},
+    noOfCardAtHand: {type: Number},
+    noOfCardPlayed: {type: Number},
     noOfCardsInMarket: {type: Number},
     noOfCardsWithOpponent: {type: Number},
     availableMove: {type: Array},
