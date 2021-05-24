@@ -11,9 +11,9 @@ const GamePlay = require("./gamePlay")
 
 class GameTraining extends GameTrain{
 
-    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
+    constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){
 
-        super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
+        super(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents)
 
     }
 

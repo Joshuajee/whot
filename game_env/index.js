@@ -7,8 +7,11 @@
  */
 
 
-const {GameTraining, shuffle}  = require("./gameStart")
+const { EventEmitter } = require("events")
+const prompt = require("prompt-sync")()
+const {GameTraining}  = require("./gameStart")
 const agents = require("../models/agents")
+const { exitCode } = require("process")
 
 let rules = {"holdOn":{"active":true, "card":1, "defend":false},
                      "pickTwo":{"active":true, "card":2, "defend":false},
@@ -16,6 +19,9 @@ let rules = {"holdOn":{"active":true, "card":1, "defend":false},
                      "suspension":{"active":true, "card":8, "defend":false},
                      "generalMarket":{"active":true, "card":14, "defend":false}
                     } 
+
+const rounds = prompt('Numbers of Tournament    ');
+
                     
 
 agents.find().select("agentName").exec((err, data)=>{
@@ -25,11 +31,52 @@ agents.find().select("agentName").exec((err, data)=>{
 
     }else{
 
-        let agentOrder = shuffle(data) 
-        let isPlayerOneHuman = false
-        let isPlayerTwoHuman = false
+        const gameEmitter = new EventEmitter();
 
-        new GameTraining(agentOrder[0].agentName, agentOrder[1].agentName, rules, isPlayerOneHuman, isPlayerTwoHuman).startGame()
+        let currentTournament = 0
+
+        let currentPlayer = 0
+
+        let currentOpponent = 1
+
+        let totalPlayers = data.length - 1
+
+        gameEmitter.on("new", ()=>{
+
+            if(currentOpponent === totalPlayers && currentPlayer !== totalPlayers){
+                currentPlayer++
+                currentOpponent = 0
+            }else if(currentPlayer === currentOpponent){
+                currentOpponent++
+            }
+
+
+            console.log("New Game")
+            console.log(currentPlayer)
+            console.log(currentOpponent)
+
+            if(currentOpponent <= totalPlayers)
+                new GameTraining(data[currentPlayer].agentName, data[currentOpponent].agentName, rules, data, 0, 1, gameEmitter).startGame()
+            else{
+
+                if(currentTournament <= rounds){
+
+                    currentPlayer = 0
+                    currentOpponent = 1
+                    totalPlayers = data.length - 1
+                    
+                    gameEmitter.emit("new")
+                    currentTournament++
+                }else{
+                    exitCode()
+                }
+                
+            } 
+
+            currentOpponent++
+        })
+
+        gameEmitter.emit("new")
 
     }
 

@@ -7,8 +7,8 @@
  */
 
 
+
 const { EventEmitter } = require("events")
-const { query } = require("express")
 const agents = require("../models/agents")
 const states = require("../models/states")
 
@@ -17,12 +17,20 @@ require("../configs/dbConnections")
 
 class GameEngine extends EventEmitter{
 
-    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
+    constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){
         
         super()
 
         this.playerOneName = playerOneName
         this.playerTwoName = playerTwoName
+
+        this.agents = agents
+
+        this.currentAgentIndex = currentPlayerIndex
+        this.currentOpponentIndex = currentOpponentIndex
+
+        this.rules = rules
+        this.gameEvents = gameEvents
 
         console.log(playerOneName)
         console.log(playerTwoName)
@@ -264,6 +272,10 @@ class GameEngine extends EventEmitter{
             })
 
 
+            this.gameEvents.emit("new")
+
+            //new GameTraining(this.agents[0].agentName, this.agents[1].agentName, this.rules, this.agents, 0, 1).startGame()
+
     }
 
     /**
@@ -285,11 +297,16 @@ class GameEngine extends EventEmitter{
 
             statesNew[i].actions[actionsNew[i][1]] = statesNew[i].actions[actionsNew[i][1]] + point
 
+            //statesNew[i].actions = this.normalize(statesNew[i].actions)
+
         }
+
 
         for(let i = 0; i < statesOld.length; i++){
 
             statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
+
+            //statesOld[i].actions = this.normalize(statesOld[i].actions)
 
         }
 
@@ -520,10 +537,7 @@ class GameEngine extends EventEmitter{
                     query.noOfCardsInMarket = noOfCardsInMarket
                 if(this.agent.useNoOfCardsWithOpponent)
                     query.noOfCardsWithOpponent = noOfCardsWithOpponent
-                 
-
        
-
 
                 const playerStates = states(playerName)
 
@@ -536,8 +550,7 @@ class GameEngine extends EventEmitter{
                         if(error) console.log("error: " + error)
 
                     }else{
-
-                        //console.log(data)
+                  
                         this.action = [false, data[0].actions]
 
                         console.log(this.action)
@@ -757,6 +770,27 @@ class GameEngine extends EventEmitter{
             return condition
 
         })
+
+    }
+
+
+    /**
+     * 
+     * @param {*} action array of raw actions
+     * @returns array of normalized actions
+     */
+    normalize(action){
+
+        let array = [...action]
+        let result = []
+
+        for(let i = 0; i < array.length; i++)   array[i] = Math.abs(array[i])
+
+        let max = Math.max(...array)
+     
+        for(let i = 0; i < array.length; i++)   result.push(action[i] / max)
+
+        return result
 
     }
 

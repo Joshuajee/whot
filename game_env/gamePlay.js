@@ -77,9 +77,9 @@ class GamePlay extends GameEngine{
 
         this.market = [...shuffle(inGameCards)]
 
-        this.goMarket(this.player1, 5)
+        this.goMarket(this.player1, 3)
 
-        this.goMarket(this.player2, 5)
+        this.goMarket(this.player2, 3)
 
         this.goMarket(this.inPlay)
 
@@ -136,7 +136,7 @@ class GamePlay extends GameEngine{
      * @param {*} playerName current agent name
      * @param {*} opponentsCardAtHand arrays of cards with opponent
      */
-    referee(action, rules, avialableMove, playerTwoCard, playerName, opponentsCardAtHand){
+    referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false){
 
 
         console.log(playerName) 
@@ -282,9 +282,7 @@ class GamePlay extends GameEngine{
         this.gameRules = state.rules
 
         if(this.availableMove.length === 1){
-            //console.log(playerName) 
-            //console.log(this.playerTwoCard)
-            //console.log(" in play " + this.inPlay[this.inPlay.length - 1])
+       
             this.goMarket(this.playerTwoCard, 1) 
             this.moves.push(["z:goMarket", -1])
 

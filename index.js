@@ -16,8 +16,7 @@ const app = express()
 
 const agents = require("./models/agents")
 
-const {GamePlaying, shuffle}  = require("./game_env/gameStart")
-const { error } = require("console")
+const {GamePlaying}  = require("./game_env/gameStart")
 
 
 
@@ -74,7 +73,6 @@ app.get('/api/leaderboard/:skip', (req, res) =>{
 })
 
 
-
 app.get('/agents', (req, res) =>{
 
     agents.find((err, data)=>{
@@ -122,56 +120,7 @@ app.post('/api/create-agent', (req, res) =>{
 
     })
 
-    
-
     console.log(agentData)
-    
-
-})
-
-
-app.get('/jee', (req, res) =>{
-    /*
-    agents.update({agentName:"jee"}, 
-        {
-            losses: 1,
-            points: 1,
-            botLosses: 1,
-            botPoints: 1,
-        }).then(err => {
-            console.log(err)
-        })
-*/
-    
-    agents.findOne({agentName:"Siri"})
-        .then((data, err) => {
-            
-            if(!err){
-
-                agents.updateOne({agentName:"Siri"},
-                    {
-                        losses: data.losses + 1, 
-                        points: data.points + 1, 
-                        botLosses: data.botLosses + 1, 
-                        botPoints: data.botPoints + 1
-                    }, 
-                    {useFindAndModify:false}).then((data, err) => {
-                        console.log(data)
-                })
-
-            }
-
-        })
-
-    res.send("Jee")
-
-})
-
-app.post('/add_agents', (req, res) =>{
-
-    let age = new agents()
-    age.agentName = "Jee"
-    age.save()
 
 })
 

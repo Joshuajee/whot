@@ -14,9 +14,9 @@ const inGameCards = [...cards]
 
 class GameTrain extends GameEngine{
 
-    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
+    constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){
 
-        super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
+        super(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents)
 
         this.rules = rules
 
@@ -64,9 +64,9 @@ class GameTrain extends GameEngine{
 
         this.market = [...shuffle(inGameCards)]
 
-        this.goMarket(this.player1, 5)
+        this.goMarket(this.player1, 3)
 
-        this.goMarket(this.player2, 5)
+        this.goMarket(this.player2, 3)
 
         this.goMarket(this.inPlay)
 
