@@ -34,18 +34,16 @@ class GamePlay extends GameEngine{
 
             this.moves.push(this.neededCard)
 
-            this.res.send(this.moves)
+            if(!this.start) this.res.send(this.moves)
 
             this.close()
 
         })
 
-
         super.on("received", ()=>{
-            let action = super.getAction
-            console.log(action)
-            console.log(this.availableMove)
-            this.referee(action, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, this.playerTwoCard)
+
+            this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName)
+        
         })  
 
     }
@@ -60,7 +58,15 @@ class GamePlay extends GameEngine{
     /**
     * This method starts the game and set all the class variables
     */
-    startGame(rules){
+    startGame(rules, res){
+
+        this.moves = []
+
+        this.start = true
+
+        this.res = res
+
+        this.shareCards = true
 
         //class variables to hold game variables
         this.player1 = []
@@ -83,26 +89,38 @@ class GamePlay extends GameEngine{
 
         this.goMarket(this.inPlay)
 
+        if(this.inPlay[0] === "whot:20"){
+
+            let whot = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
+
+            this.inPlay[0] = whot[Math.random() * whot.length]
+        }
+
+        console.log(this.inPlay[0])
+
+        this.state = {gameState: {"playerOne":{
+                            "cardAtHand":this.player1,
+                            "name":this.playerOneName
+                            },
+                        "playerTwo":{
+                            "cardAtHand":this.player2,
+                            "name":this.playerTwoName
+                            },
+                        "market":this.market,
+                        "cardPlayed":this.inPlay,
+                        rules: rules
+                        }}
+
+
+
+        this.referee(this.inPlay, rules, "avialableMove", this.player2, this.playerTwoName, true)
+        
         console.log("player 1 " + this.player1)
 
         console.log("player 2 " + this.player2)
         
         console.log("in play " + this.inPlay)
 
-        let state = {"playerOne":{
-                        "cardAtHand":this.player1,
-                        "name":this.playerOneName
-                        },
-                    "playerTwo":{
-                        "cardAtHand":this.player2,
-                        "name":this.playerTwoName
-                        },
-                    "market":this.market,
-                    "cardPlayed":this.inPlay,
-                    rules : rules
-                    }
-
-        return state
     }
     
     /**
@@ -112,6 +130,10 @@ class GamePlay extends GameEngine{
      * @returns state gotten from client
      */
     humanPlay(state, res){
+
+        this.shareCards = false
+
+        this.start = false
 
         this.state = state
 
@@ -137,21 +159,43 @@ class GamePlay extends GameEngine{
      * @param {*} opponentsCardAtHand arrays of cards with opponent
      */
     referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false){
-
-
+    
         console.log(playerName) 
         console.log(playerTwoCard)
-        
-        let card = this.chooseAction(action, avialableMove)
 
-        let index = card[0].indexOf(":") + 1
-        let number = card[0].slice(index, card[0].length)
+        let card = []
 
-        this.playGame(playerTwoCard, card)
+        let index = -1
+        let number = -1
 
-        this.moves.push(card)
+        if(this.shareCards){
+            this.firstGameState = {...this.state.gameState}
+            this.shareCards = false
+        }
 
-        this.state.playerMove = card[0]
+        if(!startGame){
+
+            card = this.chooseAction(action, avialableMove)
+
+            index = card[0].indexOf(":") + 1
+            number = card[0].slice(index, card[0].length)
+
+            this.playGame(playerTwoCard, card)
+
+            this.moves.push(card)
+
+            this.state.playerMove = card[0]
+
+        }else{
+
+            card = action
+            console.log(card)
+            console.log(action)
+            console.log(startGame)
+            index = card[0].indexOf(":") + 1
+            number = card[0].slice(index, card[0].length)
+
+        }
 
         if(rules.holdOn.active && number == rules.holdOn.card){
 
@@ -191,8 +235,13 @@ class GamePlay extends GameEngine{
 
         }else{
 
-            //send the move made to the client
-            this.res.send(this.moves)
+            if(!this.start){
+                //send the move made to the client
+                this.res.send(this.moves)
+            }else{
+
+                this.res.send({gameState: this.firstGameState, moves: this.moves})
+            }
 
         }
 
@@ -225,8 +274,6 @@ class GamePlay extends GameEngine{
             let number = parseInt(playerCard[i].slice(index, playerCard[i].length))
             let shape = playerCard[i].slice(0, index)
     
-            
-    
             if(number === 20){
     
                 availableMove.sort()
@@ -246,7 +293,6 @@ class GamePlay extends GameEngine{
             }
     
         }
-    
     
         return availableMove.sort()
     
@@ -279,15 +325,16 @@ class GamePlay extends GameEngine{
 
         this.noOfCardsWithPlayerOne = gameState.playerOne.cardAtHand.length
         
-        this.gameRules = state.rules
+        this.gameRules = gameState.rules
 
         if(this.availableMove.length === 1){
        
             this.goMarket(this.playerTwoCard, 1) 
+
             this.moves.push(["z:goMarket", -1])
 
-            this.res.send(this.moves)
-
+            if(!this.start) this.res.send(this.moves)
+            
         }else{
             //search for states
             super.stateFinder(this.playerTwoName, this.cardPlayed, this.playerTwoCard, this.noOfCardsWithPlayerOne, this.availableMove, this.playerMove, this.market.length, this.gameRules)

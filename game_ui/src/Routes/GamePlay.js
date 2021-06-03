@@ -98,7 +98,7 @@ class GamePlay extends React.Component{
             
             console.log(res)  
 
-            this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data})
+            this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data.gameState})
 
         })
 

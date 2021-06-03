@@ -42,19 +42,7 @@ app.post('/api/game', (req, res) =>{
 
     gameStart = new GamePlaying(req.body.user, req.body.agentName, req.body.rules, false, false)
 
-    console.log(req.body.rules)
-
-    let response = gameStart.startGame(req.body.rules)
-
-    console.log(response)
-
-    gameStart.on("move-made", (moves, res) => {
- 
-        res.send(moves)
-
-    })
-
-    res.send(response)
+    gameStart.startGame(req.body.rules, res)
 
 })
 
