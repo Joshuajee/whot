@@ -42,7 +42,8 @@ class GamePlay extends GameEngine{
 
         super.on("received", ()=>{
 
-            this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName)
+
+            this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, false, false)
         
         })  
 
@@ -60,13 +61,13 @@ class GamePlay extends GameEngine{
     */
     startGame(rules, res){
 
+        this.firstGameState = {}
+
         this.moves = []
 
         this.start = true
 
         this.res = res
-
-        this.shareCards = true
 
         //class variables to hold game variables
         this.player1 = []
@@ -113,7 +114,7 @@ class GamePlay extends GameEngine{
 
 
 
-        this.referee(this.inPlay, rules, "avialableMove", this.player2, this.playerTwoName, true)
+        this.referee(this.inPlay, rules, "avialableMove", this.player2, this.playerTwoName, true, true)
         
         console.log("player 1 " + this.player1)
 
@@ -131,8 +132,6 @@ class GamePlay extends GameEngine{
      */
     humanPlay(state, res){
 
-        this.shareCards = false
-
         this.start = false
 
         this.state = state
@@ -148,6 +147,7 @@ class GamePlay extends GameEngine{
         return state
     }
 
+
     /**
      * This method controls the game with the game rules, actions, availableMove,
      * playerName and opponentCard at hand. It evualuate rules with player actions
@@ -158,7 +158,7 @@ class GamePlay extends GameEngine{
      * @param {*} playerName current agent name
      * @param {*} opponentsCardAtHand arrays of cards with opponent
      */
-    referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false){
+    referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false, firstMove = false){
     
         console.log(playerName) 
         console.log(playerTwoCard)
@@ -167,11 +167,6 @@ class GamePlay extends GameEngine{
 
         let index = -1
         let number = -1
-
-        if(this.shareCards){
-            this.firstGameState = {...this.state.gameState}
-            this.shareCards = false
-        }
 
         if(!startGame){
 
@@ -197,6 +192,8 @@ class GamePlay extends GameEngine{
 
         }
 
+        if(firstMove) this.firstGameState = JSON.parse(JSON.stringify(this.state.gameState))
+
         if(rules.holdOn.active && number == rules.holdOn.card){
 
             console.log("hold On")
@@ -207,17 +204,17 @@ class GamePlay extends GameEngine{
 
             console.log("pick 2")
 
-            this.play(this.state)
-
             this.goMarket(this.playerOneCard, 2) 
+
+            this.play(this.state)
 
         }else if(rules.pickThree.active && number == rules.pickThree.card){
 
             console.log("pick 3")
 
-            this.play(this.state)
-
             this.goMarket(this.playerOneCard, 3) 
+
+            this.play(this.state)
 
         }else if(rules.suspension.active && number == rules.suspension.card){
 
@@ -229,9 +226,9 @@ class GamePlay extends GameEngine{
 
             console.log("general market")
 
-            this.play(this.state)
-
             this.goMarket(this.playerOneCard, 1) 
+
+            this.play(this.state)
 
         }else{
 
@@ -333,7 +330,13 @@ class GamePlay extends GameEngine{
 
             this.moves.push(["z:goMarket", -1])
 
-            if(!this.start) this.res.send(this.moves)
+            if(!this.start){
+                //send the move made to the client
+                this.res.send(this.moves)
+            }else{
+
+                this.res.send({gameState: this.firstGameState, moves: this.moves})
+            }
             
         }else{
             //search for states
@@ -433,7 +436,7 @@ class GamePlay extends GameEngine{
      */
     goMarket(player, times = 1){
 
-        console.log("card picked " +times)
+        console.log("card picked " + times)
 
         for(let i = 0; i < times; i ++){
 

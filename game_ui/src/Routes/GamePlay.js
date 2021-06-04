@@ -100,6 +100,18 @@ class GamePlay extends React.Component{
 
             this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data.gameState})
 
+            if(res.data.moves.length){
+            
+                //check the type of response gotten from server
+                checkPlayResponse(res.data.moves, this.state.gameState, this.events, this.state.playerTwoStates)
+          
+            }
+            
+        }).catch(error => {
+
+            console.log(error)
+
+            alert(error)
         })
 
     }
@@ -132,7 +144,6 @@ class GamePlay extends React.Component{
             
             let response = res.data
 
-        
             //check the type of response gotten from server
             checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
 
@@ -150,7 +161,6 @@ class GamePlay extends React.Component{
             //remove loader from the screen and transfer game control back to player
             this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
 
-
             alert(error)
 
         })
@@ -159,7 +169,6 @@ class GamePlay extends React.Component{
 
     playCard(card) {
 
-        
         let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
 
         card.push(cardIndex(availableMoves, card[0]))

@@ -70,14 +70,15 @@ class GameTrain extends GameEngine{
 
         this.goMarket(this.inPlay)
 
-        console.log("player 1 " + this.player1)
+        if(this.inPlay[0] === "whot:20"){
 
-        console.log("player 2 " + this.player2)
+            let whot = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
+
+            this.inPlay[0] = whot[Math.random() * whot.length]
+        }
+
+        this.referee(this.inPlay, this.rules, "avialableMove", this.player2, this.playerTwoName, this.player1, true, true)
         
-        console.log("in play " + this.inPlay)
-
-        this.play(this.player1, this.player2, this.playerOneName, this.playerTwoName)
-
     }
 
     /**
@@ -90,17 +91,43 @@ class GameTrain extends GameEngine{
      * @param {*} playerName current agent name
      * @param {*} opponentsCardAtHand arrays of cards with opponent
      */
-    referee(action, rules, avialableMove, playerCardAtHand, playerName, opponentsCardAtHand){
+    referee(action, rules, avialableMove, playerCardAtHand, playerName, opponentsCardAtHand, startGame = false, firstMove = false){
 
-        console.log("Market " + this.market.length)
-        console.log(playerName) 
-        console.log(playerCardAtHand)
-        console.log(" in play " + this.inPlay[this.inPlay.length - 1])
+        let card = null
+
+        let index = null
+        let number = null
+
+        if(!startGame){
+
+            console.log("Market " + this.market.length)
+            console.log(playerName) 
+            console.log(playerCardAtHand)
+            console.log(" in play " + this.inPlay[this.inPlay.length - 1])
         
-        let card = this.chooseAction(action, avialableMove)
 
-        let index = card[0].indexOf(":") + 1
-        let number = card[0].slice(index, card[0].length)
+            card = this.chooseAction(action, avialableMove)
+
+            index = card[0].indexOf(":") + 1
+            number = card[0].slice(index, card[0].length)
+
+        }else{
+
+            console.log("player 1 " + this.player1)
+
+            console.log("player 2 " + this.player2)
+        
+            console.log("in play " + this.inPlay)
+
+            card = action
+            console.log(card)
+            console.log(action)
+            console.log(startGame)
+            index = card[0].indexOf(":") + 1
+            number = card[0].slice(index, card[0].length)
+
+        }
+
 
         if(playerName == this.playerOneName){
 
