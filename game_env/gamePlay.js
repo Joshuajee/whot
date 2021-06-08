@@ -61,6 +61,8 @@ class GamePlay extends GameEngine{
     */
     startGame(rules, res){
 
+        console.log("START GAME")
+
         this.firstGameState = {}
 
         this.moves = []
@@ -70,8 +72,8 @@ class GamePlay extends GameEngine{
         this.res = res
 
         //class variables to hold game variables
-        this.player1 = []
-        this.player2 = []
+        this.playerOneCard = []
+        this.playerTwoCard = []
         this.inPlay = []
         this.availableMove = []
         this.need = false
@@ -84,9 +86,9 @@ class GamePlay extends GameEngine{
 
         this.market = [...shuffle(inGameCards)]
 
-        this.goMarket(this.player1, 3)
+        this.goMarket(this.playerOneCard, 3)
 
-        this.goMarket(this.player2, 3)
+        this.goMarket(this.playerTwoCard, 3)
 
         this.goMarket(this.inPlay)
 
@@ -94,17 +96,17 @@ class GamePlay extends GameEngine{
 
             let whot = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
 
-            this.inPlay[0] = whot[Math.random() * whot.length]
+            this.inPlay[0] = whot[Math.floor(Math.random() * whot.length)]
         }
 
-        console.log(this.inPlay[0])
+        this.moves[this.inPlay[0]]
 
         this.state = {gameState: {"playerOne":{
-                            "cardAtHand":this.player1,
+                            "cardAtHand":this.playerOneCard,
                             "name":this.playerOneName
                             },
                         "playerTwo":{
-                            "cardAtHand":this.player2,
+                            "cardAtHand":this.playerTwoCard,
                             "name":this.playerTwoName
                             },
                         "market":this.market,
@@ -113,14 +115,14 @@ class GamePlay extends GameEngine{
                         }}
 
 
+        console.log("player 1 " + this.playerOneCard)
 
-        this.referee(this.inPlay, rules, "avialableMove", this.player2, this.playerTwoName, true, true)
-        
-        console.log("player 1 " + this.player1)
-
-        console.log("player 2 " + this.player2)
+        console.log("player 2 " + this.playerTwoCard)
         
         console.log("in play " + this.inPlay)
+
+        this.referee(this.inPlay, rules, "avialableMove", this.playerTwoCard, this.playerTwoName, true, true)
+    
 
     }
     
@@ -440,7 +442,6 @@ class GamePlay extends GameEngine{
 
         for(let i = 0; i < times; i ++){
 
-
             if(this.market.length > 0){
 
                 player.push(this.market[this.market.length - 1])
@@ -462,13 +463,13 @@ class GamePlay extends GameEngine{
      */
     checkGame(){
 
-        if(this.player1.length < 1 || this.player2.length < 1){
+        if(this.playerOneCard.length < 1 || this.playerTwoCard.length < 1){
 
-            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            super.rewards(this.agentOne, this.agentTwo, this.playerOneCard, this.playerTwoCard, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
 
         }else if(this.market.length < 1){
    
-            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            super.rewards(this.agentOne, this.agentTwo, this.playerOneCard, this.playerTwoCard, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
             //
             let inPlay = copyArray(this.inPlay)

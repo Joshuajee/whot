@@ -74,7 +74,7 @@ class GameTrain extends GameEngine{
 
             let whot = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
 
-            this.inPlay[0] = whot[Math.random() * whot.length]
+            this.inPlay[0] = whot[Math.floor(Math.random() * whot.length)]
         }
 
         this.referee(this.inPlay, this.rules, "avialableMove", this.player2, this.playerTwoName, this.player1, true, true)
