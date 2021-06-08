@@ -43,9 +43,6 @@ class GameEngine extends EventEmitter{
         this.playerOneStateRoundNew = []
         this.playerTwoStateRoundNew = []
 
-        this.playerStateOld = []
-        this.playerStateNew = []
-
         this.playerOnePoints = 0
         this.playerTwoPoints = 0
 

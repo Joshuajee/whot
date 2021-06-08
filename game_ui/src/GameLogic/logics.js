@@ -10,13 +10,17 @@
 var MOVE_WAITING_PERIOD = 1500
 
 
+/**
+ * This function adds card to player and remove that same card from
+ * market for n number of times       
+ * 
+ * @param {*} player array of player cards
+ * @param {*} market array of market cards
+ * @param {*} times numbers of times to pick from market
+ */
 
 export function goMarket(player,  market, times = 1){
 
-    //+---------------------------------------------------------------------------+
-    //|      This function adds card to player and remove that same card from     |  
-    //|      market for n number of times                                         |
-    //+---------------------------------------------------------------------------+
 
     for(let i = 0; i < times; i ++){
 
@@ -78,15 +82,19 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
 
 
-
+/**
+ * This function takes in the player cards at hand an the action to be   
+ * taken it takes it, if a card is played it adds it to gamePlayed and   
+ * subracts it from the player card at hand 
+ * 
+ * @param {*} player the player making the move
+ * @param {*} card the move made by player
+ * @param {*} cardPlayed the card played in the game
+ * @param {*} number the number on the card
+ */
 export function playGame(player, card, cardPlayed, number){
 
-    //+---------------------------------------------------------------------------+
-    //|     This function takes in the player cards at hand an the action to be   |
-    //|     taken it takes it, if a card is played it adds it to gamePlayed and   |
-    //|     subracts it from the player card at hand                              |
-    //+---------------------------------------------------------------------------+
-    
+
     console.log("game played " + card)
 
     //if player goes to market
@@ -153,15 +161,19 @@ export function checkPlayResponse(response, gameState, events, playerTwoState){
 
 }
 
+/**
+ *  Recursive function that loop through the server response and    
+ *  handle them appropriately it calls the setTimeout function      
+ *  it also update agent states    
+ *                                  
+ * @param {*} index current index in the moves array
+ * @param {*} response array of moves
+ * @param {*} gameState current gameState
+ * @param {*} events events emitter object
+ * @param {*} playerTwoState  state of the agent
+ */
 
 function handleResponse(index, response, gameState, events, playerTwoState){
-
-    //+----------------------------------------------------------------------+
-    //|     Recursive function that loop through the server response and     |
-    //|     handle them appropriately it calls the setTimeout function       |
-    //|     it also update agent states                                      |
-    //+----------------------------------------------------------------------+
-
     
     let playerCardAtHand = gameState.playerTwo.cardAtHand
     let opponentsCardAtHand = gameState.playerOne.cardAtHand
@@ -206,26 +218,33 @@ function handleResponse(index, response, gameState, events, playerTwoState){
 }
 
 
+/**
+ * This method checks if any of the player cards or market is less 
+ * than one then it calls the reward function, if  any      
+ * of the player cards is finished that player wins the game and the 
+ * game is over but if market is finished, it adds all cards from    
+ * card Played to market and shuffle them while calling the reward
+ * function, but the game continues     
+ * 
+ * @param {*} state 
+ */
 
+export function checkGameState(state){
 
-export function checkGameState(gameState){
+    let gameState = state.gameState
 
-    //+---------------------------------------------------------------------------+
-    //|      This method checks if any of the player cards or market is less      |  
-    //|      than one then it calls the reward method in GameEngine, if  any      |
-    //|      of the player cards is finished that player wins the game and the    |
-    //|      game is over but if market is finished, it adds all cards from       |
-    //|      card Played to market and shuffle them while calling the reward      |
-    //|      method in GameEngine, but the game continues                         |
-    //+---------------------------------------------------------------------------+
+    let playerOneStates = state.playerOneStates
+    let newStates = state.newStates
+    let oldStates = state.oldStates
+
     
     if(gameState.playerOne.cardAtHand.length < 1 || gameState.playerOne.cardAtHand.length < 1){
 
-        //rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
+        rewards(gameState, playerOneStates, newStates, oldStates)
 
     }else if(gameState.market.length < 1){
 
-        //rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld)
+        rewards(gameState, playerOneStates, newStates, oldStates)
  
         // 
         let inPlay = sanitizeCardPlayed(gameState.cardPlayed)
@@ -290,11 +309,17 @@ export function sanitizeCardPlayed(cards){
 }
 
 
-export function rewards(gameState, actionOneNew, actionOneOld, actionTwoNew, actionTwoOld){
+export function rewards(gameState, playerOneStates, newStates, oldStates){
 
-    if(gameState.playerOne.cardAtHand < 1) alert(gameState.playerOne.name + " Wins ")
+    if(gameState.playerOne.cardAtHand < 1){
 
-    if(gameState.playerTwo.cardAtHand < 1) alert(gameState.playerTwo.name + " Wins ")
+        alert(gameState.playerOne.name + " Wins ")
+    } 
+
+    if(gameState.playerTwo.cardAtHand < 1){
+
+        alert(gameState.playerTwo.name + " Wins ")
+    } 
     
 }
 
@@ -322,16 +347,17 @@ export function checkGameChanges(gameState, cardPlayed, market){
 
 }
 
+/**
+ * 
+ * This function receive two arguments, the function loop through 
+ * the first argument and return 
+ *
+ * @param {*} playerCard the card in the player hand
+ * @param {*} inPlayCard the card played
+ * @returns return all the valid moves that can be made 
+ */
 
 export function availableMove(playerCard, inPlayCard){
-
-    //+----------------------------------------------------------------------+
-    //|     This function receive two arguments, the first argument is the     |
-    //|     card in the player hand and the second argument is the last      |
-    //|     card played, the function loop through the first argument and    |
-    //|     return all the valid moves that can be made                      | 
-    //+----------------------------------------------------------------------+
-
 
     let index_in = inPlayCard.indexOf(":") + 1
     let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
@@ -344,8 +370,6 @@ export function availableMove(playerCard, inPlayCard){
         let index = playerCard[i].indexOf(":") + 1
         let number = parseInt(playerCard[i].slice(index, playerCard[i].length))
         let shape = playerCard[i].slice(0, index)
-
-        
 
         if(number === 20){
 

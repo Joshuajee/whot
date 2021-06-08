@@ -63,11 +63,11 @@ class GamePlay extends React.Component{
             change : true,
             playerOneStates : [],
             playerTwoStates : [],
+            newStates : [],
+            oldStates : [],
             visibility : "hide-modal",   
         }
 
-
-         
         this.playCard = this.playCard.bind(this)
         this.needed = this.needed.bind(this)
 
@@ -117,12 +117,6 @@ class GamePlay extends React.Component{
     }
 
 
-    close(close){
-
-        //alert(this.state.visibility)
-        //this.setState({visibility : "hide-modal" })
-        //this.setState({isNeeded : false, isLoading : true})
-    }
 
     needed(card){
 
@@ -298,7 +292,7 @@ class GamePlay extends React.Component{
 
     render(){
 
-        checkGameState(this.state.gameState)
+        checkGameState(this.state)
 
         let height = window.innerHeight
 
@@ -325,9 +319,8 @@ class GamePlay extends React.Component{
 
         }
 
-        if(this.state.isNeeded){
-            gameObjects = <Need  height = {height} need={this.needed}/> 
-        }
+        if(this.state.isNeeded) gameObjects = <Need  height = {height} need={this.needed}/> 
+        
 
         console.log("states")
 

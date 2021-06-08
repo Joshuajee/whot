@@ -32,6 +32,8 @@ class GamePlay extends GameEngine{
 
             console.log("needed card " + this.neededCard[0])
 
+            this.neededCard.push(action[0])
+
             this.moves.push(this.neededCard)
 
             if(!this.start) this.res.send(this.moves)
@@ -42,6 +44,7 @@ class GamePlay extends GameEngine{
 
         super.on("received", ()=>{
 
+            console.log(super.getAction)
 
             this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, false, false)
         
@@ -98,8 +101,6 @@ class GamePlay extends GameEngine{
 
             this.inPlay[0] = whot[Math.floor(Math.random() * whot.length)]
         }
-
-        this.moves[this.inPlay[0]]
 
         this.state = {gameState: {"playerOne":{
                             "cardAtHand":this.playerOneCard,
@@ -178,6 +179,8 @@ class GamePlay extends GameEngine{
             number = card[0].slice(index, card[0].length)
 
             this.playGame(playerTwoCard, card)
+
+            card.push(action[0])
 
             this.moves.push(card)
 
@@ -330,7 +333,7 @@ class GamePlay extends GameEngine{
        
             this.goMarket(this.playerTwoCard, 1) 
 
-            this.moves.push(["z:goMarket", -1])
+            this.moves.push(["z:goMarket", -1, null])
 
             if(!this.start){
                 //send the move made to the client
