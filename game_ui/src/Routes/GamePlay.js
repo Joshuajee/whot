@@ -63,8 +63,8 @@ class GamePlay extends React.Component{
             change : true,
             playerOneStates : [],
             playerTwoStates : [],
-            newStates : [],
-            oldStates : [],
+            playerOneActions: [],
+            playerTwoActions: [],
             visibility : "hide-modal",   
         }
 
@@ -94,9 +94,7 @@ class GamePlay extends React.Component{
         let index = url.indexOf("/:") + 2
         let user = url.slice(index, url.length)
 
-        axios.post("/api/game", {"agentName":user, "user":"Guest", rules:rules}).then((res)=>{
-            
-            console.log(res)  
+        axios.post("/api/game", {"agentName":user, "user":"Guest", rules:rules, start:3}).then((res)=>{  
 
             this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data.gameState})
 
@@ -104,6 +102,8 @@ class GamePlay extends React.Component{
             
                 //check the type of response gotten from server
                 checkPlayResponse(res.data.moves, this.state.gameState, this.events, this.state.playerTwoStates)
+
+                this.state.playerTwoActions.push(...res.data.moves)
           
             }
             
@@ -143,6 +143,8 @@ class GamePlay extends React.Component{
 
             //remove loader from screen and transfer game control to player
             this.setState({opponetIsPlaying : false, isLoading : false })
+
+            this.state.playerTwoActions.push(...response)
     
         }).catch((error) =>{
 
@@ -198,6 +200,8 @@ class GamePlay extends React.Component{
 
                 //check the type of response gotten from server
                 checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
+
+                this.state.playerTwoActions.push(...response)
                 
             }).catch((error) =>{
 
@@ -251,6 +255,8 @@ class GamePlay extends React.Component{
                             //handle response gotten from server 
                             checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
      
+                            this.state.playerTwoActions.push(...response)
+
                         }).catch((error) =>{
 
                             //add card taken from player back to player
