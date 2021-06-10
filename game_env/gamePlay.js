@@ -62,7 +62,7 @@ class GamePlay extends GameEngine{
     /**
     * This method starts the game and set all the class variables
     */
-    startGame(rules, res){
+    startGame(rules, res, start){
 
         console.log("START GAME")
 
@@ -89,9 +89,9 @@ class GamePlay extends GameEngine{
 
         this.market = [...shuffle(inGameCards)]
 
-        this.goMarket(this.playerOneCard, 3)
+        this.goMarket(this.playerOneCard, start)
 
-        this.goMarket(this.playerTwoCard, 3)
+        this.goMarket(this.playerTwoCard, start)
 
         this.goMarket(this.inPlay)
 

@@ -280,8 +280,8 @@ class GameEngine extends EventEmitter{
      * @param {*} point points to reward player with
      * @param {*} statesOld states that already exists in database
      * @param {*} statesNew states that are newly created
-     * @param {*} actionsOld actions of old states
-     * @param {*} actionsNew actions of new states
+     * @param {*} actionsOld 2d array of actions of old states
+     * @param {*} actionsNew 2d array actions of new states
      */
     addReward(point, statesOld, statesNew, actionsOld, actionsNew){
 
@@ -289,6 +289,7 @@ class GameEngine extends EventEmitter{
         statesNew  = [...statesNew]
         actionsOld = [...actionsOld]
         actionsNew = [...actionsNew]
+
 
         for(let i = 0; i < statesNew.length; i++){
 

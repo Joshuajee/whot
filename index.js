@@ -42,7 +42,7 @@ app.post('/api/game', (req, res) =>{
 
     gameStart = new GamePlaying(req.body.user, req.body.agentName, req.body.rules, false, false)
 
-    gameStart.startGame(req.body.rules, res)
+    gameStart.startGame(req.body.rules, res, req.body.start)
 
 })
 
