@@ -49,7 +49,7 @@ ReactDOM.render(
         <Route path="/leaderboard" exact={true} component={leaderboard} />
         <Route path="/settings" exact={true} component={settings} />
         <Route path="/create-agent" exact={false} component={createAgent}/>
-        <Route path="/game" exact={false} component={game}/>
+        <Route path="/game/:user" exact={false} component={game}/>
       </BrowserRouter>
     {//</Provider>  
     }

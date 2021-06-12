@@ -6,6 +6,8 @@
  * @license MIT This program is distributed under the MIT license
  */
 
+import axios from "axios"
+
 
 var MOVE_WAITING_PERIOD = 1500
 
@@ -155,9 +157,9 @@ export function checkGame(card, inPlay) {
 
 }
 
-export function checkPlayResponse(response, gameState, events, playerTwoState){
+export function checkPlayResponse(response, gameState, events, playerTwoState, agent){
 
-    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, gameState, events, playerTwoState)
+    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, gameState, events, playerTwoState, agent)
 
 }
 
@@ -173,7 +175,7 @@ export function checkPlayResponse(response, gameState, events, playerTwoState){
  * @param {*} playerTwoState  state of the agent
  */
 
-function handleResponse(index, response, gameState, events, playerTwoState){
+function handleResponse(index, response, gameState, events, playerTwoState, agent){
     
     let playerCardAtHand = gameState.playerTwo.cardAtHand
     let opponentsCardAtHand = gameState.playerOne.cardAtHand
@@ -188,7 +190,7 @@ function handleResponse(index, response, gameState, events, playerTwoState){
 
     let availableMoves = availableMove(playerCardAtHand, cardPlayed[cardPlayed.length - 1])
 
-    playerTwoState.push(createState(gameState, availableMoves, false))
+    playerTwoState.push(createState(gameState, availableMoves, false, agent))
 
     if(number === 20){
 
@@ -231,12 +233,6 @@ function handleResponse(index, response, gameState, events, playerTwoState){
 export function checkGameState(state){
 
     let gameState = state.gameState
-
-    let playerOneStates = state.playerOneStates
-    let playerTwoStates = state.playerTwoStates
-
-    let newStates = state.newStates
-    let oldStates = state.oldStates
 
     if(gameState.playerOne.cardAtHand.length < 1 || gameState.playerOne.cardAtHand.length < 1){
 
@@ -313,15 +309,15 @@ export function rewards(state){
 
     let gameState = state.gameState
 
+    let playerOneStates = state.playerOneStates
+    let playerOneActions = state.playerOneActions
+
     let playerTwoStates = state.playerTwoStates
     let playerTwoActions = state.playerTwoActions
 
-    let statesAndActions = separateStatesAndActions(playerTwoStates, playerTwoActions)
-
-    console.log(playerTwoStates)
-    console.log("FFFFFFFFFFFfff")
-    console.log(statesAndActions)
-    console.log(playerTwoActions)
+    let playerOneStateAndAction = separateStateAndAction(playerOneStates, playerOneActions)
+    let playerTwoStateAndAction = separateStateAndAction(playerTwoStates, playerTwoActions)
+  
 
     if(gameState.playerOne.cardAtHand < 1){
 
@@ -332,6 +328,17 @@ export function rewards(state){
 
         alert(gameState.playerTwo.name + " Wins ")
     } 
+
+    axios.post("/api/save", {"agentName": gameState.playerTwo.name, "user": gameState.playerOne.name, gameState: gameState, playerOneStatesAndActions: playerOneStateAndAction, playerTwoStatesAndActions: playerTwoStateAndAction }).then((res)=>{  
+
+        console.log(res)
+        
+    }).catch(error => {
+
+        console.log(error)
+
+        alert(error)
+    })
     
 }
 
@@ -409,9 +416,10 @@ export function availableMove(playerCard, inPlayCard){
 
 
 
-export function createState(gameState,  availableMoves, isPlayerOne){
+export function createState(gameState,  availableMoves, isPlayerOne, agent = {}){
 
-    if(isPlayerOne)
+    if(isPlayerOne){
+
         return { 
             agentName: gameState.playerOne.name,
             cardAtHand: [...gameState.playerOne.cardAtHand],
@@ -419,20 +427,41 @@ export function createState(gameState,  availableMoves, isPlayerOne){
             cardPlayed: [...gameState.cardPlayed],
             noOfCardsInMarket: gameState.market.length,
             noOfCardsWithOpponent: gameState.playerTwo.cardAtHand.length,
+            noOfCardPlayed: gameState.cardPlayed.length,
+            noOfCardAtHand: gameState.playerOne.cardAtHand.length,
             availableMove: [...availableMoves],
             rules: gameState.rules, 
         }
-    else
-        return { 
+
+    }else{
+
+        let state = {
             agentName: gameState.playerTwo.name,
-            cardAtHand: [...gameState.playerTwo.cardAtHand],
-            cardInPlay: gameState.cardPlayed[gameState.cardPlayed.length - 1],
-            cardPlayed: [...gameState.cardPlayed],
-            noOfCardsInMarket: gameState.market.length,
-            noOfCardsWithOpponent: gameState.playerOne.cardAtHand.length,
             availableMove: [...availableMoves],
-            rules: gameState.rules, 
-        }   
+        }
+
+
+        if(agent.useCardAtHand)
+            state.cardAtHand = [...gameState.playerTwo.cardAtHand]
+        if(agent.useNoOfCardAtHand)
+            state.noOfCardAtHand = gameState.playerTwo.cardAtHand.length
+        if(agent.useCardInPlay)
+            state.cardInPlay = gameState.cardPlayed[gameState.cardPlayed.length - 1]
+        if(agent.useCardPlayed)
+            state.cardPlayed = [...gameState.cardPlayed]
+        if(agent.useNoOfCardPlayed)
+            state.noOfCardPlayed = gameState.cardPlayed.length
+        if(agent.useNoOfCardsInMarket)
+            state.noOfCardsInMarket = gameState.market.length
+        if(agent.useNoOfCardsWithOpponent)
+            state.noOfCardsWithOpponent = gameState.playerOne.cardAtHand.length
+        if(agent.useRules)
+            state.rules = gameState.rules
+
+
+
+        return state
+    }
     
 }
 
@@ -451,32 +480,24 @@ export function cardIndex(availableMove, move){
  * @param {*} action 
  */
 
-function separateStatesAndActions(state, action){
+function separateStateAndAction(state, action){
 
-    let oldStates = []
-    let newStates = []
-    let oldActions = []
-    let newActions = []
+    let validStates = []
+    let validActions = []
 
 
     for(let i = 0; i < action.length; i++){
 
-        if(action[i][2] === true){
+        if(action[i][1] > -1){
 
-            newStates.push(state[i])
-            newActions.push([action[i][0], action[i][1]])
+            //state[i].actions = []
+            validStates.push(state[i])
+            validActions.push([action[i][0], action[i][1]])
 
-        }
-
-        if(action[i][2] === false){
-
-            oldStates.push(state[i])
-            oldActions.push([action[i][0], action[i][1]])
-            
         }
 
     }
 
 
-    return [oldStates, newStates, oldActions, newActions]
+    return [validStates, validActions]
 }

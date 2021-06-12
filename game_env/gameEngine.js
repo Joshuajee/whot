@@ -24,7 +24,8 @@ class GameEngine extends EventEmitter{
         this.playerOneName = playerOneName
         this.playerTwoName = playerTwoName
 
-        this.agents = agents
+        this.agentOne = agents[0]
+        this.agentTwo = agents[1]
 
         this.currentAgentIndex = currentPlayerIndex
         this.currentOpponentIndex = currentOpponentIndex
@@ -151,10 +152,11 @@ class GameEngine extends EventEmitter{
 
     /**
      * This method sum the actions of different states
-     * @param {*} states states array of objects
+     * @param {*} states array of state objects
+     * @param {*} agent object defining object
      * @returns states with summed actions without duplicate 
      */
-    moderateState(states){
+    moderateState(states, agent){
 
         let result = []
 
@@ -162,9 +164,9 @@ class GameEngine extends EventEmitter{
 
             let currentState = []
 
-            if(this.filterState(result, state).length === 0){
+            if(this.filterState(result, state, agent).length === 0){
 
-                this.filterState(states, state).forEach(element =>{
+                this.filterState(states, state, agent).forEach(element =>{
                     currentState.push(element)
                 }) 
 
@@ -271,8 +273,6 @@ class GameEngine extends EventEmitter{
 
             this.gameEvents.emit("new")
 
-            //new GameTraining(this.agents[0].agentName, this.agents[1].agentName, this.rules, this.agents, 0, 1).startGame()
-
     }
 
     /**
@@ -323,9 +323,16 @@ class GameEngine extends EventEmitter{
      * @param {*} playerTwoActionsNew actions of player two that are new
      * @param {*} playerTwoActionsOld actions of player two that are gotten from database
      */
-    rewards(playerOneName, playerTwoName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActionsNew, playerOneActionsOld, playerTwoActionsNew, playerTwoActionsOld){
+    rewards(playerOneName, playerTwoName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActionsNew, playerOneActionsOld, playerTwoActionsNew, playerTwoActionsOld, human = null){
 
         this.round++
+
+        if(human !== null){
+            this.playerOneStateRoundNew = human.playerOneStateNew
+            this.playerOneStateRoundOld = human.playerOneStateOld
+            this.playerTwoStateRoundNew = human.playerTwoStateNew
+            this.playerTwoStateRoundOld = human.playerTwoStateOld
+        }
         
         let playerOneNumber = 0
         let playerTwoNumber = 0
@@ -442,7 +449,7 @@ class GameEngine extends EventEmitter{
         if(this.playerOneStateRoundOld.length > 0){
 
             // remove duplicate states
-            this.playerOneStateRoundOld = this.moderateState(this.playerOneStateRoundOld)
+            this.playerOneStateRoundOld = this.moderateState(this.playerOneStateRoundOld, this.agentOne)
             
             this.updateAgentWithOldStates(playerOneStates, this.playerOneStateRoundOld)
         }
@@ -450,18 +457,20 @@ class GameEngine extends EventEmitter{
         if(this.playerTwoStateRoundOld.length > 0){
 
             // remove duplicate states
-            this.playerTwoStateRoundOld = this.moderateState(this.playerTwoStateRoundOld)
+            this.playerTwoStateRoundOld = this.moderateState(this.playerTwoStateRoundOld, this.agentTwo)
             
             this.updateAgentWithOldStates(playerTwoStates, this.playerTwoStateRoundOld)
         }
 
     
         // remove duplicate states
-        this.playerOneStateRoundNew = this.moderateState(this.playerOneStateRoundNew)
-        this.playerTwoStateRoundNew = this.moderateState(this.playerTwoStateRoundNew)
+        this.playerOneStateRoundNew = this.moderateState(this.playerOneStateRoundNew, this.agentOne)
+        this.playerTwoStateRoundNew = this.moderateState(this.playerTwoStateRoundNew, this.agentTwo)
 
         //save new states
         this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
+
+
 
         //empty the StateRound array after one round
         this.playerOneStateRoundNew = []
@@ -491,84 +500,73 @@ class GameEngine extends EventEmitter{
     stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString="received"){
 
         this.playerName = playerName
-    
+
+        let agent = null
+
+
+        if(playerName == this.agentOne.agentName)
+            agent = this.agentOne
+        else
+            agent = this.agentTwo
+
 
         //make sure action array is empty for every play
         this.action = []
-
-        /*
+                
         let query = {
-                    "agentName":playerName,
-                    "cardAtHand":cardAtHand, 
-                    "noOfCardsWithOpponent": noOfCardsWithOpponent,
-                    "cardInPlay":inPlayCards,
-                    "cardPlayed": cardPlayed, 
-                    "noOfCardsInMarket":noOfCardsInMarket,
-                    "availableMove":availableMove,
-                    "rules":rules
-                }
-                */
+            "agentName":playerName,
+            "availableMove":availableMove,
+            }
 
-        agents.findOne({agentName:playerName}, (error, data)=>{
+        
+        if(agent.useCardAtHand)
+            query.cardAtHand = cardAtHand
+        if(agent.useNoOfCardAtHand)
+            query.noOfCardAtHand = cardAtHand.length
+        if(agent.useCardInPlay)
+            query.cardInPlay = cardPlayed[cardPlayed.length - 1]
+        if(agent.useCardPlayed)
+            query.cardPlayed = cardPlayed
+        if(agent.useNoOfCardPlayed)
+            query.noOfCardPlayed = cardPlayed.length
+        if(agent.useNoOfCardsInMarket)
+            query.noOfCardsInMarket = noOfCardsInMarket
+        if(agent.useNoOfCardsWithOpponent)
+            query.noOfCardsWithOpponent = noOfCardsWithOpponent
+        if(agent.useRules)
+            query.rules = rules
 
-            if(error===null){
 
-                this.agent = data
+        const playerStates = states(playerName)
+
+        playerStates.find(query, (error, data) =>{
+
+            if(data.length === 0){
+
+                this.stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString, agent)
                 
-                let query = {
-                    "agentName":playerName,
-                    "availableMove":availableMove,
-                    }
+                if(error) console.log("error: " + error)
 
+            }else{
+            
+                this.action = [false, data[0].actions]
+
+                console.log(this.action)
                 
-                if(this.agent.useCardAtHand)
-                    query.cardAtHand = cardAtHand
-                if(this.agent.useNoOfCardAtHand)
-                    query.noOfCardAtHand = cardAtHand.length
-                if(this.agent.useCardInPlay)
-                    query.cardInPlay = cardPlayed[cardPlayed.length - 1]
-                if(this.agent.useCardPlayed)
-                    query.cardPlayed = cardPlayed
-                if(this.agent.useNoOfCardPlayed)
-                    query.noOfCardPlayed = cardPlayed.length
-                if(this.agent.useNoOfCardsInMarket)
-                    query.noOfCardsInMarket = noOfCardsInMarket
-                if(this.agent.useNoOfCardsWithOpponent)
-                    query.noOfCardsWithOpponent = noOfCardsWithOpponent
-       
-
-                const playerStates = states(playerName)
-
-                playerStates.find(query, (error, data) =>{
-
-                    if(data.length === 0){
-
-                        this.stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString)
-                        
-                        if(error) console.log("error: " + error)
-
-                    }else{
-                  
-                        this.action = [false, data[0].actions]
-
-                        console.log(this.action)
-                        
-                        if(playerName === this.playerOneName)
-                            this.playerOneStateRoundOld.push(data[0])
-                        else
-                            this.playerTwoStateRoundOld.push(data[0])
-                    
-                        super.emit(eventString)
-
-                    }
-
-                })
+                if(playerName === this.playerOneName)
+                    this.playerOneStateRoundOld.push(data[0])
+                else
+                    this.playerTwoStateRoundOld.push(data[0])
+            
+                super.emit(eventString)
 
             }
 
         })
 
     }
+
+
 
     /**
      * This method creates a state and save it to an angent in the database 
@@ -583,7 +581,8 @@ class GameEngine extends EventEmitter{
      * @param {*} rules game rules
      * @param {*} eventString name of events
      */
-    stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString){
+
+    stateCreater(playerName, cardPlayed, cardAtHand, noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString, agent){
         
         this.cardAtHand = cardAtHand
         this.noOfCardsWithOpponent = noOfCardsWithOpponent
@@ -601,20 +600,6 @@ class GameEngine extends EventEmitter{
             this.output.push(0)
         }
 
-        /*
-        let state = {
-            "agentName" :   this.playerName,
-            "cardAtHand"    :   [...this.cardAtHand], 
-            "noOfCardsWithOpponent" : this.noOfCardsWithOpponent,
-            "cardInPlay"    :   this.inPlayCards,
-            "cardPlayed"    : [...this.cardPlayed], 
-            "noOfCardsInMarket" :    this.noOfCardsInMarket,
-            "availableMove" :   [...this.availableMove],
-            "actions"   :   [...this.output],
-            "rules" :   this.rules
-        }
-
-        */
 
         let state = {
             "agentName" :   this.playerName,
@@ -623,21 +608,22 @@ class GameEngine extends EventEmitter{
         }
 
         
-        
-        if(this.agent.useCardAtHand)
+        if(agent.useCardAtHand)
             state.cardAtHand = cardAtHand
-        if(this.agent.useNoOfCardAtHand)
+        if(agent.useNoOfCardAtHand)
             state.noOfCardAtHand = cardAtHand.length
-        if(this.agent.useCardInPlay)
+        if(agent.useCardInPlay)
             state.cardInPlay = cardPlayed[cardPlayed.length - 1]
-        if(this.agent.useCardPlayed)
+        if(agent.useCardPlayed)
             state.cardPlayed = cardPlayed
-        if(this.agent.useNoOfCardPlayed)
+        if(agent.useNoOfCardPlayed)
             state.noOfCardPlayed = cardPlayed.length
-        if(this.agent.useNoOfCardsInMarket)
+        if(agent.useNoOfCardsInMarket)
             state.noOfCardsInMarket = noOfCardsInMarket
-        if(this.agent.useNoOfCardsWithOpponent)
+        if(agent.useNoOfCardsWithOpponent)
             state.noOfCardsWithOpponent = noOfCardsWithOpponent
+        if(agent.useRules)
+            states.rules = rules
 
         this.action = [true, this.output]
                 
@@ -739,30 +725,35 @@ class GameEngine extends EventEmitter{
             let cardPlayed = true
             let noOfCardsInMarket = true
             let noOfCardsWithOpponent = true
+            let noOfCardPlayed = true
+            let rules = true
 
-            if(this.agent.useCardAtHand)
+            if(agent.useCardAtHand)
                 cardAtHand = compareArray(el.cardAtHand, state.cardAtHand)
 
-            if(this.agent.useNoOfCardAtHand)
-                noOfCardAtHand = compareArray(el.cardAtHand.length, state.cardAtHand.length)
+            if(agent.useNoOfCardAtHand)
+                noOfCardAtHand = el.noOfCardAtHand == state.noOfCardAtHand
     
-            if(this.agent.useCardInPlay)
+            if(agent.useCardInPlay)
                 cardInPlay = el.cardInPlay == state.cardInPlay 
 
-            if(this.agent.useCardPlayed)
+            if(agent.useCardPlayed)
                 cardPlayed = compareArray(el.cardPlayed, state.cardPlayed)
 
-            if(this.agent.useNoOfCardPlayed)
-                noOfCardPlayed = compareArray(el.cardPlayed.length, state.cardPlayed.length)
+            if(agent.useNoOfCardPlayed)
+                noOfCardPlayed = el.noOfCardPlayed == state.noOfCardPlayed
 
-            if(this.agent.useNoOfCardsInMarket)
+            if(agent.useNoOfCardsInMarket)
                 noOfCardsInMarket = el.noOfCardsInMarket == state.noOfCardsInMarket
 
-            if(this.agent.useNoOfCardsWithOpponent)
+            if(agent.useNoOfCardsWithOpponent)
                 noOfCardsWithOpponent = el.noOfCardsWithOpponent == state.noOfCardsWithOpponent
 
+            if(agent.useRules)
+                rules = el.rules == state.rules
+
   
-            let condition = compareArray(el.availableMove, state.availableMove) && cardAtHand && noOfCardAtHand
+            let condition = compareArray(el.availableMove, state.availableMove) && cardAtHand && noOfCardAtHand && rules
                             && cardInPlay && cardPlayed && noOfCardPlayed && noOfCardsInMarket && noOfCardsWithOpponent
  
             return condition
@@ -798,11 +789,48 @@ class GameEngine extends EventEmitter{
      * @param {*} state state object
      * @returns array of filtered state that matched the conditions
      */
-    filterState(states, state) {
+    filterState(states, state, agent) {
 
         return states.filter(function(el) {
 
-            return compareArray(el.availableMove, state.availableMove)
+            let cardAtHand = true
+            let noOfCardAtHand = true
+            let cardInPlay = true
+            let cardPlayed = true
+            let noOfCardsInMarket = true
+            let noOfCardsWithOpponent = true
+            let noOfCardPlayed = true
+            let rules = true
+
+            if(agent.useCardAtHand)
+                cardAtHand = compareArray(el.cardAtHand, state.cardAtHand)
+
+            if(agent.useNoOfCardAtHand)
+                noOfCardAtHand = el.noOfCardAtHand == state.noOfCardAtHand
+    
+            if(agent.useCardInPlay)
+                cardInPlay = el.cardInPlay == state.cardInPlay 
+
+            if(agent.useCardPlayed)
+                cardPlayed = compareArray(el.cardPlayed, state.cardPlayed)
+
+            if(agent.useNoOfCardPlayed)
+                noOfCardPlayed = el.noOfCardPlayed == state.noOfCardPlayed
+
+            if(agent.useNoOfCardsInMarket)
+                noOfCardsInMarket = el.noOfCardsInMarket == state.noOfCardsInMarket
+
+            if(agent.useNoOfCardsWithOpponent)
+                noOfCardsWithOpponent = el.noOfCardsWithOpponent == state.noOfCardsWithOpponent
+
+            if(agent.useRules)
+                rules = el.rules == state.rules
+
+  
+            let condition = compareArray(el.availableMove, state.availableMove) && cardAtHand && noOfCardAtHand && rules
+                            && cardInPlay && cardPlayed && noOfCardPlayed && noOfCardsInMarket && noOfCardsWithOpponent
+ 
+            return condition
         
         })
 
@@ -810,13 +838,18 @@ class GameEngine extends EventEmitter{
 
 }
 
-function compareArray(array1, array2){
 
-    //+---------------------------------------------------------------------------+
-    //|    This function compares two one dimensional arrays and return true if   |
-    //|    they are thesame else false it takes an arrays as the first and        |
-    //|    second argument                                                        |
-    //+---------------------------------------------------------------------------+ 
+/**
+ * This function compares two one dimensional arrays and return true if  
+ * they are thesame else false it takes an arrays as the first and      
+ * second argument  
+ *  
+ * @param {*} array1 array of items
+ * @param {*} array2 array of items
+ * @returns boolean true or false
+ */
+
+function compareArray(array1, array2){
 
     if(array1.length == array2.length){
 

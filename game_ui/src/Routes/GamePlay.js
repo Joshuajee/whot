@@ -28,6 +28,11 @@ import {EventEmitter} from "events"
 var cardPlayedCards = [0]
 var marketCards = [0]
 
+var url = window.location.href
+  
+var index = url.indexOf("/:") + 2
+var user = url.slice(index, url.length)
+
 let rules = {"holdOn":{"active":true, "card":1, "defend":false},
             "pickTwo":{"active":true, "card":2, "defend":false},
             "pickThree":{"active":true, "card":5, "defend":false}, 
@@ -58,6 +63,7 @@ class GamePlay extends React.Component{
                     "cardPlayed":[],
                     rules: rules
             },
+            playerTwoData: {},
             playerOneCardIndex : 0,
             playerTwoCardIndex : 0,
             change : true,
@@ -89,19 +95,14 @@ class GamePlay extends React.Component{
 
     componentDidMount(){
 
-        let url = window.location.href 
-  
-        let index = url.indexOf("/:") + 2
-        let user = url.slice(index, url.length)
+        axios.post("/api/game", {"agentName": user, "user": "Guest", rules: rules, start: 25}).then((res)=>{  
 
-        axios.post("/api/game", {"agentName":user, "user":"Guest", rules:rules, start:3}).then((res)=>{  
-
-            this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data.gameState})
+            this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data.gameState, playerTwoData: res.data.agentInfo}) 
 
             if(res.data.moves.length){
             
                 //check the type of response gotten from server
-                checkPlayResponse(res.data.moves, this.state.gameState, this.events, this.state.playerTwoStates)
+                checkPlayResponse(res.data.moves, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
 
                 this.state.playerTwoActions.push(...res.data.moves)
           
@@ -128,7 +129,7 @@ class GamePlay extends React.Component{
 
         this.setState({isNeeded : false, isLoading : true, opponetIsPlaying : true})
  
-        let request = {"gameState":this.state.gameState, "playerMove":card, rules:rules}
+        let request = {"agentName":user, "user": "Guest", "gameState": this.state.gameState, "playerMove": card, rules:rules}
     
         let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
         this.state.gameState.playerOne.cardAtHand.splice(index, 1)
@@ -139,7 +140,7 @@ class GamePlay extends React.Component{
             let response = res.data
 
             //check the type of response gotten from server
-            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
+            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
 
             //remove loader from screen and transfer game control to player
             this.setState({opponetIsPlaying : false, isLoading : false })
@@ -189,7 +190,7 @@ class GamePlay extends React.Component{
 
             this.setState({opponetIsPlaying:false, isLoading:true})
 
-            let request = {"gameState":this.state.gameState, "playerMove":"z:goMarket", rules:rules}
+            let request = {"agentName": user, "user": "Guest", "gameState": this.state.gameState, "playerMove": "z:goMarket", rules:rules}
         
             axios.post("/api/play", request).then((res)=>{
                 
@@ -199,7 +200,7 @@ class GamePlay extends React.Component{
                 this.setState({isLoading : false, opponetIsPlaying : true})
 
                 //check the type of response gotten from server
-                checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
+                checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
 
                 this.state.playerTwoActions.push(...response)
                 
@@ -241,7 +242,7 @@ class GamePlay extends React.Component{
                     
                     let sendMove = referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
                    
-                    let request = {"gameState":this.state.gameState, "playerMove":card[0], rules:rules}
+                    let request = {"agentName": user, "user": "Guest", "gameState": this.state.gameState, "playerMove":card[0], rules:rules}
                     
                     if(sendMove){
 
@@ -253,7 +254,7 @@ class GamePlay extends React.Component{
                             this.setState({isLoading : false, opponetIsPlaying : true})
 
                             //handle response gotten from server 
-                            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates)
+                            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
      
                             this.state.playerTwoActions.push(...response)
 

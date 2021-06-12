@@ -19,9 +19,23 @@ const agents = require("./models/agents")
 const {GamePlaying}  = require("./game_env/gameStart")
 
 
+function game(req, res, next){
 
-var gameStart = new GamePlaying()
+    const guest = require("./cards/user.json")
 
+    agents.findOne({agentName: req.body.agentName}).then((data, err)=>{
+
+        let gameStart = new GamePlaying(req.body.user, req.body.agentName, req.body.rules, [guest, data], 0, 1)
+
+        req.gameStart = gameStart
+
+        next()
+
+
+    })
+    
+
+}
 
 //Here we are configuring express to use body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,20 +43,26 @@ app.use(bodyParser.json());
 
 
 //this route plays the game
-app.post('/api/play', (req, res) =>{
+app.post('/api/play', game, (req, res) =>{
 
-    gameStart.humanPlay(req.body, res)
+    req.gameStart.humanPlay(req.body, res)
+    
+})
+
+
+//this route plays the game
+app.post('/api/save', game, (req, res) =>{
+
+    req.gameStart.save(req.body, res)
 
 })
 
 
 
 //this route starts the game
-app.post('/api/game', (req, res) =>{
+app.post('/api/game', game, (req, res) =>{
 
-    gameStart = new GamePlaying(req.body.user, req.body.agentName, req.body.rules, false, false)
-
-    gameStart.startGame(req.body.rules, res, req.body.start)
+    req.gameStart.startGame(req.body.rules, res, req.body.start)
 
 })
 

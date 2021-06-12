@@ -24,7 +24,7 @@ const rounds = prompt('Numbers of Tournament    ');
 
                     
 
-agents.find().select("agentName").exec((err, data)=>{
+agents.find().exec((err, data)=>{
 
     if(err){
         console.log("Failed to retrieve data " + err)

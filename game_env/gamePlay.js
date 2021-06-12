@@ -6,6 +6,9 @@
  * @license MIT This program is distributed under the MIT license
  */
 
+ const agents = require("../models/agents")
+ const states = require("../models/states")
+ 
 const GameEngine = require("./gameEngine")
 
 const cards = require("../cards").cards
@@ -31,8 +34,6 @@ class GamePlay extends GameEngine{
             this.neededCard = this.chooseAction(action, this.needOption)
 
             console.log("needed card " + this.neededCard[0])
-
-            this.neededCard.push(action[0])
 
             this.moves.push(this.neededCard)
 
@@ -150,6 +151,71 @@ class GamePlay extends GameEngine{
         return state
     }
 
+    save(requestBody, res){
+
+        let playerOneCardAtHand = requestBody.gameState.playerOne.cardAtHand
+        let playerTwoCardAtHand = requestBody.gameState.playerTwo.cardAtHand
+
+        let playerOneStates = requestBody.playerOneStatesAndActions[0]
+        let playerOneActions = requestBody.playerOneStatesAndActions[1]
+
+        let playerTwoStates = requestBody.playerTwoStatesAndActions[0]
+        let playerTwoActions = requestBody.playerTwoStatesAndActions[1]
+
+        for(let i = 0; i < playerOneStates.length; i++){
+
+            let output = []
+            
+            //set inital values of zeros for output
+            for(let x = 0; x < playerOneStates[i].availableMove.length; x++){
+
+                output.push(0)
+
+            }
+
+            playerOneStates[i].actions = output
+
+        }
+ 
+
+
+        for(let i = 0; i < playerTwoStates.length; i++){
+
+            let output = []
+            
+            //set inital values of zeros for output
+            for(let x = 0; x < playerTwoStates[i].availableMove.length; x++){
+
+                output.push(0)
+
+            }
+
+            playerTwoStates[i].actions = output
+
+        }
+
+
+       
+
+        let human = {}
+
+        human.playerOneStateNew = playerOneStates
+        human.playerOneStateOld = []
+        human.playerTwoStateNew = playerTwoStates
+        human.playerTwoStateOld = []
+
+     
+        super.rewards(this.agentOne.agentName, this.agentTwo.agentName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActions, [], playerTwoStates, [], human)
+
+        //console.log(newStates)
+        //res.send(newStates)
+
+        res.send(human)
+
+    }
+
+
+
 
     /**
      * This method controls the game with the game rules, actions, availableMove,
@@ -179,8 +245,6 @@ class GamePlay extends GameEngine{
             number = card[0].slice(index, card[0].length)
 
             this.playGame(playerTwoCard, card)
-
-            card.push(action[0])
 
             this.moves.push(card)
 
@@ -242,7 +306,14 @@ class GamePlay extends GameEngine{
                 this.res.send(this.moves)
             }else{
 
-                this.res.send({gameState: this.firstGameState, moves: this.moves})
+                agents.findOne({agentName: this.playerTwoName}).then((data, err)=>{
+
+                    //console.log(data)
+
+                    this.res.send({gameState: this.firstGameState, moves: this.moves, agentInfo: data})
+
+                })
+                
             }
 
         }
@@ -333,14 +404,22 @@ class GamePlay extends GameEngine{
        
             this.goMarket(this.playerTwoCard, 1) 
 
-            this.moves.push(["z:goMarket", -1, null])
+            this.moves.push(["z:goMarket", -1])
 
             if(!this.start){
                 //send the move made to the client
                 this.res.send(this.moves)
+
             }else{
 
-                this.res.send({gameState: this.firstGameState, moves: this.moves})
+                agents.findOne({agentName: this.playerTwoName}).then((data, err)=>{
+
+                    console.log(data)
+
+                    this.res.send({gameState: this.firstGameState, moves: this.moves, agentInfo: data})
+
+                })
+                    
             }
             
         }else{
