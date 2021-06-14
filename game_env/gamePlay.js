@@ -6,8 +6,9 @@
  * @license MIT This program is distributed under the MIT license
  */
 
- const agents = require("../models/agents")
- const states = require("../models/states")
+const agents = require("../models/agents")
+const states = require("../models/states")
+
  
 const GameEngine = require("./gameEngine")
 
@@ -17,9 +18,9 @@ const inGameCards = [...cards]
 
 class GamePlay extends GameEngine{
     
-    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
+    constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){
 
-        super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
+        super(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents)
 
         this.playerOneName = playerOneName
         this.playerTwoName = playerTwoName
@@ -103,6 +104,8 @@ class GamePlay extends GameEngine{
             this.inPlay[0] = whot[Math.floor(Math.random() * whot.length)]
         }
 
+        this.moves.push([this.inPlay[0], -2])
+
         this.state = {gameState: {"playerOne":{
                             "cardAtHand":this.playerOneCard,
                             "name":this.playerOneName
@@ -151,6 +154,42 @@ class GamePlay extends GameEngine{
         return state
     }
 
+    findState(state, index, max, agentName){
+
+        let currentState = state[index]
+
+        const playerStates = states(agentName)
+
+        console.log("_____________________________________")
+        console.log(agentName)
+
+        playerStates.find({currentState}).then((err, data) => {
+
+            if(!err){
+
+                console.log(data)
+                console.log(err)
+                
+                if(data.length > 0){
+
+                }else{
+
+                }
+                console.log(index)
+
+            }else{
+
+            }
+
+            if(index < max){
+                this.findState(state, index + 1, max, agentName)
+            }else{
+                //callback
+            }
+
+        })
+    }
+
     save(requestBody, res){
 
         let playerOneCardAtHand = requestBody.gameState.playerOne.cardAtHand
@@ -161,6 +200,15 @@ class GamePlay extends GameEngine{
 
         let playerTwoStates = requestBody.playerTwoStatesAndActions[0]
         let playerTwoActions = requestBody.playerTwoStatesAndActions[1]
+
+        console.log(playerOneStates)
+        console.log(playerOneActions)
+
+
+
+        //this.findState(playerTwoStates, 0, playerTwoStates.length, this.playerTwoName)
+
+        
 
         for(let i = 0; i < playerOneStates.length; i++){
 
@@ -205,12 +253,10 @@ class GamePlay extends GameEngine{
         human.playerTwoStateOld = []
 
      
-        super.rewards(this.agentOne.agentName, this.agentTwo.agentName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActions, [], playerTwoStates, [], human)
-
-        //console.log(newStates)
-        //res.send(newStates)
-
-        res.send(human)
+        super.rewards(this.agentOne.agentName, this.agentTwo.agentName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActions, [], playerTwoActions, [], human)
+        
+    
+        res.send(playerOneStates)
 
     }
 
@@ -309,8 +355,15 @@ class GamePlay extends GameEngine{
                 agents.findOne({agentName: this.playerTwoName}).then((data, err)=>{
 
                     //console.log(data)
+                    const guest = require("../cards/user.json")
 
-                    this.res.send({gameState: this.firstGameState, moves: this.moves, agentInfo: data})
+                    this.res.send(
+                        {
+                            gameState: this.firstGameState, 
+                            moves: this.moves, 
+                            agentInfo: data,
+                            playerInfo: guest
+                        })
 
                 })
                 

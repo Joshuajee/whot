@@ -48,7 +48,7 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
     let index = card[0].indexOf(":") + 1
     let number = parseInt(card[0].slice(index, card[0].length))
 
-    playGame(playerCardAtHand, card, cardPlayed, number)
+    if(card[1] !== -2) playGame(playerCardAtHand, card, cardPlayed, number)
 
     if(rules.holdOn.active && number === rules.holdOn.card){
 
@@ -317,7 +317,6 @@ export function rewards(state){
 
     let playerOneStateAndAction = separateStateAndAction(playerOneStates, playerOneActions)
     let playerTwoStateAndAction = separateStateAndAction(playerTwoStates, playerTwoActions)
-  
 
     if(gameState.playerOne.cardAtHand < 1){
 
@@ -329,7 +328,19 @@ export function rewards(state){
         alert(gameState.playerTwo.name + " Wins ")
     } 
 
-    axios.post("/api/save", {"agentName": gameState.playerTwo.name, "user": gameState.playerOne.name, gameState: gameState, playerOneStatesAndActions: playerOneStateAndAction, playerTwoStatesAndActions: playerTwoStateAndAction }).then((res)=>{  
+    console.log("PPPPPPPPPPPPPPPPPPPP")
+    console.log(playerOneStates)
+    console.log(playerOneActions)
+
+    axios.post("/api/save", 
+        {
+            agentName: gameState.playerTwo.name, 
+            user: gameState.playerOne.name, 
+            gameState: gameState, 
+            playerOneStatesAndActions: playerOneStateAndAction, 
+            playerTwoStatesAndActions: playerTwoStateAndAction 
+        }
+        ).then((res)=>{  
 
         console.log(res)
         
@@ -339,7 +350,7 @@ export function rewards(state){
 
         alert(error)
     })
-    
+
 }
 
 export function checkGameChanges(gameState, cardPlayed, market){
@@ -411,6 +422,7 @@ export function availableMove(playerCard, inPlayCard){
 
 
     return availableMove.sort()
+
 
 }
 
@@ -497,7 +509,6 @@ function separateStateAndAction(state, action){
         }
 
     }
-
 
     return [validStates, validActions]
 }

@@ -248,30 +248,34 @@ class GameEngine extends EventEmitter{
 
                 }
 
+
+                agents.findOne({agentName: losserName})
+                .then((data, err) => {
+                    
+                    if(!err){
+    
+                        agents.updateOne({agentName: losserName},
+                            {
+                                "losses": data.losses + 1, 
+                                "points": data.points + losserPoints, 
+                                "botLosses": data.botLosses + 1, 
+                                "botPoints": data.botPoints + losserPoints
+                            }, 
+                            {useFindAndModify:false}).then((data, err) => {
+                                console.log(data)
+                        })
+    
+                    }
+    
+                })
+    
+    
+                this.gameEvents.emit("new")
+
+
             })
 
-        agents.findOne({agentName: losserName})
-            .then((data, err) => {
-                
-                if(!err){
-
-                    agents.updateOne({agentName: losserName},
-                        {
-                            "losses": data.losses + 1, 
-                            "points": data.points + losserPoints, 
-                            "botLosses": data.botLosses + 1, 
-                            "botPoints": data.botPoints + losserPoints
-                        }, 
-                        {useFindAndModify:false}).then((data, err) => {
-                            console.log(data)
-                    })
-
-                }
-
-            })
-
-
-            this.gameEvents.emit("new")
+       
 
     }
 
@@ -623,7 +627,7 @@ class GameEngine extends EventEmitter{
         if(agent.useNoOfCardsWithOpponent)
             state.noOfCardsWithOpponent = noOfCardsWithOpponent
         if(agent.useRules)
-            states.rules = rules
+            state.rules = rules
 
         this.action = [true, this.output]
                 
@@ -635,6 +639,11 @@ class GameEngine extends EventEmitter{
         super.emit(eventString)
 
         //this.actionCreater(availableMove, playerName)
+
+
+        console.log(":State")
+
+        console.log(state)
         
     }
 

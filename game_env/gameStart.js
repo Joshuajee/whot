@@ -9,7 +9,6 @@
 const {GameTrain, shuffle} = require("./gameTrain")
 const GamePlay = require("./gamePlay")
 
-var agent = [0, 0] 
 
 class GameTraining extends GameTrain{
 

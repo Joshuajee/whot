@@ -56,7 +56,7 @@ agents.find().exec((err, data)=>{
             console.log(currentOpponent)
 
             if(currentOpponent <= totalPlayers)
-                new GameTraining(data[currentPlayer].agentName, data[currentOpponent].agentName, rules, data, 0, 1, gameEmitter).startGame()
+                new GameTraining(data[currentPlayer].agentName, data[currentOpponent].agentName, rules, [data[currentPlayer], data[currentOpponent]], 0, 1, gameEmitter).startGame()
             else{
 
                 if(currentTournament <= rounds){

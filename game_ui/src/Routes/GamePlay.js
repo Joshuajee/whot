@@ -63,6 +63,7 @@ class GamePlay extends React.Component{
                     "cardPlayed":[],
                     rules: rules
             },
+            playerOneData: {},
             playerTwoData: {},
             playerOneCardIndex : 0,
             playerTwoCardIndex : 0,
@@ -97,7 +98,14 @@ class GamePlay extends React.Component{
 
         axios.post("/api/game", {"agentName": user, "user": "Guest", rules: rules, start: 25}).then((res)=>{  
 
-            this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data.gameState, playerTwoData: res.data.agentInfo}) 
+            this.setState(
+                {
+                    isLoading:false, 
+                    opponetIsPlaying:false, 
+                    gameState:res.data.gameState, 
+                    playerOneData: res.data.playerInfo,
+                    playerTwoData: res.data.agentInfo
+                }) 
 
             if(res.data.moves.length){
             
@@ -123,9 +131,11 @@ class GamePlay extends React.Component{
 
         let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
 
-        this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true))
+        this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true, this.state.playerOneData))
 
         card.push(cardIndex(availableMoves, card[0]))
+
+        this.state.playerOneActions.push(card)
 
         this.setState({isNeeded : false, isLoading : true, opponetIsPlaying : true})
  
@@ -170,7 +180,9 @@ class GamePlay extends React.Component{
 
         card.push(cardIndex(availableMoves, card[0]))
 
-        this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true))
+        this.state.playerOneActions.push(card)
+
+        this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true, this.state.playerOneData))
 
         this.setState({ isLoading : true })
 
@@ -214,6 +226,7 @@ class GamePlay extends React.Component{
                 
                 //undo last state
                 this.state.playerOneStates.pop()
+                this.state.playerOneActions.pop()
 
                 //remove loader from the screen and transfer game control back to player
                 this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
@@ -237,6 +250,7 @@ class GamePlay extends React.Component{
 
                     //remove last state
                     this.state.playerOneStates.pop()
+                    this.state.playerOneActions.pop()
 
                 }else{
                     
@@ -268,6 +282,7 @@ class GamePlay extends React.Component{
 
                             //undo last state update
                             this.state.playerOneStates.pop()
+                            this.state.playerOneActions.pop()
 
                             //remove loader and transfer game control back to player
                             this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
@@ -298,6 +313,10 @@ class GamePlay extends React.Component{
     }
 
     render(){
+
+
+        console.log("Actionssssssss")
+        console.log(this.state.playerOneActions)
 
         checkGameState(this.state)
 

@@ -111,6 +111,24 @@ class GameTrain extends GameEngine{
             index = card[0].indexOf(":") + 1
             number = card[0].slice(index, card[0].length)
 
+            if(playerName == this.playerOneName){
+
+                if(action[0])
+                    this.actionOneNew.push(card)
+                else
+                    this.actionOneOld.push(card)
+                
+            }else{
+                
+                if(action[0])
+                    this.actionTwoNew.push(card)
+                else
+                    this.actionTwoOld.push(card)
+    
+            }
+    
+            this.playGame(playerCardAtHand, card)
+
         }else{
 
             console.log("player 1 " + this.player1)
@@ -128,24 +146,6 @@ class GameTrain extends GameEngine{
 
         }
 
-
-        if(playerName == this.playerOneName){
-
-            if(action[0])
-                this.actionOneNew.push(card)
-            else
-                this.actionOneOld.push(card)
-            
-        }else{
-            
-            if(action[0])
-                this.actionTwoNew.push(card)
-            else
-                this.actionTwoOld.push(card)
-
-        }
-
-        this.playGame(playerCardAtHand, card)
 
         if(rules.holdOn.active && number == rules.holdOn.card){
 
@@ -327,9 +327,10 @@ class GameTrain extends GameEngine{
     */
     chooseAction(action, availableMove){
 
-        console.log(...action[1])
-
         let maxAction = Math.max(...action[1])
+
+        console.log("ACTION", action[1])
+        console.log(maxAction)
 
         let actionPicked = []
         let pickedAction = []
@@ -360,6 +361,8 @@ class GameTrain extends GameEngine{
      * @param {*} move move made by the player
      */
     playGame(player, move){
+
+        console.log(this.market.length + this.inPlay.length + this.player1.length + this.player2.length)
 
         console.log("game move " + move[0])
         
@@ -400,14 +403,16 @@ class GameTrain extends GameEngine{
 
         }
 
+        
+
+        console.log("Market ", this.market)
+        console.log("InPlay ", this.inPlay)
+        console.log("Player 1 ", this.player1)
+        console.log("Player 2 ", this.player2)
+
         console.log(this.market.length + this.inPlay.length + this.player1.length + this.player2.length)
 
-        //console.log("Market ", this.market)
-        //console.log("InPlay ", this.inPlay)
-        //console.log("Player 1 ", this.player1)
-        //console.log("Player 2 ", this.player2)
-
-        //if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length !== 56) 
+        if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length !== 56) jhj
 
     }
 
