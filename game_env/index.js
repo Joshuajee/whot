@@ -11,7 +11,6 @@ const { EventEmitter } = require("events")
 const prompt = require("prompt-sync")()
 const {GameTraining}  = require("./gameStart")
 const agents = require("../models/agents")
-const { exitCode } = require("process")
 
 let rules = {"holdOn":{"active":true, "card":1, "defend":false},
                      "pickTwo":{"active":true, "card":2, "defend":false},
@@ -68,7 +67,7 @@ agents.find().exec((err, data)=>{
                     gameEmitter.emit("new")
                     currentTournament++
                 }else{
-                    exitCode()
+                    process.exit(1)
                 }
                 
             } 

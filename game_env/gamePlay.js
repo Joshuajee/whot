@@ -154,43 +154,45 @@ class GamePlay extends GameEngine{
         return state
     }
 
-    findState(state, index, max, agentName){
+    async separateStates(state, index, max, agentName, newOrOldArray = []){
 
         let currentState = state[index]
+        let newOrOld = newOrOldArray
 
         const playerStates = states(agentName)
 
-        console.log("_____________________________________")
-        console.log(agentName)
+        try{
 
-        playerStates.find({currentState}).then((err, data) => {
+            await playerStates.find({currentState}).then( async (data, err) => {
 
-            if(!err){
+                if(err === undefined){
 
-                console.log(data)
-                console.log(err)
-                
-                if(data.length > 0){
+                    if(data.length > 0){
+                        newOrOld.push(data[0])
+                    }else{
+                        newOrOld.push(null)
+                    }
 
                 }else{
-
+                    await this.separateStates(state, index, max, agentName, newOrOld)
                 }
-                console.log(index)
 
-            }else{
+                if(index + 1 < max){
+                    await this.separateStates(state, index + 1, max, agentName, newOrOld)
+                }else{
+                    console.log("DONE")
+                }
 
-            }
+            })
 
-            if(index < max){
-                this.findState(state, index + 1, max, agentName)
-            }else{
-                //callback
-            }
+            return newOrOld
 
-        })
+        }catch{
+            console.log("eRrorrrrrrrr")
+        }
     }
 
-    save(requestBody, res){
+    async save(requestBody, res){
 
         let playerOneCardAtHand = requestBody.gameState.playerOne.cardAtHand
         let playerTwoCardAtHand = requestBody.gameState.playerTwo.cardAtHand
@@ -204,11 +206,84 @@ class GamePlay extends GameEngine{
         console.log(playerOneStates)
         console.log(playerOneActions)
 
+        res.status(200).json({status: 'received'})
+
+        try{
+
+            const playerOneSeparated = await this.separateStates(playerOneStates, 0, playerOneStates.length, this.playerOneName)
+            const playerTwoSeparated = await this.separateStates(playerTwoStates, 0, playerTwoStates.length, this.playerTwoName)
+
+            let playerOneNewOldSA = this.separateToNewOldSA(playerOneSeparated, playerOneStates, playerOneActions)
+
+            let playerTwoNewOldSA = this.separateToNewOldSA(playerTwoSeparated, playerTwoStates, playerTwoActions)
+
+            this.addActionsToNewState(playerOneNewOldSA[0], playerTwoNewOldSA[0])
+            console.log("ONE")
+            console.log(playerOneNewOldSA[0])
+
+            console.log("NEW")
+            console.log(playerTwoNewOldSA[0])
 
 
-        //this.findState(playerTwoStates, 0, playerTwoStates.length, this.playerTwoName)
+            let human = {}
+
+            human.playerOneStateNew = playerOneNewOldSA[0]
+            human.playerOneStateOld = playerOneNewOldSA[2]
+            human.playerTwoStateNew = playerTwoNewOldSA[0]
+            human.playerTwoStateOld = playerTwoNewOldSA[2]
+
+            console.log(playerOneNewOldSA[2])
+    
+            
+            super.rewards(
+                this.agentOne.agentName, 
+                this.agentTwo.agentName, 
+                playerOneCardAtHand,        
+                playerTwoCardAtHand, 
+                playerOneNewOldSA[1], 
+                playerOneNewOldSA[3], 
+                playerTwoNewOldSA[1], 
+                playerTwoNewOldSA[3], 
+                human) 
+
+        } catch(err) {
+
+            console.log(err)
+
+        }
+        
 
         
+
+    }
+
+    separateToNewOldSA(filteredPlayerState, playerStates, playerActions){
+
+        let newStates = []
+        let oldStates = []
+        let newActions = []
+        let oldActions = []
+
+        for (let i = 0; i < filteredPlayerState.length; i++){
+
+            if(filteredPlayerState[i] === null){
+
+                newStates.push(playerStates[i])
+                newActions.push(playerActions[i])
+
+            }else{
+
+                oldStates.push(filteredPlayerState[i])
+                oldActions.push(playerActions[i])
+
+            }
+
+        }
+
+        return [newStates, newActions, oldStates, oldActions]
+    }
+
+    addActionsToNewState (playerOneStates, playerTwoStates){
 
         for(let i = 0; i < playerOneStates.length; i++){
 
@@ -242,21 +317,6 @@ class GamePlay extends GameEngine{
 
         }
 
-
-       
-
-        let human = {}
-
-        human.playerOneStateNew = playerOneStates
-        human.playerOneStateOld = []
-        human.playerTwoStateNew = playerTwoStates
-        human.playerTwoStateOld = []
-
-     
-        super.rewards(this.agentOne.agentName, this.agentTwo.agentName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActions, [], playerTwoActions, [], human)
-        
-    
-        res.send(playerOneStates)
 
     }
 

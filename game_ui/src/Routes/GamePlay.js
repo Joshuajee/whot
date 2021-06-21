@@ -96,7 +96,7 @@ class GamePlay extends React.Component{
 
     componentDidMount(){
 
-        axios.post("/api/game", {"agentName": user, "user": "Guest", rules: rules, start: 25}).then((res)=>{  
+        axios.post("/api/game", {"agentName": user, "user": "Guest", rules: rules, start: 3}).then((res)=>{  
 
             this.setState(
                 {
