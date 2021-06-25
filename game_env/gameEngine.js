@@ -287,7 +287,7 @@ class GameEngine extends EventEmitter{
      * @param {*} actionsOld 2d array of actions of old states
      * @param {*} actionsNew 2d array actions of new states
      */
-    addReward(point, statesOld, statesNew, actionsOld, actionsNew){
+    addReward(point, statesOld, statesNew, actionsOld, actionsNew, learningRate){
 
         statesOld = [...statesOld]
         statesNew  = [...statesNew]
@@ -297,7 +297,9 @@ class GameEngine extends EventEmitter{
 
         for(let i = 0; i < statesNew.length; i++){
 
-            statesNew[i].actions[actionsNew[i][1]] = statesNew[i].actions[actionsNew[i][1]] + point
+            //statesNew[i].actions[actionsNew[i][1]] = statesNew[i].actions[actionsNew[i][1]] + point
+
+            statesNew[i].actions[actionsNew[i][1]] = this.learn(statesNew[i].actions[actionsNew[i][1]], point, learningRate)
 
             //statesNew[i].actions = this.normalize(statesNew[i].actions)
 
@@ -306,7 +308,9 @@ class GameEngine extends EventEmitter{
 
         for(let i = 0; i < statesOld.length; i++){
 
-            statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
+            //statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
+
+            statesOld[i].actions[actionsOld[i][1]] = this.learn(statesOld[i].actions[actionsOld[i][1]], point, learningRate)
 
             //statesOld[i].actions = this.normalize(statesOld[i].actions)
 
@@ -398,8 +402,23 @@ class GameEngine extends EventEmitter{
             if(this.playerOneNumber < this.playerTwoNumber){
 
                 // rewards when player one has fewer card number than player two
-                this.addReward(5 - 1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
-                this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+                this.addReward(
+                    5 - 1 * playerOneNumber / 100, 
+                    this.playerOneStateRoundOld, 
+                    this.playerOneStateRoundNew, 
+                    playerOneActionsOld, 
+                    playerOneActionsNew,
+                    this.agentOne.learningRate
+                    )
+
+                this.addReward(
+                    -1 * playerTwoNumber / 100, 
+                    this.playerTwoStateRoundOld, 
+                    this.playerTwoStateRoundNew, 
+                    playerTwoActionsOld, 
+                    playerTwoActionsNew,
+                    this.agentTwo.learningRate
+                    )
 
                 this.playerOnePoints += 5 - 1 * playerOneNumber / 100
                 this.playerTwoPoints += -1 * playerTwoNumber / 100
@@ -407,8 +426,22 @@ class GameEngine extends EventEmitter{
             }else if(this.playerOneNumber > this.playerTwoNumber){
 
                 // rewards when player two has fewer card number than player one
-                this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
-                this.addReward(5 - 1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+                this.addReward(
+                    -1 * playerOneNumber / 100, 
+                    this.playerOneStateRoundOld, 
+                    this.playerOneStateRoundNew, 
+                    playerOneActionsOld, 
+                    playerOneActionsNew,
+                    this.agentOne.learningRate
+                    )
+
+                this.addReward(
+                    5 - 1 * playerTwoNumber / 100, 
+                    this.playerTwoStateRoundOld, 
+                    this.playerTwoStateRoundNew, 
+                    playerTwoActionsOld, 
+                    playerTwoActionsNew,
+                    this.agentTwo.learningRate)
 
                 this.playerOnePoints += -1 * playerOneNumber / 100
                 this.playerTwoPoints += 5 -1 * playerTwoNumber / 100
@@ -416,8 +449,23 @@ class GameEngine extends EventEmitter{
             }else{
 
                 //rewards when player two has same card number as player one
-                this.addReward(-1 * playerOneNumber / 100, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
-                this.addReward(-1 * playerTwoNumber / 100, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+                this.addReward(
+                    -1 * playerOneNumber / 100, 
+                    this.playerOneStateRoundOld, 
+                    this.playerOneStateRoundNew, 
+                    playerOneActionsOld, 
+                    playerOneActionsNew,
+                    this.agentOne.learningRate
+                    )
+
+                this.addReward(
+                    -1 * playerTwoNumber / 100, 
+                    this.playerTwoStateRoundOld, 
+                    this.playerTwoStateRoundNew, 
+                    playerTwoActionsOld, 
+                    playerTwoActionsNew,
+                    this.agentTwo.learningRate
+                    )
 
                 this.playerOnePoints += -1 * playerOneNumber / 100
                 this.playerTwoPoints += -1 * playerTwoNumber / 100
@@ -431,10 +479,24 @@ class GameEngine extends EventEmitter{
             console.log("Player One Win")
             
             //reward player one
-            this.addReward(5, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+            this.addReward(
+                5, 
+                this.playerOneStateRoundOld, 
+                this.playerOneStateRoundNew, 
+                playerOneActionsOld, 
+                playerOneActionsNew,
+                this.agentOne.learningRate
+                )
            
             //penalise player two
-            this.addReward(-2 - 1 * playerTwoNumber / 10, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+            this.addReward(
+                -2 - 1 * playerTwoNumber / 10, 
+                this.playerTwoStateRoundOld, 
+                this.playerTwoStateRoundNew, 
+                playerTwoActionsOld, 
+                playerTwoActionsNew,
+                this.agentTwo.learningRate
+                )
 
             this.updatePlayer(playerOneName, playerTwoName, 5, -2 - 1 * playerTwoNumber / 10)
 
@@ -442,9 +504,21 @@ class GameEngine extends EventEmitter{
 
             console.log("Player Two Win")
             //penalise player one
-            this.addReward(-2 - 1 * playerOneNumber / 10, this.playerOneStateRoundOld, this.playerOneStateRoundNew, playerOneActionsOld, playerOneActionsNew)
+            this.addReward(
+                -2 - 1 * playerOneNumber / 10, 
+                this.playerOneStateRoundOld, 
+                this.playerOneStateRoundNew, 
+                playerOneActionsOld, 
+                playerOneActionsNew,
+                this.agentOne.learningRate)
             //reward player two
-            this.addReward(5, this.playerTwoStateRoundOld, this.playerTwoStateRoundNew, playerTwoActionsOld, playerTwoActionsNew)
+            this.addReward(
+                5, 
+                this.playerTwoStateRoundOld, 
+                this.playerTwoStateRoundNew, 
+                playerTwoActionsOld, 
+                playerTwoActionsNew,
+                this.agentTwo.learningRate)
             
             this.updatePlayer(playerTwoName, playerOneName, 5, -2 - 1 * playerOneNumber / 10)
 
@@ -644,6 +718,8 @@ class GameEngine extends EventEmitter{
         console.log(":State")
 
         console.log(state)
+
+        console.log(eventString)
         
     }
 
@@ -773,22 +849,18 @@ class GameEngine extends EventEmitter{
 
 
     /**
-     * 
-     * @param {*} action array of raw actions
-     * @returns array of normalized actions
+     * This method give the 
+     * @param {*} prevAction 
+     * @param {*} currAction 
+     * @param {*} learningRate 
+     * @param {*} discountRate 
+     * @returns 
      */
-    normalize(action){
+    learn(prevAction, currAction, learningRate = 0.01, discountRate = 1){
 
-        let array = [...action]
-        let result = []
-
-        for(let i = 0; i < array.length; i++)   array[i] = Math.abs(array[i])
-
-        let max = Math.max(...array)
-     
-        for(let i = 0; i < array.length; i++)   result.push(action[i] / max)
-
-        return result
+        const maxReward = 100
+        
+        return prevAction + learningRate * (currAction + discountRate * maxReward - prevAction)
 
     }
 

@@ -26,6 +26,9 @@ class GamePlay extends GameEngine{
         this.playerTwoName = playerTwoName
         this.rules = rules
 
+        this.agentOne = agents[0]
+        this.agentTwo = agents[1]
+
         super.on("need", ()=>{
 
             const action = super.getAction
@@ -149,7 +152,7 @@ class GamePlay extends GameEngine{
 
         console.log(state)
         
-        this.play(state)
+        this.play(state, this.agentOne.agentName)
 
         return state
     }
@@ -441,18 +444,73 @@ class GamePlay extends GameEngine{
     }
 
     /**
+     * This method deals with available moves when Whot:20 card is involved
+     * @param {*} agent current agent property object
+     * @param {*} playerCard current player cards at hand
+     * @returns array of available moves for whot
+     */
+
+    whotAvailableMoves(agent, playerCard){
+
+        let availableMove = []
+
+        if(!agent.canNeedAnyCard && playerCard.length > 1) {
+    
+            for(let i = 0; i < playerCard.length; i++){
+
+                let index = playerCard[i].indexOf(":") + 1
+                let shape = playerCard[i].slice(0, index)
+
+                if(playerCard[i] !== "whot:20") {
+
+                    for(let i = 0; i < availableMove.length; i++) {
+
+                        if(availableMove[i] === shape + "20") break
+
+                        if(i + 1 === availableMove.length) availableMove.push(shape + "20")
+
+                    }
+
+                    if(availableMove.length === 0){
+                        availableMove.push(shape + "20")
+                    }
+
+                }
+
+            }
+
+        } else {
+            
+            availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+
+        }
+
+        return availableMove.sort()
+    }
+
+    /**
      * This method search for valid moves           
      * @param {*} playerCard cards of the player that is to make a move
      * @param {*} inPlayCard last card played
      * @returns an array all valid moves that can be mades
      */    
-    availableMoves(playerCard, inPlayCard){
+    availableMoves(playerCard, inPlayCard, playerName){
 
         let index_in = inPlayCard.indexOf(":") + 1
         let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
         let shape_in = inPlayCard.slice(0, index_in)
     
         let availableMove = ["z:goMarket"]
+
+        if(playerName === this.agentOne.agentName){
+
+            if(!this.agentOne.canGoMarket) availableMove = []
+
+        }else{
+
+            if(!this.agentTwo.canGoMarket) availableMove = []
+       
+        } 
     
         for(let i = 0; i < playerCard.length; i++){
              
@@ -464,7 +522,17 @@ class GamePlay extends GameEngine{
     
                 availableMove.sort()
     
-                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+                    //determines the agent that is playing and if the agent can need any card
+                    if(playerName === this.agentOne.agentName){
+
+                        availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
+    
+                    }else{
+    
+                        availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
+                
+                    }
+
                 
                 return availableMove
     
@@ -489,7 +557,9 @@ class GamePlay extends GameEngine{
      * method from the GameEngine class
      * @param {*} state current game state gotten from the client
      */
-    play(state){
+    play(state, playerName = this.agentTwo.agentName){
+
+        console.log(" __________________ " + playerName)
         
         let gameState = state.gameState
 
@@ -507,13 +577,13 @@ class GamePlay extends GameEngine{
         this.playerTwoName = this.playerTwo.name
         this.playerTwoCard = this.playerTwo.cardAtHand
 
-        this.availableMove = this.availableMoves(this.playerTwoCard, this.cardPlayed[this.cardPlayed.length - 1])
+        this.availableMove = this.availableMoves(this.playerTwoCard, this.cardPlayed[this.cardPlayed.length - 1], playerName)
 
         this.noOfCardsWithPlayerOne = gameState.playerOne.cardAtHand.length
         
         this.gameRules = gameState.rules
 
-        if(this.availableMove.length === 1){
+        if(this.availableMove.length === 0){
        
             this.goMarket(this.playerTwoCard, 1) 
 

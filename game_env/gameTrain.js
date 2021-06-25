@@ -23,6 +23,9 @@ class GameTrain extends GameEngine{
         //class variables to hold players Names
         this.playerOneName = playerOneName
         this.playerTwoName = playerTwoName
+
+        this.agentOne = agents[0]
+        this.agentTwo = agents[1]
         
         this.currentPlayerName = this.playerOneName
 
@@ -235,18 +238,75 @@ class GameTrain extends GameEngine{
     }
 
     /**
+     * This method deals with available moves when Whot:20 card is involved
+     * @param {*} agent current agent property object
+     * @param {*} playerCard current player cards at hand
+     * @returns array of available moves for whot
+     */
+    whotAvailableMoves(agent, playerCard){
+
+            let availableMove = []
+    
+            if(!agent.canNeedAnyCard && playerCard.length > 1) {
+        
+                for(let i = 0; i < playerCard.length; i++){
+    
+                    let index = playerCard[i].indexOf(":") + 1
+                    let shape = playerCard[i].slice(0, index)
+    
+                    if(playerCard[i] !== "whot:20") {
+    
+                        console.log("__________________________________")
+    
+                        for(let i = 0; i < availableMove.length; i++) {
+    
+                            if(availableMove[i] === shape + "20") break
+    
+                            if(i + 1 === availableMove.length) availableMove.push(shape + "20")
+    
+                        }
+    
+                        if(availableMove.length === 0){
+                            availableMove.push(shape + "20")
+                        }
+    
+                    }
+    
+                }
+    
+            } else {
+                
+                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+    
+            }
+    
+            return availableMove.sort()
+    }
+
+    /**
      * This method search for valid moves           
      * @param {*} playerCard cards of the player that is to make a move
      * @param {*} inPlayCard last card played
      * @returns an array all valid moves that can be mades
      */
-    availableMoves(playerCard, inPlayCard){
+    availableMoves(playerCard, inPlayCard, playerName){
 
         let index_in = inPlayCard.indexOf(":") + 1
         let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
         let shape_in = inPlayCard.slice(0, index_in)
     
         let availableMove = ["z:goMarket"]
+
+        //determines the agent that is playing and if the agent can always go to market
+        if(playerName === this.agentOne.agentName){
+
+            if(!this.agentOne.canGoMarket) availableMove = []
+
+        }else{
+
+            if(!this.agentTwo.canGoMarket) availableMove = []
+       
+        }
     
         for(let i = 0; i < playerCard.length; i++){
              
@@ -257,9 +317,18 @@ class GameTrain extends GameEngine{
             if(number === 20){
             
                 availableMove.sort()
+
+                //determines the agent that is playing and if the agent can need any card
+                if(playerName === this.agentOne.agentName){
+
+                    availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
+
+                }else{
+
+                    availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
             
-                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
-                
+                }
+               
                 return availableMove
             
             }if(number === number_in){
@@ -273,6 +342,8 @@ class GameTrain extends GameEngine{
             }
     
         }
+
+        if(availableMove.length === 0) availableMove = ["z:goMarket"]
     
         return availableMove.sort()
     
@@ -298,7 +369,7 @@ class GameTrain extends GameEngine{
 
         this.currentPlayerName = playerName
 
-        this.availableMove = this.availableMoves(this.cardAtHand, inPlayCard)
+        this.availableMove = this.availableMoves(this.cardAtHand, inPlayCard, playerName)
 
         if(this.availableMove.length === 1){
 

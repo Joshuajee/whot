@@ -20,6 +20,8 @@ import axios from "axios"
     let formData ={
         agentName: "",
         availableMove: true,
+        canGoMarket: true,
+        canNeedAnyCard: true,
         cardAtHand: false,
         noOfCardAtHand: false,
         cardInPlay: false,
@@ -37,6 +39,8 @@ import axios from "axios"
 
         formData ={
             agentName: name === "agentName" ? value : formData.agentName,
+            canGoMarket: name === "canGoMarket" ? value === "true" ? true : false : formData.canGoMarket,
+            canNeedAnyCard: name === "canNeedAnyCard" ? value === "true" ? true : false : formData.canNeedAnyCard,
             availableMove: name === "availableMove" ? value === "true" ? true : false : formData.availableMove,
             cardAtHand: name === "cardAtHand" ? value === "true" ? true : false : formData.cardAtHand,
             noOfCardAtHand: name === "noOfCardAtHand" ? value === "true" ? true : false : formData.noOfCardAtHand,
@@ -137,7 +141,9 @@ import axios from "axios"
 
                     </div>
 
-                    
+                    <FormInput label="Can Go Market" type={"select"} identifier={"canGoMarket"} onChange={handleEvent} yes />
+
+                    <FormInput label="Can Need Any Card" type={"select"} identifier={"canNeedAnyCard"} onChange={handleEvent} yes />
 
                     <FormInput label="Cards At Hand" type={"select"} identifier={"cardAtHand"} onChange={handleEvent} />
 

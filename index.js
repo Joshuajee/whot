@@ -108,6 +108,8 @@ app.post('/api/create-agent', (req, res) =>{
 
             let agent = new agents()
             agent.agentName = agentData.agentName
+            agent.canGoMarket = agentData.canGoMarket
+            agent.canNeedAnyCard = agentData.canNeedAnyCard
             agent.useCardAtHand = agentData.cardAtHand
             agent.useNoOfCardAtHand = agentData.noOfCardAtHand
             agent.useCardInPlay = agentData.cardInPlay
@@ -117,6 +119,7 @@ app.post('/api/create-agent', (req, res) =>{
             agent.useNoOfCardsWithOpponent =  agentData.noOfCardsWithOpponent
             agent.useAvailableMove = agentData.availableMove
             agent.useRules = agentData.rules
+
 
             agent.save()
 

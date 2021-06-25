@@ -16,7 +16,8 @@ let rules = {"holdOn":{"active":true, "card":1, "defend":false},
                      "pickTwo":{"active":true, "card":2, "defend":false},
                      "pickThree":{"active":true, "card":5, "defend":false}, 
                      "suspension":{"active":true, "card":8, "defend":false},
-                     "generalMarket":{"active":true, "card":14, "defend":false}
+                     "generalMarket":{"active":true, "card":14, "defend":false},
+                     "marketFinishGameEnd" : false
                     } 
 
 const rounds = prompt('Numbers of Tournament    ');

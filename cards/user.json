@@ -1,6 +1,8 @@
 {
     "agentName": "Guest",
     "createdBy": "Guest",
+    "canGoMarket": true,
+    "canNeedAnyCard": true,
     "useCardAtHand": true,
     "useCardInPlay": true,
     "useCardPlayed": true,
