@@ -10,7 +10,7 @@ const {GameTrain, shuffle} = require("./gameTrain")
 const GamePlay = require("./gamePlay")
 
 
-class GameTraining extends GameTrain{
+class GameTraining extends GameTrain {
 
     constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){
 
@@ -22,9 +22,8 @@ class GameTraining extends GameTrain{
 
 
 
-class GamePlaying extends GamePlay{
+class GamePlaying extends GamePlay {
 
-    
 
     constructor(playerOneName, playerTwoName, rules, agent, isPlayerOneHuman, isPlayerTwoHuman){
 

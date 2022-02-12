@@ -30,14 +30,15 @@ class Leaderboard extends React.Component {
     }
 
     componentDidMount(){
-        axios.get("/api/leaderboard/0").then((response) =>{
+        axios.get("/api/v1/leaderboard/0").then((response) =>{
             console.log(response)
             this.setState({
                 isLoading:false,
-                response:response.data
+                response:response.data.data
             })
         })
     }
+
     
     render(){
 

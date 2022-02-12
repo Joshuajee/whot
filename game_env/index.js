@@ -12,6 +12,10 @@ const prompt = require("prompt-sync")()
 const {GameTraining}  = require("./gameStart")
 const agents = require("../models/agents")
 
+require("../configs/dbConnections")
+
+
+
 let rules = {"holdOn":{"active":true, "card":1, "defend":false},
                      "pickTwo":{"active":true, "card":2, "defend":false},
                      "pickThree":{"active":true, "card":5, "defend":false}, 

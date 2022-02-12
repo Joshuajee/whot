@@ -20,7 +20,7 @@ import Player from "../Componets/CardHolder/Player";
 
 import Need from "../Componets/CardHolder/Need"
 import Loader from "../Componets/Loader"
-import Modal from "../Componets/Modal"
+//import Modal from "../Componets/Modal"
 
 import {EventEmitter} from "events"
 
@@ -97,7 +97,7 @@ class GamePlay extends React.Component{
 
     componentDidMount(){
 
-        axios.post("/api/game", {"agentName": user, "user": "Guest", rules: rules, start: 3}).then((res)=>{  
+        axios.post("/api/v1/start", {"agentName": user, "user": "Guest", rules: rules, start: 3}).then((res)=>{  
 
             this.setState(
                 {
@@ -146,7 +146,7 @@ class GamePlay extends React.Component{
         this.state.gameState.playerOne.cardAtHand.splice(index, 1)
         this.state.gameState.cardPlayed.push(card[0])
 
-        axios.post("/api/play", request).then((res)=>{
+        axios.post("/api/v1/play", request).then((res)=>{
             
             let response = res.data
 
@@ -205,7 +205,7 @@ class GamePlay extends React.Component{
 
             let request = {"agentName": user, "user": "Guest", "gameState": this.state.gameState, "playerMove": "z:goMarket", rules:rules}
         
-            axios.post("/api/play", request).then((res)=>{
+            axios.post("/api/v1/play", request).then((res)=>{
                 
                 let response = res.data
 
@@ -261,7 +261,7 @@ class GamePlay extends React.Component{
                     
                     if(sendMove){
 
-                        axios.post("/api/play", request).then((res)=>{
+                        axios.post("/api/v1/play", request).then((res)=>{
                             
                             let response = res.data
 

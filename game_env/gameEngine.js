@@ -13,8 +13,6 @@ const agents = require("../models/agents")
 const states = require("../models/states")
 
 
-require("../configs/dbConnections")
-
 class GameEngine extends EventEmitter{
 
     constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){

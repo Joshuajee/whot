@@ -62,7 +62,7 @@ import axios from "axios"
 
         e.preventDefault()
 
-        axios.post('/api/create-agent', {agent: formData}).then((res)=>{
+        axios.post('/api/v1/create-agent', {agent: formData}).then((res)=>{
             
             //console.log(res)  
             alert(res.data.msg)
