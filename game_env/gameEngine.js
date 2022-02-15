@@ -8,82 +8,69 @@
 
 
 
-const { EventEmitter } = require("events")
-const agents = require("../models/agents")
-const states = require("../models/states")
+const { EventEmitter } = require("events");
+const Agents = require("../models/agents");
+const States = require("../models/states");
 
 
 class GameEngine extends EventEmitter{
 
     constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){
         
-        super()
+        super();
 
-        this.playerOneName = playerOneName
-        this.playerTwoName = playerTwoName
+        this.playerOneName = playerOneName;
+        this.playerTwoName = playerTwoName;
 
-        this.agentOne = agents[0]
-        this.agentTwo = agents[1]
+        this.agentOne = agents[0];
+        this.agentTwo = agents[1];
 
-        this.currentAgentIndex = currentPlayerIndex
-        this.currentOpponentIndex = currentOpponentIndex
+        this.currentAgentIndex = currentPlayerIndex;
+        this.currentOpponentIndex = currentOpponentIndex;
 
-        this.rules = rules
-        this.gameEvents = gameEvents
+        this.rules = rules;
+        this.gameEvents = gameEvents;
 
-        console.log(playerOneName)
-        console.log(playerTwoName)
-
-        this.action = []
+        this.action = [];
             
-        this.playerOneStateRoundOld = []
-        this.playerTwoStateRoundOld = []
+        this.playerOneStateRoundOld = [];
+        this.playerTwoStateRoundOld = [];
 
-        this.playerOneStateRoundNew = []
-        this.playerTwoStateRoundNew = []
+        this.playerOneStateRoundNew = [];
+        this.playerTwoStateRoundNew = [];
 
-        this.playerOnePoints = 0
-        this.playerTwoPoints = 0
+        this.playerOnePoints = 0;
+        this.playerTwoPoints = 0;
 
-        this.round = 1
+        this.round = 1;
+
+        this.user = undefined;
+        this.agent = undefined;
         
-        super.on("actionOutput", ()=>{
+        super.on("actionOutput", () => {
 
-            /*
-
-            let state = {
-                            "agentName" :   this.playerName,
-                            "cardAtHand"    :   [...this.cardAtHand], 
-                            "noOfCardsWithOpponent" : this.noOfCardsWithOpponent,
-                            "cardInPlay"    :   this.inPlayCards,
-                            "cardPlayed"    : [...this.cardPlayed], 
-                            "noOfCardsInMarket" :    this.noOfCardsInMarket,
-                            "availableMove" :   [...this.availableMove],
-                            "actions"   :   [...this.actionOutput],
-                            "rules" :   this.rules
-                        }
-                    
-            */
-
-            let state = {
-                "agentName" :   this.playerName,
-                "availableMove" :   [...this.availableMove],
-                "actions"   :   [...this.actionOutput],
-            }
+            const state = {
+                agentId: this.agent,
+                userId: this.user,
+                availableMove: [...this.availableMove],
+                actions: [...this.actionOutput]
+            };
 
             this.action = [true, ...this.actionOutput]
 
             //add this state to the right player
             if(this.playerName === playerOneName)
-                this.playerOneStateRoundNew.push(state)
+                this.playerOneStateRoundNew.push(state);
             else
-                this.playerTwoStateRoundNew.push(state)
+                this.playerTwoStateRoundNew.push(state);
            
-            super.emit(this.eventString)
+            super.emit(this.eventString);
 
         })
 
         super.on("action", () => {
+
+            console.log(this.agents)
 
             /*
             for(let i = 0; i < this.states.length; i++){
@@ -130,22 +117,10 @@ class GameEngine extends EventEmitter{
         return this.action
     }
 
-    updateAgentWithNewStates(playerOneStates, playerTwoStates){
-
-        //save the new states for player one
-        playerOneStates.insertMany(this.playerOneStateRoundNew, (error)=>{
-
-            if(error) console.log("error: " + error)
-
-        })
-
-        //save the new states for player two
-        playerTwoStates.insertMany(this.playerTwoStateRoundNew, (error)=>{
-
-            if(error) console.log("error: " + error)
-
-        })
-
+    async updateAgentWithNewStates() {
+        //save the new states for players
+        console.log([...this.playerOneStateRoundNew, ...this.playerTwoStateRoundNew])
+        await States.insertMany([...this.playerOneStateRoundNew, ...this.playerTwoStateRoundNew ]);
     }
 
     /**
@@ -185,7 +160,7 @@ class GameEngine extends EventEmitter{
 
                     result.push(currentState[0])
 
-                }else{
+                } else { 
 
                     result.push(currentState[0])
 
@@ -199,21 +174,12 @@ class GameEngine extends EventEmitter{
 
     }
 
-    updateAgentWithOldStates(playerStates, playerRound){
+    async updateAgentWithOldStates(playerRound){
 
         //save the new states for player one
-        playerRound.forEach(state => {
+        playerRound.forEach(async state => {
 
-            let query = {
-                "agentName": state.agentName,
-                "availableMove": state.availableMove,
-            }
-
-            playerStates.updateOne(query, {actions : state.actions}, (error)=>{
-
-                if(error) console.log("error: " + error)
-    
-            })
+            await States.updateOne(state);
 
         })
 
@@ -226,54 +192,32 @@ class GameEngine extends EventEmitter{
      * @param {*} winnerPoints points to be added to winner
      * @param {*} losserPoints points to be substracted from loser
      */
-    updatePlayer(winnerName, losserName, winnerPoints, losserPoints){
+    async updatePlayer(winnerName, losserName, winnerPoints, losserPoints) {
 
-        agents.findOne({agentName: winnerName})
-            .then((data, err) => {
-                
-                if(!err){
+        const winnerUpdate = { 
+            $inc: { 
+                wins: 1, 
+                points: winnerPoints,
+                botWins: 1, 
+                botPoints: winnerPoints 
+            }
+        };
 
-                    agents.updateOne({agentName: winnerName},
-                        {
-                            "wins": data.wins + 1,
-                            "points": data.points + winnerPoints, 
-                            "botWins": data.botWins + 1, 
-                            "botPoints": data.botPoints + winnerPoints
-                        }, 
-                        {useFindAndModify:false}).then((data, err) => {
-                            console.log(data)
-                    })
+        const losserUpdate = { 
+            $inc: { 
+                losses: 1, 
+                points: losserPoints,
+                botLosses: 1, 
+                botPoints: losserPoints
+            }
+        };
 
-                }
+        await Agents.updateOne({agentName: winnerName}, winnerUpdate);
 
+        await Agents.updateOne({agentName: losserName}, losserUpdate);
 
-                agents.findOne({agentName: losserName})
-                .then((data, err) => {
-                    
-                    if(!err){
-    
-                        agents.updateOne({agentName: losserName},
-                            {
-                                "losses": data.losses + 1, 
-                                "points": data.points + losserPoints, 
-                                "botLosses": data.botLosses + 1, 
-                                "botPoints": data.botPoints + losserPoints
-                            }, 
-                            {useFindAndModify:false}).then((data, err) => {
-                                console.log(data)
-                        })
-    
-                    }
-    
-                })
-    
-    
-                this.gameEvents.emit("new")
-
-
-            })
-
-       
+               
+        this.gameEvents.emit("new");
 
     }
 
@@ -295,22 +239,14 @@ class GameEngine extends EventEmitter{
 
         for(let i = 0; i < statesNew.length; i++){
 
-            //statesNew[i].actions[actionsNew[i][1]] = statesNew[i].actions[actionsNew[i][1]] + point
-
             statesNew[i].actions[actionsNew[i][1]] = this.learn(statesNew[i].actions[actionsNew[i][1]], point, learningRate)
-
-            //statesNew[i].actions = this.normalize(statesNew[i].actions)
 
         }
 
 
         for(let i = 0; i < statesOld.length; i++){
 
-            //statesOld[i].actions[actionsOld[i][1]] = statesOld[i].actions[actionsOld[i][1]] + point
-
             statesOld[i].actions[actionsOld[i][1]] = this.learn(statesOld[i].actions[actionsOld[i][1]], point, learningRate)
-
-            //statesOld[i].actions = this.normalize(statesOld[i].actions)
 
         }
 
@@ -329,22 +265,22 @@ class GameEngine extends EventEmitter{
      * @param {*} playerTwoActionsNew actions of player two that are new
      * @param {*} playerTwoActionsOld actions of player two that are gotten from database
      */
-    rewards(playerOneName, playerTwoName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActionsNew, playerOneActionsOld, playerTwoActionsNew, playerTwoActionsOld, human = null){
+    async rewards(playerOneName, playerTwoName, playerOneCardAtHand, playerTwoCardAtHand, playerOneActionsNew, playerOneActionsOld, playerTwoActionsNew, playerTwoActionsOld, human = null){
 
-        this.round++
+        this.round++;
 
         if(human !== null){
-            this.playerOneStateRoundNew = human.playerOneStateNew
-            this.playerOneStateRoundOld = human.playerOneStateOld
-            this.playerTwoStateRoundNew = human.playerTwoStateNew
-            this.playerTwoStateRoundOld = human.playerTwoStateOld
+            this.playerOneStateRoundNew = human.playerOneStateNew;
+            this.playerOneStateRoundOld = human.playerOneStateOld;
+            this.playerTwoStateRoundNew = human.playerTwoStateNew;
+            this.playerTwoStateRoundOld = human.playerTwoStateOld;
         }
         
-        let playerOneNumber = 0
-        let playerTwoNumber = 0
+        let playerOneNumber = 0;
+        let playerTwoNumber = 0;
 
-        const playerOneStates = states(playerOneName)
-        const playerTwoStates = states(playerTwoName)
+        const playerOneStates = await States;//(playerOneName);
+        const playerTwoStates = await States;//(playerTwoName);
 
         //sum the card numbers if any is remaining for agent one
         if(playerOneCardAtHand.length > 0){
@@ -527,7 +463,7 @@ class GameEngine extends EventEmitter{
             // remove duplicate states
             this.playerOneStateRoundOld = this.moderateState(this.playerOneStateRoundOld, this.agentOne)
             
-            this.updateAgentWithOldStates(playerOneStates, this.playerOneStateRoundOld)
+            //await this.updateAgentWithOldStates(this.playerOneStateRoundOld)
         }
 
         if(this.playerTwoStateRoundOld.length > 0){
@@ -535,7 +471,7 @@ class GameEngine extends EventEmitter{
             // remove duplicate states
             this.playerTwoStateRoundOld = this.moderateState(this.playerTwoStateRoundOld, this.agentTwo)
             
-            this.updateAgentWithOldStates(playerTwoStates, this.playerTwoStateRoundOld)
+            //await this.updateAgentWithOldStates(this.playerTwoStateRoundOld)
         }
 
     
@@ -544,9 +480,7 @@ class GameEngine extends EventEmitter{
         this.playerTwoStateRoundNew = this.moderateState(this.playerTwoStateRoundNew, this.agentTwo)
 
         //save new states
-        this.updateAgentWithNewStates(playerOneStates, playerTwoStates)
-
-
+        await this.updateAgentWithNewStates();
 
         //empty the StateRound array after one round
         this.playerOneStateRoundNew = []
@@ -573,26 +507,28 @@ class GameEngine extends EventEmitter{
      * @param {*} rules game rules
      * @param {*} eventString name of events
      */
-    stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString="received"){
+    async stateFinder(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString="received"){
 
         this.playerName = playerName
 
         let agent = null
 
 
-        if(playerName == this.agentOne.agentName)
-            agent = this.agentOne
-        else
-            agent = this.agentTwo
+        if(playerName == this.agentOne.agentName) {
+            agent = this.agentOne;
+        } else {
+            agent = this.agentTwo;
+        }
+
+        this.agent = agent;
 
 
         //make sure action array is empty for every play
         this.action = []
                 
-        let query = {
-            "agentName":playerName,
-            "availableMove":availableMove,
-            }
+        const query = {
+            availableMove: availableMove,
+        }
 
         
         if(agent.useCardAtHand)
@@ -613,32 +549,26 @@ class GameEngine extends EventEmitter{
             query.rules = rules
 
 
-        const playerStates = states(playerName)
+        const state = await States.findOne(query);
 
-        playerStates.find(query, (error, data) =>{
+        if(!state) {
 
-            if(data.length === 0){
-
-                this.stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString, agent)
+            await this.stateCreater(playerName, cardPlayed, cardAtHand,  noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString, agent)
                 
-                if(error) console.log("error: " + error)
-
-            }else{
+        }   else    {
             
-                this.action = [false, data[0].actions]
+            this.action = [false, state.actions]
 
-                console.log(this.action)
+            console.log(this.action)
                 
-                if(playerName === this.playerOneName)
-                    this.playerOneStateRoundOld.push(data[0])
-                else
-                    this.playerTwoStateRoundOld.push(data[0])
+            if(playerName === this.playerOneName)
+                this.playerOneStateRoundOld.push(state)
+            else
+                this.playerTwoStateRoundOld.push(state)
             
-                super.emit(eventString)
+            super.emit(eventString)
 
-            }
-
-        })
+        }
 
     }
 
@@ -658,7 +588,7 @@ class GameEngine extends EventEmitter{
      * @param {*} eventString name of events
      */
 
-    stateCreater(playerName, cardPlayed, cardAtHand, noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString, agent){
+    async stateCreater(playerName, cardPlayed, cardAtHand, noOfCardsWithOpponent, availableMove, inPlayCards, noOfCardsInMarket, rules, eventString, agent){
         
         this.cardAtHand = cardAtHand
         this.noOfCardsWithOpponent = noOfCardsWithOpponent
@@ -677,10 +607,11 @@ class GameEngine extends EventEmitter{
         }
 
 
-        let state = {
-            "agentName" :   this.playerName,
-            "availableMove" :   [...this.availableMove],
-            "actions"   :   [...this.output],
+        const state = {
+            agentId: this.agent,
+            userId: this.user,
+            availableMove:   [...this.availableMove],
+            actions:   [...this.output],
         }
 
         
@@ -709,15 +640,6 @@ class GameEngine extends EventEmitter{
             this.playerTwoStateRoundNew.push(state)
             
         super.emit(eventString)
-
-        //this.actionCreater(availableMove, playerName)
-
-
-        console.log(":State")
-
-        console.log(state)
-
-        console.log(eventString)
         
     }
 
@@ -729,21 +651,18 @@ class GameEngine extends EventEmitter{
      */
     actionCreater(availableMove, playerName){
         
-        let query = {
-            "agentName":playerName,
-            "availableMove":availableMove
-            }
+        const query = { availableMove: availableMove };
         
-        this.output = []
+        this.output = [];
         
         //set inital values of zeros for output
         for(let i = 0; i < availableMove.length; i++){
-            this.output.push(0)
+            this.output.push(0);
         }
 
-        this.states = []
+        this.states = [];
 
-        const playerStates = states(playerName)
+        const playerStates = States(playerName)
 
         //find state with similar cars and moves
         playerStates.find(query, (error, data) =>{

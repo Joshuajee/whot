@@ -6,8 +6,11 @@
  * @license MIT This program is distributed under the MIT license
  */
 
-const agents = require("../models/agents")
+const guest = require("../cards/user.json")
+
+const Agents = require("../models/agents")
 const states = require("../models/states")
+
 
  
 const GameEngine = require("./gameEngine")
@@ -47,11 +50,11 @@ class GamePlay extends GameEngine{
 
         })
 
-        super.on("received", ()=>{
+        super.on("received", async() => {
 
             console.log(super.getAction)
 
-            this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, false, false)
+            await this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, false, false)
         
         })  
 
@@ -67,7 +70,7 @@ class GamePlay extends GameEngine{
     /**
     * This method starts the game and set all the class variables
     */
-    startGame(rules, res, start){
+    async startGame(rules, res, start){
 
         console.log("START GAME")
 
@@ -129,7 +132,7 @@ class GamePlay extends GameEngine{
         
         console.log("in play " + this.inPlay)
 
-        this.referee(this.inPlay, rules, "avialableMove", this.playerTwoCard, this.playerTwoName, true, true)
+        await this.referee(this.inPlay, rules, "avialableMove", this.playerTwoCard, this.playerTwoName, true, true)
     
 
     }
@@ -140,7 +143,7 @@ class GamePlay extends GameEngine{
      * @param {*} res response object to be sent to client
      * @returns state gotten from client
      */
-    humanPlay(state, res){
+    async humanPlay(state, res){
 
         this.start = false
 
@@ -149,10 +152,8 @@ class GamePlay extends GameEngine{
         this.moves = []
 
         this.res = res
-
-        console.log(state)
         
-        this.play(state, this.agentOne.agentName)
+        await this.play(state, this.agentOne.agentName)
 
         return state
     }
@@ -336,7 +337,7 @@ class GamePlay extends GameEngine{
      * @param {*} playerName current agent name
      * @param {*} opponentsCardAtHand arrays of cards with opponent
      */
-    referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false, firstMove = false){
+    async referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false, firstMove = false){
     
         console.log(playerName) 
         console.log(playerTwoCard)
@@ -376,29 +377,29 @@ class GamePlay extends GameEngine{
 
             console.log("hold On")
 
-            this.play(this.state)
+            await this.play(this.state)
           
-        }else if(rules.pickTwo.active && number == rules.pickTwo.card){
+        } else if(rules.pickTwo.active && number == rules.pickTwo.card){
 
             console.log("pick 2")
 
             this.goMarket(this.playerOneCard, 2) 
 
-            this.play(this.state)
+            await this.play(this.state)
 
-        }else if(rules.pickThree.active && number == rules.pickThree.card){
+        } else if(rules.pickThree.active && number == rules.pickThree.card){
 
             console.log("pick 3")
 
             this.goMarket(this.playerOneCard, 3) 
 
-            this.play(this.state)
+            await this.play(this.state)
 
         }else if(rules.suspension.active && number == rules.suspension.card){
 
             console.log("suspension")
 
-            this.play(this.state)
+            await this.play(this.state)
 
         }else if(rules.generalMarket.active && number == rules.generalMarket.card){
 
@@ -406,7 +407,7 @@ class GamePlay extends GameEngine{
 
             this.goMarket(this.playerOneCard, 1) 
 
-            this.play(this.state)
+            await this.play(this.state)
 
         }else{
 
@@ -415,20 +416,15 @@ class GamePlay extends GameEngine{
                 this.res.send(this.moves)
             }else{
 
-                agents.findOne({agentName: this.playerTwoName}).then((data, err)=>{
+                const agent = await Agents.findOne({agentName: this.playerTwoName})//.then((data, err)=>{
 
-                    //console.log(data)
-                    const guest = require("../cards/user.json")
-
-                    this.res.send(
-                        {
-                            gameState: this.firstGameState, 
-                            moves: this.moves, 
-                            agentInfo: data,
-                            playerInfo: guest
-                        })
-
-                })
+                this.res.send(
+                    {
+                        gameState: this.firstGameState, 
+                        moves: this.moves, 
+                        agentInfo: agent,
+                        playerInfo: guest
+                    })
                 
             }
 
@@ -557,7 +553,7 @@ class GamePlay extends GameEngine{
      * method from the GameEngine class
      * @param {*} state current game state gotten from the client
      */
-    play(state, playerName = this.agentTwo.agentName){
+    async play(state, playerName = this.agentTwo.agentName){
 
         console.log(" __________________ " + playerName)
         
@@ -593,19 +589,15 @@ class GamePlay extends GameEngine{
                 //send the move made to the client
                 this.res.send(this.moves)
 
-            }else{
+            } else {
 
-                agents.findOne({agentName: this.playerTwoName}).then((data, err)=>{
+                const agent = await Agents.findOne({agentName: this.playerTwoName});
 
-                    console.log(data)
-
-                    this.res.send({gameState: this.firstGameState, moves: this.moves, agentInfo: data})
-
-                })
-                    
+                this.res.send({gameState: this.firstGameState, moves: this.moves, agentInfo: agent});
+   
             }
             
-        }else{
+        } else {
             //search for states
             super.stateFinder(this.playerTwoName, this.cardPlayed, this.playerTwoCard, this.noOfCardsWithPlayerOne, this.availableMove, this.playerMove, this.market.length, this.gameRules)
         }

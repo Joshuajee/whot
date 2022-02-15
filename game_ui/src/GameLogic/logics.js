@@ -332,7 +332,7 @@ export function rewards(state){
     console.log(playerOneStates)
     console.log(playerOneActions)
 
-    axios.post("/api/save", 
+    axios.post("/api/v1/save", 
         {
             agentName: gameState.playerTwo.name, 
             user: gameState.playerOne.name, 

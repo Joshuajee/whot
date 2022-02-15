@@ -9,12 +9,18 @@
 const mongoose = require("mongoose");
 
 
-var agentSchema = new mongoose.Schema({ 
-    agentName: {type: String},
+const agentSchema = new mongoose.Schema({ 
+    agentName: {
+        type: String,
+        unique: [true, "Agent Name already exist"],
+        required: [true, "Agent Name must have a name"],
+        minlength: [3, "Name too short atleast 3 characters"],
+        maxlength: [10, "Name too long atmost 10 characters"]
+    },
     createdBy:{type: String, default: "Guest"}, 
     rounds: {type: Number, default: 0},
     canGoMarket: {type: Boolean, default: true},
-    canNeedAnyCard: {type: Boolean, default: true},
+    canNeedAnyCard: {type: Boolean, default: false},
     wins: {type: Number, default:0}, 
     losses: {type: Number, default: 0},
     points: {type: Number, default: 0}, 
@@ -37,6 +43,6 @@ var agentSchema = new mongoose.Schema({
     useAvailableMove: {type: Boolean, default: true},
     useRules: {type: Boolean, default: true},   
     createdOn: {type: Date, default: Date.now}, 
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model("agents", agentSchema)
+module.exports = mongoose.model("Agents", agentSchema)

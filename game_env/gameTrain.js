@@ -29,21 +29,21 @@ class GameTrain extends GameEngine{
         
         this.currentPlayerName = this.playerOneName
 
-        super.on("playerOne", () => {
-            this.checkGame()
+        super.on("playerOne", async () => {
+            await this.checkGame()
             if(this.player1.length > 0 && this.player2.length > 0)
                 this.play(this.player1, this.player2, this.playerOneName, this.playerTwoName)
         })
 
-        super.on("playerTwo", () => {
-            this.checkGame()
+        super.on("playerTwo", async () => {
+            await this.checkGame()
             if(this.player1.length > 0 && this.player2.length > 0)
                 this.play(this.player2, this.player1, this.playerTwoName, this.playerOneName)
         })
 
-        super.on("received", ()=>{
+        super.on("received", async () =>{
             let action = super.getAction
-            this.referee(action, this.rules, this.availableMove, this.cardAtHand.sort(), this.playerName, this.opponent)
+            await this.referee(action, this.rules, this.availableMove, this.cardAtHand.sort(), this.playerName, this.opponent)
         })
 
     }
@@ -110,6 +110,9 @@ class GameTrain extends GameEngine{
         
 
             card = this.chooseAction(action, avialableMove)
+
+            console.log(action, avialableMove)
+            console.log(card)
 
             index = card[0].indexOf(":") + 1
             number = card[0].slice(index, card[0].length)
@@ -459,12 +462,12 @@ class GameTrain extends GameEngine{
 
         }else{
 
-            this.inPlay.push(move[0])
             
             for(let i = 0; i < player.length; i++){
 
                 if(player[i] == move[0]){
 
+                    this.inPlay.push(move[0])
                     player.splice(i, 1)
                     break
 
@@ -482,8 +485,6 @@ class GameTrain extends GameEngine{
         console.log("Player 2 ", this.player2)
 
         console.log(this.market.length + this.inPlay.length + this.player1.length + this.player2.length)
-
-        if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length !== 56) jhj
 
     }
 
@@ -518,20 +519,20 @@ class GameTrain extends GameEngine{
      * finished, it adds all cards from card Played to market and shuffle them 
      * while calling the reward method in GameEngine, but the game continues  
      */
-    checkGame(){
+    async checkGame() {
 
         if(this.player1.length < 1 || this.player2.length < 1){
 
-            super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            await super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
             this.actionOneNew = []
             this.actionOneOld = []
             this.actionTwoNew = []
             this.actionTwoOld = []
             
-        }else if(this.market.length < 1){
+        } else if(this.market.length < 1){
    
-            super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            await super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
             //santize the card
             let inPlay = sanitizeCardPlayed(this.inPlay)
