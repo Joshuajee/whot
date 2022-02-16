@@ -10,9 +10,10 @@
 
 import Start from "../Componets/Background/Start";
 import Button from "../Componets/Button";
+import Modal from "../Componets/Modal";
 
 
-function Home() {
+const Home = () => {
 
 
     let height = window.innerHeight * 0.25
@@ -37,6 +38,8 @@ function Home() {
                 <Button text={"Create Agent"} link={"/create-agent"} class={"btn-create"}/>
 
                 <Button text={"Settings"} link={"/settings"} class={"btn-settings"}/>
+
+                <Modal/>
                 
             </div>
             

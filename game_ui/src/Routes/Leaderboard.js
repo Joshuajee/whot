@@ -1,6 +1,6 @@
 /**
  * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
@@ -8,65 +8,75 @@
 
 
 
-import React from "react"
+import React, { useState, useEffect, useCallback } from "react";
 import Start from "../Componets/Background/Start";
 import Agent from "../Componets/Agent";
-import axios from "axios"
+import axios from "axios";
+//import { useSelector, useDispatch } from "react-redux";
 
-import Loader from "../Componets/Loader"
+import Loader from "../Componets/Loader";
+//import { increase } from "../Redux/actions";
 
-class Leaderboard extends React.Component {
+const Leaderboard = () =>  {
 
-    constructor(){
+    const [isLoading, setIsLoading] = useState(false);
+    const [data, setData] = useState(null);
+    const [agents, setAgents] = useState(null);
+/*
+    const counter = useSelector((state) => state.counter);
 
-        super()
+    const dispatch = useDispatch();
 
-        this.state = {
-            isLoading:true,
-            response:{}
+    console.log(counter)
+*/
+
+    useEffect(() => {
+
+        setIsLoading(true);
+
+        axios.get("/api/v1/leaderboard/0").then( res => {
+
+            setData(res?.data?.data)
+            setIsLoading(false)
+
+        }, err => {
+
+        });
+
+    }, []);
+
+    useEffect(() => {
+        const agents = [];
+    
+        for (let i = 0; i < data?.length; i++) {
+    
+            agents.push(
+                <Agent agentName={data[i].agentName} 
+                    points={data[i].points}                             
+                    wins={data[i].wins}
+                    losses={data[i].losses} />);
         }
 
+        setAgents(agents);
 
-    }
-
-    componentDidMount(){
-        axios.get("/api/v1/leaderboard/0").then((response) =>{
-            console.log(response)
-            this.setState({
-                isLoading:false,
-                response:response.data.data
-            })
-        })
-    }
+    }, [data]);
 
     
-    render(){
+    if(isLoading) return (<Loader />);
 
-        if(this.state.isLoading) return (<Loader />)
-        let data = this.state.response
-        let agents = []
-        for (let i = 0; i < data.length; i++) {
-            agents.push(<Agent agentName={data[i].agentName} 
-                            points={data[i].points} 
-                            wins={data[i].wins}
-                            losses={data[i].losses} />)
-        }
+    return(
+        <div>
 
-        return(
-            <div>
+            <Start />
 
-                <Start />
+            <div className="leaderboard">
 
-                <div className="leaderboard">
+                {agents}
 
-                    {agents}
-
-                </div>
-                
             </div>
-        )
-    }
-
+            
+        </div>
+    )
 }
 
-export default Leaderboard
+export default React.memo(Leaderboard);

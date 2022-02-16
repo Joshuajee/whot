@@ -513,7 +513,6 @@ class GameEngine extends EventEmitter{
 
         let agent = null
 
-
         if(playerName == this.agentOne.agentName) {
             agent = this.agentOne;
         } else {
@@ -522,14 +521,13 @@ class GameEngine extends EventEmitter{
 
         this.agent = agent;
 
-
         //make sure action array is empty for every play
         this.action = []
                 
         const query = {
+            agentId: this.agent?._id,
             availableMove: availableMove,
         }
-
         
         if(agent.useCardAtHand)
             query.cardAtHand = cardAtHand
@@ -550,6 +548,7 @@ class GameEngine extends EventEmitter{
 
 
         const state = await States.findOne(query);
+
 
         if(!state) {
 
