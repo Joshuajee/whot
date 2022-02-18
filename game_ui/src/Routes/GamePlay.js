@@ -1,39 +1,35 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
  */
 
 
-import React from "react"
-import axios from "axios"
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 import {canPlay, checkPlayResponse, createState,
-        referee, goMarket, checkGameState, 
-        checkGameChanges, availableMove, cardIndex} from  "../GameLogic/logics"
+        referee, goMarket, checkGameState,  availableMove, 
+        cardIndex, undoMove} from  "../GameLogic/logics";
 
 import InPlay  from "../Componets/CardHolder/InPlay";
 import Market from "../Componets/CardHolder/Market";
 import Player from "../Componets/CardHolder/Player";
+import Need from "../Componets/CardHolder/Need";
+import Loader from "../Componets/Loader";
+import Modal from "../Componets/Modal";
 
-import Need from "../Componets/CardHolder/Need"
-import Loader from "../Componets/Loader"
-//import Modal from "../Componets/Modal"
+import { useSelector, useDispatch } from "react-redux";
+import { updateGameState } from "../Redux/actions";
 
-import {EventEmitter} from "events"
-
-
-var cardPlayedCards = [0]
-var marketCards = [0]
-
-var url = window.location.href
+const url = window.location.href
   
-var index = url.indexOf("/:") + 2
-var user = url.slice(index, url.length)
+const index = url.indexOf("/:") + 2
+const user = url.slice(index, url.length)
 
-let rules = {"holdOn":{"active":true, "card":1, "defend":false},
+const rules = {"holdOn":{"active":true, "card":1, "defend":false},
             "pickTwo":{"active":true, "card":2, "defend":false},
             "pickThree":{"active":true, "card":5, "defend":false}, 
             "suspension":{"active":true, "card":8, "defend":false},
@@ -41,252 +37,217 @@ let rules = {"holdOn":{"active":true, "card":1, "defend":false},
             "marketFinishGameEnd" : false
         } 
 
-class GamePlay extends React.Component{
+const GamePlay = () => {
+
+    const { gameState, playerOneStates, playerOneActions, playerTwoStates, 
+        playerTwoActions, playerOneCardIndex, playerTwoCardIndex
+        } = useSelector((state) => state);
+
+    const dispatch = useDispatch();
 
 
-    constructor(){
+    const [playerOneData, setPlayerOneData] = useState({});
+    const [playerTwoData, setPlayerTwoData] = useState({});
+    //const visibility = "hide-modal"; 
+    const [isNeeded, setIsNeeded] =  useState(false);
+    const [playerCard, setPlayerCard] = useState([]);
+    const [opponetCard, setOpponetCard] = useState([]);
+    const [inPlay, setInplay] = useState([]);
+    const [cardPlayed, setCardPlayed] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [opponetIsPlaying, setOpponetIsPlaying] = useState(false);
+    const [opponetMoves, setOpponetMoves] = useState([]);
 
-        super()
 
-        this.state = {
-            isLoading:true,
-            opponetIsPlaying:false,
-            isNeeded:false,
-            gameState:{"playerOne":{
-                            "cardAtHand":[""],
-                            "name":""
-                        },
-                        "playerTwo":{
-                            "cardAtHand":[""],
-                            "name":""
-                        },
-                    "market":[""],
-                    "cardPlayed":[],
-                    rules: rules
-            },
-            playerOneData: {},
-            playerTwoData: {},
-            playerOneCardIndex : 0,
-            playerTwoCardIndex : 0,
-            change : true,
-            playerOneStates : [],
-            playerTwoStates : [],
-            playerOneActions: [],
-            playerTwoActions: [],
-            visibility : "hide-modal",   
-        }
+    useEffect(() => {
 
-        this.playCard = this.playCard.bind(this)
-        this.needed = this.needed.bind(this)
+        axios.post("/api/v1/start", {agentName: user, user: "Guest", rules: rules, start: 5}).then((res)=>{  
 
-        this.events = new EventEmitter()
+            const data = res.data;
 
-        this.events.on("play", ()=>{
+            dispatch(updateGameState(data.gameState));
 
-            this.setState({ change : this.state.change ? false : true })
-  
-        })
+            setPlayerOneData(data.playerInfo);
 
-        this.events.on("play-end", ()=>{
+            setPlayerTwoData(data.agentInfo);
 
-            this.setState({ opponetIsPlaying : false })
-            
-        })
+            setIsLoading(false);
 
-    }
+            setOpponetIsPlaying(false);
 
-    componentDidMount(){
+            setOpponetMoves(data.moves);
 
-        axios.post("/api/v1/start", {"agentName": user, "user": "Guest", rules: rules, start: 3}).then((res)=>{  
-
-            this.setState(
-                {
-                    isLoading:false, 
-                    opponetIsPlaying:false, 
-                    gameState:res.data.gameState, 
-                    playerOneData: res.data.playerInfo,
-                    playerTwoData: res.data.agentInfo
-                }) 
-
-            if(res.data.moves.length){
-            
-                //check the type of response gotten from server
-                checkPlayResponse(res.data.moves, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
-
-                this.state.playerTwoActions.push(...res.data.moves)
-          
-            }
-            
         }).catch(error => {
 
             console.log(error)
-
+    
             alert(error)
         })
 
-    }
+    }, [dispatch]);
+
+    useEffect(() => {
+
+        if(opponetMoves.length){
+            
+            //check the type of response gotten from server
+            checkPlayResponse(opponetMoves, gameState, playerTwoStates, playerTwoData, dispatch, setOpponetIsPlaying);
+
+            //playerTwoActions.push(...opponetMoves);
+
+            setOpponetMoves([]);
+      
+        }   
+
+    }, [gameState, opponetMoves, playerTwoActions, playerTwoData, playerTwoStates, dispatch]);
 
 
+    const needed = (card) => {
 
-    needed(card){
+        let availableMoves = availableMove(gameState.playerOne.cardAtHand, gameState.cardPlayed[gameState.cardPlayed.length - 1])
 
-        let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
-
-        this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true, this.state.playerOneData))
+        //playerOneStates.push(createState(gameState, availableMoves, true, playerOneData))
 
         card.push(cardIndex(availableMoves, card[0]))
 
-        this.state.playerOneActions.push(card)
+        playerOneActions.push(card)
 
-        this.setState({isNeeded : false, isLoading : true, opponetIsPlaying : true})
+        setIsLoading(true);
+        setIsNeeded(false);
+        setOpponetIsPlaying(false);
  
-        let request = {"agentName":user, "user": "Guest", "gameState": this.state.gameState, "playerMove": card, rules:rules}
+        let request = {agentName:  user, user: "Guest", gameState, playerMove: card, rules:rules}
     
-        let index = this.state.gameState.playerOne.cardAtHand.indexOf("whot:20")
-        this.state.gameState.playerOne.cardAtHand.splice(index, 1)
-        this.state.gameState.cardPlayed.push(card[0])
+        let index = gameState.playerOne.cardAtHand.indexOf("whot:20")
+        gameState.playerOne.cardAtHand.splice(index, 1)
+        gameState.cardPlayed.push(card[0])
 
         axios.post("/api/v1/play", request).then((res)=>{
             
-            let response = res.data
+            const response = res.data
 
             //check the type of response gotten from server
-            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
+            checkPlayResponse(response, gameState, playerTwoStates, playerTwoData, dispatch, setOpponetIsPlaying)
 
             //remove loader from screen and transfer game control to player
-            this.setState({opponetIsPlaying : false, isLoading : false })
+            setOpponetIsPlaying(false);
+            setIsLoading(false);
 
-            this.state.playerTwoActions.push(...response)
+            //playerTwoActions.push(...response)
     
         }).catch((error) =>{
 
-            //remove the last card played
-            this.state.gameState.cardPlayed.pop()
+            //undo last move
+            undoMove(gameState, card, dispatch);
 
-            //return whot back to player
-            this.state.gameState.playerOne.cardAtHand.push("whot:20")
-
-            //remove loader from the screen and transfer game control back to player
-            this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
+            //remove loader and transfer game control back to player
+            setIsLoading(false);
+            setOpponetIsPlaying(false);
 
             alert(error)
+            
+        });
 
-        })
+    };
 
-    }
+    const playCard = (card) => {
 
-    playCard(card) {
-
-        let availableMoves = availableMove(this.state.gameState.playerOne.cardAtHand, this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
+        const availableMoves = availableMove(gameState.playerOne.cardAtHand, gameState.cardPlayed[gameState.cardPlayed.length - 1])
 
         card.push(cardIndex(availableMoves, card[0]))
 
-        this.state.playerOneActions.push(card)
+        //playerOneActions.push(card)
 
-        this.state.playerOneStates.push(createState(this.state.gameState, availableMoves, true, this.state.playerOneData))
+        //playerOneStates.push(createState(gameState, availableMoves, true, playerOneData))
 
-        this.setState({ isLoading : true })
+        setIsLoading(true);
 
-        console.log("State 1")
-
-        console.log(this.state.playerOneStates)
-
-        console.log("State 2")
-
-        console.log(this.state.playerTwoStates)
 
         if(card[0] === "z:goMarket"){
 
-            this.setState({opponetIsPlaying : true})
+            setOpponetIsPlaying(true);
 
-            goMarket(this.state.gameState.playerOne.cardAtHand, this.state.gameState.market)
+            goMarket(gameState, gameState.playerOne.name, 1, dispatch);
 
-            this.setState({opponetIsPlaying:false, isLoading:true})
+            setOpponetIsPlaying(false);
 
-            let request = {"agentName": user, "user": "Guest", "gameState": this.state.gameState, "playerMove": "z:goMarket", rules:rules}
+            setIsLoading(true);
+
+            const request = {agentName: user, user: "Guest", gameState, playerMove: "z:goMarket", rules}
         
             axios.post("/api/v1/play", request).then((res)=>{
                 
                 let response = res.data
 
                 //remove loader from screen and transfer game control back to opponent
-                this.setState({isLoading : false, opponetIsPlaying : true})
-
+                setIsLoading(false);
+                setOpponetIsPlaying(true);
+ 
                 //check the type of response gotten from server
-                checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
 
-                this.state.playerTwoActions.push(...response)
+                checkPlayResponse(response, gameState, playerTwoStates, playerTwoData, dispatch, setOpponetIsPlaying);
+
+                //playerTwoActions.push(...response)
                 
             }).catch((error) =>{
 
-                //add card taken from market to player back to market
-                this.state.gameState.market.push(this.state.gameState.playerOne.cardAtHand[this.state.gameState.playerOne.cardAtHand.length - 1])
+                //undo last move
+                undoMove(gameState, card, dispatch);
 
-                //remove the card taken from market from player
-                this.state.gameState.playerOne.cardAtHand.pop()
-                
-                //undo last state
-                this.state.playerOneStates.pop()
-                this.state.playerOneActions.pop()
+                //remove loader and transfer game control back to player
+                setIsLoading(false);
+                setOpponetIsPlaying(false);
 
-                //remove loader from the screen and transfer game control back to player
-                this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
+                alert(error);
 
-                alert(error)
+            });
 
-            })
-
-        }else{
-
+        }   else    {
     
-            let playGame = canPlay(card[0], this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1])
+            const playGame = canPlay(card[0], gameState.cardPlayed[gameState.cardPlayed.length - 1])
 
-            this.setState({isNeeded : playGame[1]})
+            setIsNeeded(playGame[1]);
 
             if(playGame[0]){
 
                 if(playGame[1]){
 
-                    this.setState({isNeeded : true, isLoading : false})
+                    setIsNeeded(true);
+                    setIsLoading(false);
 
                     //remove last state
-                    this.state.playerOneStates.pop()
-                    this.state.playerOneActions.pop()
+                    //playerOneStates.pop()
+                    //playerOneActions.pop()
 
                 }else{
                     
-                    let sendMove = referee(card, rules, this.state.gameState.playerOne.cardAtHand, this.state.gameState.playerTwo.cardAtHand, this.state.gameState.cardPlayed, this.state.gameState.market)
+                    const sendMove = referee(gameState, card, "Guest", dispatch);
                    
-                    let request = {"agentName": user, "user": "Guest", "gameState": this.state.gameState, "playerMove":card[0], rules:rules}
+                    const request = { agentName: user, user: "Guest", gameState: gameState, playerMove:card[0], rules}
                     
-                    if(sendMove){
+                    if(sendMove) {
 
                         axios.post("/api/v1/play", request).then((res)=>{
                             
-                            let response = res.data
+                            const response = res.data
 
                             //remove loader from screen and transfer game control back to opponent
-                            this.setState({isLoading : false, opponetIsPlaying : true})
+                            setIsLoading(false);
+                            setOpponetIsPlaying(true);
 
                             //handle response gotten from server 
-                            checkPlayResponse(response, this.state.gameState, this.events, this.state.playerTwoStates, this.state.playerTwoData)
+                            checkPlayResponse(response, gameState, playerTwoStates, playerTwoData, dispatch, setOpponetIsPlaying);
      
-                            this.state.playerTwoActions.push(...response)
+                            //playerTwoActions.push(...response)
 
-                        }).catch((error) =>{
+                        }).catch((error) => {
 
-                            //add card taken from player back to player
-                            this.state.gameState.playerOne.cardAtHand.push(card[0])
-
-                            //undo last game played
-                            this.state.gameState.cardPlayed.pop()
-
-                            //undo last state update
-                            this.state.playerOneStates.pop()
-                            this.state.playerOneActions.pop()
+                            //undo last move
+                            undoMove(gameState, card, dispatch);
 
                             //remove loader and transfer game control back to player
-                            this.setState({isLoading : false, opponetIsPlaying : false, visibility : "show-modal"})
+                            setIsLoading(false);
+                            setOpponetIsPlaying(false);
 
                             alert(error)
 
@@ -294,7 +255,7 @@ class GamePlay extends React.Component{
 
                     }else{
 
-                        this.setState({isLoading:false})
+                        setIsLoading(false)
 
                     }
 
@@ -302,7 +263,7 @@ class GamePlay extends React.Component{
             
             }else{
 
-                this.setState({isLoading : false})
+                setIsLoading(false);
 
                 alert("illegal move")
     
@@ -313,63 +274,51 @@ class GamePlay extends React.Component{
       
     }
 
-    render(){
+    useEffect(() => {
 
+        setPlayerCard(gameState.playerOne.cardAtHand);
 
-        console.log("Actionssssssss")
-        console.log(this.state.playerOneActions)
+        setOpponetCard(gameState.playerTwo.cardAtHand);
 
-        checkGameState(this.state)
+        setInplay(gameState.cardPlayed[gameState.cardPlayed.length - 1]);
 
-        let height = window.innerHeight
+        setCardPlayed(gameState.cardPlayed);
 
-        if(this.state.isLoading) return(<center id="game-table"  className="game-table"><Loader /> </center>)
+    }, [gameState]);
 
-        let playerCard = this.state.gameState.playerOne.cardAtHand
+    useEffect(() => {
+        checkGameState(gameState, dispatch);
+    }, [gameState, dispatch])
 
-        let opponetCard = this.state.gameState.playerTwo.cardAtHand
+    if (isLoading) return(<center id="game-table"  className="game-table"><Loader /> </center>)
 
-        let inPlay = this.state.gameState.cardPlayed[this.state.gameState.cardPlayed.length - 1]
-
-        let gameObjects = null 
-
-        let checkChanges = checkGameChanges(this.state.gameState, cardPlayedCards, marketCards)
-
-        if(checkChanges){
-
-            gameObjects = <div>
-                                <Player top={0.2} angle={180} cards={opponetCard} action={this.playCard}    playable={false} index={this.state.playerTwoCardIndex} />
-                                <Player top={0.8} angle={0} cards={playerCard} action={this.playCard} playable={!this.state.opponetIsPlaying} index={this.state.playerOneCardIndex}/>
-                                <InPlay className="center" cards={inPlay} cardNumber={this.state.gameState.cardPlayed.length}/>
-                                <Market action={this.playCard} playable={!this.state.opponetIsPlaying} cardNumber={this.state.gameState.market.length} />
-                            </div>
-
+    return(
+        <div>
+        {
+        //    <Modal text={"Network Error"} close={close} visibility={visibility} />
         }
+            <center id="game-table"  className="game-table">
 
-        if(this.state.isNeeded) gameObjects = <Need  height = {height} need={this.needed}/> 
-        
+                <div>
+                    
+                    <Player top={0.2} angle={180} cards={opponetCard} action={playCard} playable={false} index={playerTwoCardIndex} />
+                    <Player top={0.8} angle={0} cards={playerCard} action={playCard} playable={!opponetIsPlaying} index={playerOneCardIndex}/>
+                    
+                    { inPlay && <InPlay className="center" cards={inPlay} cardNumber={cardPlayed?.length} />  }
 
-        console.log("states")
+                    <Market action={playCard} playable={!opponetIsPlaying} cardNumber={gameState.market.length} />
 
-        console.log(this.state.gameState)
+                </div>
 
-        return(
-            <div>
-            {
-            //    <Modal text={"Network Error"} close={this.close} visibility={this.state.visibility} />
-            }
-                <center id="game-table"  className="game-table">
+            </center>
 
-                    {gameObjects}
+            { isNeeded && <Need need={needed}/> }
 
-                </center>
+        </div>
 
-            </div>
-    
-            )
-
-    }
+    )
 
 }
+
 
 export default GamePlay

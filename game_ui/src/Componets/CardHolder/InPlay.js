@@ -1,6 +1,6 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
@@ -14,7 +14,7 @@ import CardNumber from "./CardNumber"
 
 
 
-function InPlay(props) {
+const InPlay = (props) => {
     
     let width = window.innerWidth
     let height = window.innerHeight

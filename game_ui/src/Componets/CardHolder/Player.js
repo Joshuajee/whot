@@ -1,6 +1,6 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
@@ -8,123 +8,106 @@
 
 
 
-import React from "react"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import React, {useState, useEffect} from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-import chooseCard from "../../GameLogic/chooseCard"
+import chooseCard from "../../GameLogic/chooseCard";
 
-import CardNumber from "./CardNumber"
+import CardNumber from "./CardNumber";
 
 
-class Player extends React.Component {
+const Player = (props) => {
 
-    constructor(){
+    const { cards, action, playable, index } = props;
 
-        super()
+    const [start, setStart] = useState(index);
+    const [width] = useState(window.innerWidth);
+    const [margin] =  useState(width * 0.05);
+    const [cardSpaceAvailable] = useState(width  - margin * 2);
+    const [style, setStyle] = useState({});
+    const [left, setLeft] = useState(null);
+    const [right, setRight] = useState(null);
+    const [height] =  useState(window.innerHeight);
+    const [cardSize] = useState(height / (4 * 1.5));
 
-        this.state = {
-            start:0,
-        }
-    }
+    const [top] =  useState(props.top * height - cardSize);
 
+    const [noOfCardsThatCanBeDisplayed] =  useState(cardSpaceAvailable / (cardSize * 1.1));
+    const [navStyle] = useState({height: cardSize * 1.5});
     
-    render(){
+ 
 
-        let width = window.innerWidth
-        let height = window.innerHeight
-        let cardSize = height / (4 * 1.5)
+    useEffect(() => {
+        
 
-        let margin = width * 0.05
-
-        let top = this.props.top * height - cardSize
-
-        let cardSpaceAvailable = width  - margin * 2
-
-        let noOfCardsThatCanBeDisplayed = cardSpaceAvailable / (cardSize * 1.1)
-
-        let style = {
+        const style = {
             position: "absolute",
             top: top,
             left: margin,
             align: "center",
             width: cardSpaceAvailable,  
             height: cardSize,
-        }
+        };
 
-        let navStyle = {
-            height: cardSize  * 1.5
-        }
-        
-        
+        setStyle(style);
 
-        let left = null
-        let right = null
+    }, [cardSize, cardSpaceAvailable, margin, top]);
 
-        if(this.state.start > 0 && this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed){
-            
-            left =  <span onClick={() =>  { this.setState({start: this.state.start - 1}) } } >
-                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowLeft} /> 
-                    </span>
-            
-            right = <span onClick={() => { if(this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed) this.setState({start: this.state.start + 1}) } } >
+    useEffect(() => {
+
+        if(start < cards.length - noOfCardsThatCanBeDisplayed) {
+
+            setRight(<span style={{top:100}} onClick={() => { if(start < cards.length - noOfCardsThatCanBeDisplayed) { setStart(start + 1) } } } >
                         <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowRight} /> 
-                    </span>
-
-        }else if(this.state.start > 0){
-
-            left =  <span style={{top:100}} onClick={() =>  { this.setState({start: this.state.start - 1}) } } >
-                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowLeft} /> 
-                    </span>
-
-        }else if(this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed){
-            
-            right = <span style={{top:100}} onClick={() => { if(this.state.start < this.props.cards.length - noOfCardsThatCanBeDisplayed) this.setState({start: this.state.start + 1}) } } >
-                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowRight} /> 
-                    </span>
-
+                    </span>);
+        
+        } else {
+            setRight(null)
         }
 
+        if (start !== 0) {
 
-        return(
-            <div style={style} className="player">
+            setLeft(<span style={{top:100}} onClick={() =>  { setStart(start - 1) }  } >
+                        <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowLeft} /> 
+                    </span>);
+        } else {
+            setLeft(null);
+        }
 
-                {left}
-                {this.displayCards(this.props.cards.sort(), cardSize, this.props.action, this.state.start)}  
-                {right}
+    }, [navStyle, start, cards, noOfCardsThatCanBeDisplayed]);
 
-                <CardNumber cardNumber={this.props.cards.length} />
-                
-            </div>
-            )
-    }
+
+    const displayCards = (cards, cardSize, action, start=0) => {
     
-
-    displayCards(cards, cardSize, action, start=0) {
-    
-        let cardArray = []
-    
-        let width = window.innerWidth
-        
-        let margin = width * 0.05
-        let cardSpaceAvailable = width  - margin * 2
+        const cardArray = [];
     
         for(let i = start; i < cards.length; i++){
            
             if((i + 1 - start) * 1.1 * cardSize >= cardSpaceAvailable) break
             
-            if(this.props.playable)
-                cardArray.push(<span onClick = {() => action([cards[i]])}> { chooseCard(cards[i], cardSize) } </span>)
+            if(playable)
+                cardArray.push(<span  key={i} onClick = {() => action([cards[i]])}> { chooseCard(cards[i], cardSize) } </span>)
             else
-            cardArray.push(<span> { chooseCard(cards[i], cardSize) } </span>)
+                cardArray.push(<span key={i} > { chooseCard(cards[i], cardSize) } </span>)
         }
-    
-        return cardArray
-    }
-    
 
+        return cardArray;
 
+   }
+
+    return(
+        <div style={style} className="player">
+
+            {left}
+            {displayCards(cards.sort(), cardSize, action, start)}  
+            {right}
+
+            <CardNumber cardNumber={cards.length} />
+            
+        </div>)
+    
 }
 
 
-export default Player
+export default Player;

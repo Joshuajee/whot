@@ -130,11 +130,6 @@ body{
     background-color: brown;
 }
 
-.need-bar{
-  background-color: darkmagenta;
-  z-index: 10;
-}
-
 .card-number{
   color: whitesmoke;
   background-color: blueviolet;
