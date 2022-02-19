@@ -16,6 +16,7 @@ const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
 const cors = require("cors");
+const path = require('path');
 const apiRoutes = require("./routes/apiRoutes");
 
 // Start express app
@@ -71,26 +72,22 @@ app.use(
 app.use(compression());
 
 
-//check if we are in a production environment
-if(process.env.NODE_ENV === "production"){
-    
-    //serve static production asset
-    app.use(express.static("game_ui/build"))
-
-    //get the current file path
-    const path = require('path')
-
-    //handle any route that is missing from the Server
-    app.get('*', (req, res) =>{  
-        res.sendFile(path.resolve(__dirname, "game_ui", "build", "index.html"))
-        console.log(path.resolve(__dirname, "game_ui", "build", "index.html"))
-    })
-
-}
-
-
 //3) ROUTES
 app.use("/api/v1/", apiRoutes);
+
+
+//serve static asset
+app.use(express.static(path.join(__dirname, 'game_ui/build')));
+
+//app.use(express.static("game_ui/build"))
+
+
+//handle any route that is missing from the Server
+app.get('*', (req, res) =>{  
+  res.sendFile(path.resolve(__dirname, "game_ui", "build", "index.html"))
+  console.log(path.resolve(__dirname, "game_ui", "build", "index.html"))
+})
+
 
 
 
