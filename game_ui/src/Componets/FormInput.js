@@ -10,7 +10,12 @@ function FormInput(props){
 
                 <div class="col-75">
 
-                    <input type="text" required id={identifier} name={identifier} onChange={props.onChange} placeholder="eg Joe" />
+                    <input 
+                        type="text" 
+                        required 
+                        id={identifier} 
+                        name={identifier} 
+                        onChange={props.onChange} placeholder="eg Joe" />
                 
                 </div>
 

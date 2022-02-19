@@ -1,99 +1,79 @@
 /**
  * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
  */
 
 
-
+import { useState } from "react";
 import Start from "../Componets/Background/Start";
-import FormInput from "../Componets/FormInput"
-import "../Styles/form.css"
+import FormInput from "../Componets/FormInput";
+import "../Styles/form.css";
+import axios from "axios";
+import Loader from "../Componets/Loader";
 
-import axios from "axios"
- 
- 
- function CreateAgent() {
 
-    let formData ={
-        agentName: "",
-        availableMove: true,
-        canGoMarket: true,
-        canNeedAnyCard: true,
-        cardAtHand: false,
-        noOfCardAtHand: false,
-        cardInPlay: false,
-        cardPlayed: false,
-        noOfCardPlayed: false,
-        noOfCardsInMarket: false,
-        noOfCardsWithOpponent: false,
-        rules: false
-    }
+const form = {
+    agentName: "",
+    availableMove: true,
+    canGoMarket: true,
+    canNeedAnyCard: true,
+    cardAtHand: false,
+    noOfCardAtHand: false,
+    cardInPlay: false,
+    cardPlayed: false,
+    noOfCardPlayed: false,
+    noOfCardsInMarket: false,
+    noOfCardsWithOpponent: false,
+    rules: false
+}
+ 
+const CreateAgent = () => {
+
+    const [formData, setFormData] = useState(form);
+    const [isLoading, setIsLoading] = useState(false);
+
+
 
     function handleEvent(e){
 
         const name = e.target.name
         const value = e.target.value
 
-        formData ={
-            agentName: name === "agentName" ? value : formData.agentName,
-            canGoMarket: name === "canGoMarket" ? value === "true" ? true : false : formData.canGoMarket,
-            canNeedAnyCard: name === "canNeedAnyCard" ? value === "true" ? true : false : formData.canNeedAnyCard,
-            availableMove: name === "availableMove" ? value === "true" ? true : false : formData.availableMove,
-            cardAtHand: name === "cardAtHand" ? value === "true" ? true : false : formData.cardAtHand,
-            noOfCardAtHand: name === "noOfCardAtHand" ? value === "true" ? true : false : formData.noOfCardAtHand,
-            cardInPlay: name === "cardInPlay" ? value === "true" ? true : false : formData.cardInPlay,
-            cardPlayed: name === "cardPlayed" ? value === "true" ? true : false : formData.cardPlayed,
-            noOfCardPlayed: name === "noOfCardPlayed" ? value === "true" ? true : false : formData.noOfCardPlayed,
-            noOfCardsInMarket: name === "noOfCardsInMarket" ? value === "true" ? true : false : formData.noOfCardsInMarket,
-            noOfCardsWithOpponent: name === "noOfCardsWithOpponent" ? value === "true" ? true : false : formData.noOfCardsWithOpponent,
-            rules: name === "rules" ? value === "true" ? true : false : formData.rules
-        }
-
-
-        console.log(formData)
-
+        setFormData(e => {
+            e[name] = value;
+            return e;
+        })
 
     }
 
     function submit(e){
 
-        e.preventDefault()
+        e.preventDefault();
 
+        setIsLoading(false);
+    
         axios.post('/api/v1/create-agent', {agent: formData}).then((res)=>{
             
-            //console.log(res)  
             alert(res.data.msg)
 
-            if(res.data.success){
-                /*
-                formData ={
-                    agentName: name === "agentName" ? value : formData.agentName,
-                    availableMove: name === "availableMove" ? value === "true" ? true : false : formData.availableMove,
-                    cardAtHand: name === "cardAtHand" ? value === "true" ? true : false : formData.cardAtHand,
-                    noOfCardAtHand: name === "noOfCardAtHand" ? value === "true" ? true : false : formData.noOfCardAtHand,
-                    cardInPlay: name === "cardInPlay" ? value === "true" ? true : false : formData.cardInPlay,
-                    cardPlayed: name === "cardPlayed" ? value === "true" ? true : false : formData.cardPlayed,
-                    noOfCardPlayed: name === "noOfCardPlayed" ? value === "true" ? true : false : formData.noOfCardPlayed,
-                    noOfCardsInMarket: name === "noOfCardsInMarket" ? value === "true" ? true : false : formData.noOfCardsInMarket,
-                    noOfCardsWithOpponent: name === "noOfCardsWithOpponent" ? value === "true" ? true : false : formData.noOfCardsWithOpponent,
-                    rules: name === "rules" ? value === "true" ? true : false : formData.rules
-                }  
+            setIsLoading(true);
 
-                */
+            if(res.data.status){
 
             }
-           // this.setState({isLoading:false, opponetIsPlaying:false, gameState:res.data})
 
         })
+
     }
 
+
+    if(isLoading) return (<Loader />);
     
- 
-     return(
-         <center>
+    return(
+        <center>
  
             <Start />
             
@@ -167,7 +147,7 @@ import axios from "axios"
 
             </div>
             
-         </center>
+        </center>
      )
  
  }

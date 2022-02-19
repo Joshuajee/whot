@@ -1,16 +1,15 @@
 /**
  * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
  */
 
-
 import Whot from "../Componets/Background/Whot"
 
 
-function Settings() {
+const Settings = () => {
 
 
     return(

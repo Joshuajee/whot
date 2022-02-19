@@ -1,30 +1,46 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
  */
 
 
-
+import { useState, useEffect } from "react";
 import chooseCard from "../../GameLogic/chooseCard";
-import CardNumber from "./CardNumber"
+import CardNumber from "./CardNumber";
 
 
 
 
-function InPlay(props) {
-    
-    let width = window.innerWidth
-    let height = window.innerHeight
-    let cardSize = height / (4 * 1.5)
+const InPlay = (props) => {
 
-    const style = {
-        position:"absolute",
-        top:height/2 - cardSize,
-        left:width/2 - cardSize * 0.6666666667
-    }
+    const { height, width, isLandscape } = props;
+
+    const [cardSize, setCardSize] = useState(0);
+    const [style, setStyle] = useState({});
+
+    useEffect(() => {
+
+        
+        const style = {
+            position: "absolute",
+            top: (height / 2) - cardSize,
+            left: (width / 2) - (cardSize * 0.6666666667)
+        };
+
+        if (isLandscape) {
+            setCardSize(height / (4 * 1.5));
+        } else {
+            setCardSize(width / (4 * 1.5));
+            style.top = (width / 2) - cardSize;
+            style.left = (height / 2) - (cardSize * 0.6666666667)
+        }
+
+        setStyle(style);
+
+    }, [height, width, cardSize, isLandscape]);
 
     return(
         <div style={style}>

@@ -1,6 +1,6 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
@@ -12,8 +12,7 @@ import {faUserCircle } from '@fortawesome/free-solid-svg-icons'
 import Button from "./Button"
 
  
-
-function Agent(props) {
+const Agent = (props) =>  {
 
     return(
         <div className="agents">
@@ -29,7 +28,7 @@ function Agent(props) {
                         Wins  {props.wins} <br/>
                         Loss {props.losses} <br/>
                         points {parseFloat(props.points.toPrecision(6))} <br/>
-                        <Button text={"Play Agent"}  class={"btn-play"} link={"/game/:" + props.agentName} />
+                        <Button text={"Play Agent"}  class={"btn-play"} link={`/game/${props.agentName}`} />
     
                     </td>
                 </tr>

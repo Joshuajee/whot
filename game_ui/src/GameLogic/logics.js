@@ -1,12 +1,13 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
  */
 
-import axios from "axios"
+import axios from "axios";
+import { removeLast, updateGameState, updatePlayerTwoStates } from "../Redux/actions";
 
 
 var MOVE_WAITING_PERIOD = 1500
@@ -21,34 +22,54 @@ var MOVE_WAITING_PERIOD = 1500
  * @param {*} times numbers of times to pick from market
  */
 
-export function goMarket(player,  market, times = 1){
+export function goMarket(gameState, player, times = 1, dispatch){
 
+    const newGameState = { ...gameState };
+    const market  = newGameState.market;
 
     for(let i = 0; i < times; i ++){
 
         if(market.length > 0){
 
-            player.push(market[market.length - 1])
+            if (player === gameState.playerOne.name) {
 
-            console.log(market[market.length - 1])
+                newGameState.playerOne.cardAtHand.push(market[market.length - 1]);
 
-            market.pop()
+            } else if (player === gameState.playerTwo.name) {
+
+                newGameState.playerTwo.cardAtHand.push(market[market.length - 1]);
+            }
+
+            newGameState.market.pop();
 
         }
 
     }
 
+    dispatch(updateGameState(newGameState));
+
 }
 
 
 
-export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market){
+export function referee(gameState, card, playerName, dispatch) {
 
- 
-    let index = card[0].indexOf(":") + 1
-    let number = parseInt(card[0].slice(index, card[0].length))
+    const playerTwoName = gameState.playerTwo.name;
+    const playerOneName = gameState.playerOne.name;
+    let name = playerOneName;
 
-    if(card[1] !== -2) playGame(playerCardAtHand, card, cardPlayed, number)
+    if(playerName === playerOneName) {
+        name = playerTwoName;
+    } else if(playerName === playerTwoName) {
+        name = playerOneName;
+    }
+
+    const rules = gameState.rules;
+
+    const index = card[0].indexOf(":") + 1;
+    const number = parseInt(card[0].slice(index, card[0].length));
+
+    if(card[1] !== -2) playGame(gameState, playerName, card, number, dispatch);
 
     if(rules.holdOn.active && number === rules.holdOn.card){
 
@@ -56,13 +77,13 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
        
     }else if(rules.pickTwo.active && number === rules.pickTwo.card){
 
-        goMarket(opponentsCardAtHand, market, 2)
+        goMarket(gameState, name, 2, dispatch);
 
         return false
 
     }else if(rules.pickThree.active && number === rules.pickThree.card){
 
-        goMarket(opponentsCardAtHand, market, 3)
+        goMarket(gameState, name, 3, dispatch);
 
         return false
 
@@ -72,7 +93,7 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
 
     }else if(rules.generalMarket.active && number === rules.generalMarket.card){
 
-        goMarket(opponentsCardAtHand, market)
+        goMarket(gameState, name, 1, dispatch);
 
         return false
    
@@ -94,31 +115,39 @@ export function referee(card, rules, playerCardAtHand, opponentsCardAtHand, card
  * @param {*} cardPlayed the card played in the game
  * @param {*} number the number on the card
  */
-export function playGame(player, card, cardPlayed, number){
+export function playGame(gameState, playerName, card, number, dispatch){
 
+    const newGameState = { ...gameState };
 
-    console.log("game played " + card)
+    let playerCardAtHand = newGameState.playerTwo.cardAtHand;
 
-    //if player goes to market
-    if(card[0] === "z:goMarket"){
+    if (newGameState.playerOne.name === playerName) {
+        playerCardAtHand = newGameState.playerOne.cardAtHand;
+    }
 
-    }else if(number === 20){
+    console.log("game played ", card);
 
-        cardPlayed.pop()
+    if (number === 20){
 
-        cardPlayed.push(card[0])
+        newGameState.cardPlayed.pop();
 
-    }else{
+        newGameState.cardPlayed.push(card[0]);
 
-        cardPlayed.push(card[0])
+    } else if(card[0] !== "z:goMarket"){
 
-        for(let i = 0; i < player.length; i++){
+        newGameState.cardPlayed.push(card[0]);
 
-            if(player[i] === card[0]) player.splice(i, 1)
+        for(let i = 0; i < playerCardAtHand.length; i++){
+
+            if(playerCardAtHand[i] === card[0]) playerCardAtHand.splice(i, 1);
             
         }
 
     }
+
+    dispatch(updateGameState(newGameState));
+
+    console.log(" Game State ", newGameState)
 
 }
 
@@ -157,9 +186,9 @@ export function checkGame(card, inPlay) {
 
 }
 
-export function checkPlayResponse(response, gameState, events, playerTwoState, agent){
+export function checkPlayResponse(response, gameState, playerTwoState, agent, dispatch, setOpponetIsPlaying){
 
-    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, gameState, events, playerTwoState, agent)
+    setTimeout(handleResponse, MOVE_WAITING_PERIOD, 0, response, gameState, playerTwoState, agent, dispatch, setOpponetIsPlaying)
 
 }
 
@@ -171,51 +200,54 @@ export function checkPlayResponse(response, gameState, events, playerTwoState, a
  * @param {*} index current index in the moves array
  * @param {*} response array of moves
  * @param {*} gameState current gameState
- * @param {*} events events emitter object
  * @param {*} playerTwoState  state of the agent
  */
 
-function handleResponse(index, response, gameState, events, playerTwoState, agent){
-    
-    let playerCardAtHand = gameState.playerTwo.cardAtHand
-    let opponentsCardAtHand = gameState.playerOne.cardAtHand
-    let cardPlayed = gameState.cardPlayed
-    let market = gameState.market
+function handleResponse(index, response, gameState, playerTwoState, agent, dispatch, setOpponetIsPlaying){
 
+    const playerTwoName = gameState.playerTwo.name;
+    const playerCardAtHand = gameState.playerTwo.cardAtHand;
+    const cardPlayed = gameState.cardPlayed;
 
-    let rules = gameState.rules
-   
-    let cardIndex = response[index][0].indexOf(":") + 1
-    let number = parseInt(response[index][0].slice(cardIndex, response[index][0].length))
+    const cardIndex = response[index][0].indexOf(":") + 1
+    const number = parseInt(response[index][0].slice(cardIndex, response[index][0].length))
 
-    let availableMoves = availableMove(playerCardAtHand, cardPlayed[cardPlayed.length - 1])
+    const availableMoves = availableMove(playerCardAtHand, cardPlayed[cardPlayed.length - 1])
 
-    playerTwoState.push(createState(gameState, availableMoves, false, agent))
+    const state = (createState(gameState, availableMoves, false, agent));
+
+    if(response[index][1] >= 0) {
+        dispatch(updatePlayerTwoStates(state));
+    }
 
     if(number === 20){
 
-        cardPlayed.push(response[index][0])
+        const newGameState = {...gameState}
+
+        newGameState.cardPlayed.push(response[index][0])
 
         for(let i = 0; i < playerCardAtHand.length; i++){
 
-            if(playerCardAtHand[i] === "whot:20") playerCardAtHand.splice(i, 1)
+            if(playerCardAtHand[i] === "whot:20") newGameState.playerTwo.cardAtHand.splice(i, 1)
             
         }
 
+        dispatch(updateGameState(newGameState))
+
     }else if(response[index][0] !== "z:goMarket"){
 
-        referee(response[index], rules, playerCardAtHand, opponentsCardAtHand, cardPlayed, market)
+        referee(gameState, response[index], playerTwoName, dispatch);
         
     }else{
 
-        goMarket(playerCardAtHand, market)
+        goMarket(gameState, playerTwoName, 1, dispatch);
 
     }
 
-    events.emit("play")
-
-    if(index + 1 < response.length) setTimeout(handleResponse, MOVE_WAITING_PERIOD, index + 1, response, gameState, events, playerTwoState)
-    else events.emit("play-end")
+    if(index + 1 < response.length) setTimeout(handleResponse, MOVE_WAITING_PERIOD, index + 1, response, gameState, playerTwoState, agent, dispatch, setOpponetIsPlaying)
+    else { 
+        setOpponetIsPlaying(false);
+    }
 }
 
 
@@ -227,35 +259,61 @@ function handleResponse(index, response, gameState, events, playerTwoState, agen
  * card Played to market and shuffle them while calling the reward
  * function, but the game continues     
  * 
- * @param {*} state object of the current game state
+ * @param {*} gameState object of the current game state
  */
 
-export function checkGameState(state){
+export function checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch){
 
-    let gameState = state.gameState
+    const newGameState = {...gameState};
 
-    if(gameState.playerOne.cardAtHand.length < 1 || gameState.playerOne.cardAtHand.length < 1){
+    const playerOneCards = newGameState.playerOne.cardAtHand;
 
-        rewards(state)
+    const playerTwoCards = newGameState.playerTwo.cardAtHand;
 
-    }else if(gameState.market.length < 1){
+    const market = newGameState.market;
 
-        rewards(state)
- 
-        // 
-        let inPlay = sanitizeCardPlayed(gameState.cardPlayed)
+    const cardPlayed = newGameState.cardPlayed;
+
+    console.log(" state 1", playerOneStates);
+    console.log(" state 2", playerTwoStates);
+    console.log(" action 1", playerOneActions);
+    console.log(" action 2", playerTwoActions);
+
+    if(playerOneCards.length < 1 || playerTwoCards.length < 1)  {
+
+        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
+
+        if(gameState.playerOne.cardAtHand < 1){
+
+            alert(gameState.playerOne.name + " Wins ")
+        } 
+    
+        if(gameState.playerTwo.cardAtHand < 1){
+    
+            alert(gameState.playerTwo.name + " Wins ")
+        } 
+    
+    }else if(market.length < 1) {
+
+        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
+
+        const inPlay = sanitizeCardPlayed(cardPlayed);
 
         //adds all the card played to market
-        gameState.market = inPlay
+        newGameState.market = inPlay;
         
         //reasign inplay giving it just its last value
-        gameState.cardPlayed = [ gameState.cardPlayed[gameState.cardPlayed.length - 1]]
+        newGameState.cardPlayed = [ cardPlayed[cardPlayed.length - 1]];
 
         //removed the last card from market
-        gameState.market.pop()
+        newGameState.market.pop();
 
         //shuffles the cards
-        gameState.market = shuffle(gameState.market)
+        newGameState.market = shuffle([...newGameState.market]);
+
+        dispatch(updateGameState(newGameState));
+
+        console.log(newGameState)
 
     }
 
@@ -304,29 +362,30 @@ export function sanitizeCardPlayed(cards){
 
 }
 
+export function undoMove(gameState, card, playerOneStates, playerOneActions, dispatch) {
 
-export function rewards(state){
+    const newGameState = {  ...gameState  };
 
-    let gameState = state.gameState
+    //add card taken from player back to player    
+    newGameState.playerOne.cardAtHand.push(card[0])
 
-    let playerOneStates = state.playerOneStates
-    let playerOneActions = state.playerOneActions
+    //undo last game played
+    newGameState.cardPlayed.pop()
 
-    let playerTwoStates = state.playerTwoStates
-    let playerTwoActions = state.playerTwoActions
+    //undo last state update
+    dispatch(removeLast(playerOneStates));
+    dispatch(removeLast(playerOneActions));
+
+    dispatch(updateGameState(newGameState));
+
+}
+
+
+export function rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch) {
 
     let playerOneStateAndAction = separateStateAndAction(playerOneStates, playerOneActions)
     let playerTwoStateAndAction = separateStateAndAction(playerTwoStates, playerTwoActions)
 
-    if(gameState.playerOne.cardAtHand < 1){
-
-        alert(gameState.playerOne.name + " Wins ")
-    } 
-
-    if(gameState.playerTwo.cardAtHand < 1){
-
-        alert(gameState.playerTwo.name + " Wins ")
-    } 
 
     console.log("PPPPPPPPPPPPPPPPPPPP")
     console.log(playerOneStates)
@@ -350,30 +409,6 @@ export function rewards(state){
 
         alert(error)
     })
-
-}
-
-export function checkGameChanges(gameState, cardPlayed, market){
-
-    //returns true if there is a change in market length
-    if(gameState.market.length !== market.length){
-        
-        market = gameState.market
-        cardPlayed = gameState.cardPlayed
-
-        return true
-    }
-
-    //returns true if there is a change in market length
-    if(gameState.cardPlayed.length !== cardPlayed.length){
-        
-        market = gameState.market
-        cardPlayed = gameState.cardPlayed
-        
-        return true
-    }
-
-    return false
 
 }
 
@@ -422,11 +457,7 @@ export function availableMove(playerCard, inPlayCard){
 
 
     return availableMove.sort()
-
-
 }
-
-
 
 export function createState(gameState,  availableMoves, isPlayerOne, agent = {}){
 

@@ -20,9 +20,9 @@ import CardCover from "../Componets/Cards/CardCover";
 function chooseCard(card, cardSize, need=false){
 
     
-    let index = card.indexOf(":")
-    let number = card.slice(index + 1, card.length)
-    let shape = card.slice(0, index)
+    const index = card.indexOf(":")
+    const number = card.slice(index + 1, card.length)
+    const shape = card.slice(0, index)
 
     switch(shape){
 

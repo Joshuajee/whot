@@ -47,7 +47,7 @@ exports.createAgent = catchAsync(async(req, res, next) => {
 
     if (agent) return
 
-    await Agents.create({
+    const data = await Agents.create({
         agentName: agentData.agentName,
         canGoMarket: agentData.canGoMarket,
         canNeedAnyCard: agentData.canNeedAnyCard,
@@ -62,7 +62,7 @@ exports.createAgent = catchAsync(async(req, res, next) => {
         useRules: agentData.rules,
     })
 
-    res.json({msg: "Agent Saved", "success": true})
+    res.status(201).json({ status: 'success', msg: "Agent Saved", success: true, data})
 
 });
 
