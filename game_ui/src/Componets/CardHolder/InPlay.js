@@ -7,24 +7,40 @@
  */
 
 
-
+import { useState, useEffect } from "react";
 import chooseCard from "../../GameLogic/chooseCard";
-import CardNumber from "./CardNumber"
+import CardNumber from "./CardNumber";
 
 
 
 
 const InPlay = (props) => {
-    
-    let width = window.innerWidth
-    let height = window.innerHeight
-    let cardSize = height / (4 * 1.5)
 
-    const style = {
-        position:"absolute",
-        top:height/2 - cardSize,
-        left:width/2 - cardSize * 0.6666666667
-    }
+    const { height, width, isLandscape } = props;
+
+    const [cardSize, setCardSize] = useState(0);
+    const [style, setStyle] = useState({});
+
+    useEffect(() => {
+
+        
+        const style = {
+            position: "absolute",
+            top: (height / 2) - cardSize,
+            left: (width / 2) - (cardSize * 0.6666666667)
+        };
+
+        if (isLandscape) {
+            setCardSize(height / (4 * 1.5));
+        } else {
+            setCardSize(width / (4 * 1.5));
+            style.top = (width / 2) - cardSize;
+            style.left = (height / 2) - (cardSize * 0.6666666667)
+        }
+
+        setStyle(style);
+
+    }, [height, width, cardSize, isLandscape]);
 
     return(
         <div style={style}>

@@ -1,4 +1,4 @@
-import {    GAME_STATE, PLAYER_ONE_ACTION, PLAYER_ONE_INDEX, PLAYER_ONE_STATE, PLAYER_TWO_ACTION, PLAYER_TWO_INDEX, PLAYER_TWO_STATE,   } from "../constants/action-types";
+import {    GAME_STATE, PLAYER_ONE_ACTION, PLAYER_ONE_INDEX, PLAYER_ONE_STATE, PLAYER_TWO_ACTION, PLAYER_TWO_INDEX, PLAYER_TWO_STATE, REMOVE_LAST,   } from "../constants/action-types";
 import defaults from "./../../GameEnv/cards/defaults";
 
 const initials = defaults();
@@ -24,17 +24,21 @@ function rootReducer(state = initialState, action) {
         case GAME_STATE:
             return { ...state, gameState: payload }
         case PLAYER_ONE_STATE:
-            return { ...state, playOneStates: [...state.playOneStates, payload] }
+            return { ...state, playerOneStates: [...state.playerOneStates, payload] }
         case PLAYER_TWO_STATE:
-            return { ...state, playTwoStates: [...state.playTwoStates, payload] }
+            return { ...state, playerTwoStates: [...state.playerTwoStates, payload] }
         case PLAYER_ONE_ACTION:
-            return { ...state, playOneActions: [...state.playOneActions, payload] }
+            return { ...state, playerOneActions: [...state.playerOneActions, payload] }
         case PLAYER_TWO_ACTION:
-            return { ...state, playTwoActions: [...state.playTwoActions, payload] }
+            return { ...state, playerTwoActions: [...state.playerTwoActions, payload] }
         case PLAYER_ONE_INDEX:
             return { ...state, playerOneIndex: payload }
         case PLAYER_TWO_INDEX:
             return { ...state, playerTwoIndex: payload }
+        case REMOVE_LAST:
+            console.log(action)
+            payload.pop();
+            return { ...state, payload }
         default:
             return state
     }

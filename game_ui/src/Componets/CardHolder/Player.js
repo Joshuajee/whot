@@ -11,48 +11,66 @@
 import React, {useState, useEffect} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-
 import chooseCard from "../../GameLogic/chooseCard";
-
 import CardNumber from "./CardNumber";
 
 
 const Player = (props) => {
 
-    const { cards, action, playable, index } = props;
+    const { cards, action, playable, index, isLandscape, width, height } = props;
 
     const [start, setStart] = useState(index);
-    const [width] = useState(window.innerWidth);
-    const [margin] =  useState(width * 0.05);
-    const [cardSpaceAvailable] = useState(width  - margin * 2);
+    const [margin, setMargin] =  useState(0);
+    const [cardSpaceAvailable, setCardSpaceAvailable] = useState(0);
     const [style, setStyle] = useState({});
     const [left, setLeft] = useState(null);
     const [right, setRight] = useState(null);
-    const [height] =  useState(window.innerHeight);
-    const [cardSize] = useState(height / (4 * 1.5));
-
-    const [top] =  useState(props.top * height - cardSize);
-
-    const [noOfCardsThatCanBeDisplayed] =  useState(cardSpaceAvailable / (cardSize * 1.1));
-    const [navStyle] = useState({height: cardSize * 1.5});
+    const [cardSize, setCardSize] = useState(0);
+    const [top, setTop] =  useState(0);
+    const [noOfCardsThatCanBeDisplayed, setNoOfCardsThatCanBeDisplayed] =  useState(0);
+    const [navStyle, setNavStyle] = useState({});
     
- 
+    
+    useEffect(() => {
+
+        if (isLandscape) {
+
+            setCardSize(height / (4 * 1.5));
+            setTop(props.top * height - cardSize);
+            setMargin(width * 0.05);
+            setCardSpaceAvailable((width  - margin * 2));
+            
+        } else {
+
+            setCardSize(width / (4 * 1.5));
+            setTop(props.top * width - cardSize);
+            setMargin(height * 0.1408);
+            setCardSpaceAvailable((height  - margin * 2));
+
+        }
+
+    }, [props.top, width, height, cardSize, isLandscape]);
+
+    useEffect(() => {
+
+        setNoOfCardsThatCanBeDisplayed(cardSpaceAvailable / (cardSize * 1.1))
+        setNavStyle({height: cardSize * 1.5});
+
+    }, [cardSize, cardSpaceAvailable, width, margin]);
 
     useEffect(() => {
         
-
         const style = {
             position: "absolute",
             top: top,
             left: margin,
-            align: "center",
             width: cardSpaceAvailable,  
-            height: cardSize,
+            height: cardSize
         };
 
         setStyle(style);
 
-    }, [cardSize, cardSpaceAvailable, margin, top]);
+    }, [cardSize, cardSpaceAvailable, margin, top, height, width, isLandscape]);
 
     useEffect(() => {
 
@@ -77,7 +95,6 @@ const Player = (props) => {
 
     }, [navStyle, start, cards, noOfCardsThatCanBeDisplayed]);
 
-
     const displayCards = (cards, cardSize, action, start=0) => {
     
         const cardArray = [];
@@ -97,7 +114,7 @@ const Player = (props) => {
    }
 
     return(
-        <div style={style} className="player">
+        <div style={style}>
 
             {left}
             {displayCards(cards.sort(), cardSize, action, start)}  
@@ -108,6 +125,5 @@ const Player = (props) => {
         </div>)
     
 }
-
 
 export default Player;

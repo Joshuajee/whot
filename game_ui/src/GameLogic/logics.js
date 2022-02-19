@@ -7,7 +7,7 @@
  */
 
 import axios from "axios";
-import { updateGameState } from "../Redux/actions";
+import { removeLast, updateGameState, updatePlayerTwoStates } from "../Redux/actions";
 
 
 var MOVE_WAITING_PERIOD = 1500
@@ -214,9 +214,11 @@ function handleResponse(index, response, gameState, playerTwoState, agent, dispa
 
     const availableMoves = availableMove(playerCardAtHand, cardPlayed[cardPlayed.length - 1])
 
+    const state = (createState(gameState, availableMoves, false, agent));
 
-    //playerTwoState.push(createState(gameState, availableMoves, false, agent))
-
+    if(response[index][1] >= 0) {
+        dispatch(updatePlayerTwoStates(state));
+    }
 
     if(number === 20){
 
@@ -257,10 +259,10 @@ function handleResponse(index, response, gameState, playerTwoState, agent, dispa
  * card Played to market and shuffle them while calling the reward
  * function, but the game continues     
  * 
- * @param {*} state object of the current game state
+ * @param {*} gameState object of the current game state
  */
 
-export function checkGameState(gameState, dispatch){
+export function checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch){
 
     const newGameState = {...gameState};
 
@@ -272,13 +274,28 @@ export function checkGameState(gameState, dispatch){
 
     const cardPlayed = newGameState.cardPlayed;
 
+    console.log(" state 1", playerOneStates);
+    console.log(" state 2", playerTwoStates);
+    console.log(" action 1", playerOneActions);
+    console.log(" action 2", playerTwoActions);
+
     if(playerOneCards.length < 1 || playerTwoCards.length < 1)  {
 
-        //rewards(state)
+        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
 
+        if(gameState.playerOne.cardAtHand < 1){
+
+            alert(gameState.playerOne.name + " Wins ")
+        } 
+    
+        if(gameState.playerTwo.cardAtHand < 1){
+    
+            alert(gameState.playerTwo.name + " Wins ")
+        } 
+    
     }else if(market.length < 1) {
 
-        //rewards(state)
+        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
 
         const inPlay = sanitizeCardPlayed(cardPlayed);
 
@@ -345,7 +362,7 @@ export function sanitizeCardPlayed(cards){
 
 }
 
-export function undoMove(gameState, card, dispatch) {
+export function undoMove(gameState, card, playerOneStates, playerOneActions, dispatch) {
 
     const newGameState = {  ...gameState  };
 
@@ -356,36 +373,19 @@ export function undoMove(gameState, card, dispatch) {
     newGameState.cardPlayed.pop()
 
     //undo last state update
-    //playerOneStates.pop()
-    //playerOneActions.pop()
+    dispatch(removeLast(playerOneStates));
+    dispatch(removeLast(playerOneActions));
 
     dispatch(updateGameState(newGameState));
 
 }
 
 
-export function rewards(state){
-
-    let gameState = state.gameState
-
-    let playerOneStates = state.playerOneStates
-    let playerOneActions = state.playerOneActions
-
-    let playerTwoStates = state.playerTwoStates
-    let playerTwoActions = state.playerTwoActions
+export function rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch) {
 
     let playerOneStateAndAction = separateStateAndAction(playerOneStates, playerOneActions)
     let playerTwoStateAndAction = separateStateAndAction(playerTwoStates, playerTwoActions)
 
-    if(gameState.playerOne.cardAtHand < 1){
-
-        alert(gameState.playerOne.name + " Wins ")
-    } 
-
-    if(gameState.playerTwo.cardAtHand < 1){
-
-        alert(gameState.playerTwo.name + " Wins ")
-    } 
 
     console.log("PPPPPPPPPPPPPPPPPPPP")
     console.log(playerOneStates)

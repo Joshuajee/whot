@@ -22,19 +22,13 @@ const Leaderboard = () =>  {
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState(null);
     const [agents, setAgents] = useState(null);
-/*
-    const counter = useSelector((state) => state.counter);
-
-    const dispatch = useDispatch();
-
-    console.log(counter)
-*/
+    const [page, setPage] = useState(0);
 
     useEffect(() => {
 
         setIsLoading(true);
 
-        axios.get("/api/v1/leaderboard/0").then( res => {
+        axios.get(`/api/v1/leaderboard/${page}`).then(res => {
 
             setData(res?.data?.data)
             setIsLoading(false)
@@ -43,7 +37,7 @@ const Leaderboard = () =>  {
 
         });
 
-    }, []);
+    }, [page]);
 
     useEffect(() => {
         const agents = [];
@@ -74,6 +68,10 @@ const Leaderboard = () =>  {
                 {agents}
 
             </div>
+
+            <button onClick={() => setPage(x => x - 1)}> Prev </button>
+
+            <button onClick={() => setPage(x => x + 1)}> Next </button>
             
         </div>
     )

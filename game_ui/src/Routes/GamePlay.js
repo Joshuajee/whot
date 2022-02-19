@@ -19,15 +19,11 @@ import Market from "../Componets/CardHolder/Market";
 import Player from "../Componets/CardHolder/Player";
 import Need from "../Componets/CardHolder/Need";
 import Loader from "../Componets/Loader";
-import Modal from "../Componets/Modal";
+//import Modal from "../Componets/Modal";
 
 import { useSelector, useDispatch } from "react-redux";
-import { updateGameState } from "../Redux/actions";
-
-const url = window.location.href
-  
-const index = url.indexOf("/:") + 2
-const user = url.slice(index, url.length)
+import { removeLast, updateGameState, updatePlayerOneActions, updatePlayerOneStates, updatePlayerTwoActions } from "../Redux/actions";
+import { useParams } from "react-router";
 
 const rules = {"holdOn":{"active":true, "card":1, "defend":false},
             "pickTwo":{"active":true, "card":2, "defend":false},
@@ -39,16 +35,19 @@ const rules = {"holdOn":{"active":true, "card":1, "defend":false},
 
 const GamePlay = () => {
 
+    const { user } = useParams();
+
     const { gameState, playerOneStates, playerOneActions, playerTwoStates, 
         playerTwoActions, playerOneCardIndex, playerTwoCardIndex
         } = useSelector((state) => state);
 
     const dispatch = useDispatch();
 
-
+    const [height, setHeight] = useState(window.innerHeight);
+    const [width, setWidth] = useState(window.innerWidth);
     const [playerOneData, setPlayerOneData] = useState({});
     const [playerTwoData, setPlayerTwoData] = useState({});
-    //const visibility = "hide-modal"; 
+    //const [error, setError] = useState(null)
     const [isNeeded, setIsNeeded] =  useState(false);
     const [playerCard, setPlayerCard] = useState([]);
     const [opponetCard, setOpponetCard] = useState([]);
@@ -57,6 +56,41 @@ const GamePlay = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [opponetIsPlaying, setOpponetIsPlaying] = useState(false);
     const [opponetMoves, setOpponetMoves] = useState([]);
+    const [isLandscape, setIsLandscape] = useState(true);
+    const [style, setStyle] = useState({});
+    const [gameArea, setGameArea] = useState({});
+
+    useEffect(() => {
+
+        window.onresize = () => {
+            setHeight(window.innerHeight);
+            setWidth(window.innerWidth);
+        }
+
+        window.onorientationchange = () => {
+            setHeight(window.innerHeight);
+            setWidth(window.innerWidth);
+        }
+
+    }, []);
+
+    useEffect(() => {
+
+        if(height > width) {
+
+            setIsLandscape(false);
+            setStyle({transform: 'rotate(90deg)'});
+            setGameArea({height: width * 0.98, width: height * 0.96 });
+
+        } else {
+
+            setIsLandscape(true);
+            setStyle({});
+            setGameArea({height: height * 0.97, width: width * 0.98 });
+
+        }
+
+    }, [height, width]);
 
 
     useEffect(() => {
@@ -84,7 +118,7 @@ const GamePlay = () => {
             alert(error)
         })
 
-    }, [dispatch]);
+    }, [dispatch, user]);
 
     useEffect(() => {
 
@@ -93,7 +127,13 @@ const GamePlay = () => {
             //check the type of response gotten from server
             checkPlayResponse(opponetMoves, gameState, playerTwoStates, playerTwoData, dispatch, setOpponetIsPlaying);
 
-            //playerTwoActions.push(...opponetMoves);
+            opponetMoves.forEach(element => {
+
+                if(element[1] >= 0) {
+                    dispatch(updatePlayerTwoActions(element));
+                }
+
+            });
 
             setOpponetMoves([]);
       
@@ -106,21 +146,27 @@ const GamePlay = () => {
 
         let availableMoves = availableMove(gameState.playerOne.cardAtHand, gameState.cardPlayed[gameState.cardPlayed.length - 1])
 
-        //playerOneStates.push(createState(gameState, availableMoves, true, playerOneData))
+        const state = createState(gameState, availableMoves, true, playerOneData);
+
+        dispatch(updatePlayerOneStates(state));
 
         card.push(cardIndex(availableMoves, card[0]))
 
-        playerOneActions.push(card)
+        dispatch(updatePlayerOneActions(card));
 
         setIsLoading(true);
         setIsNeeded(false);
         setOpponetIsPlaying(false);
  
-        let request = {agentName:  user, user: "Guest", gameState, playerMove: card, rules:rules}
+        const request = {agentName:  user, user: "Guest", gameState, playerMove: card, rules:rules}
     
-        let index = gameState.playerOne.cardAtHand.indexOf("whot:20")
-        gameState.playerOne.cardAtHand.splice(index, 1)
-        gameState.cardPlayed.push(card[0])
+        const index = gameState.playerOne.cardAtHand.indexOf("whot:20");
+        const newGameState = {...gameState};
+
+        newGameState.playerOne.cardAtHand.splice(index, 1);
+        newGameState.cardPlayed.push(card[0]);
+
+        dispatch(updateGameState(newGameState));
 
         axios.post("/api/v1/play", request).then((res)=>{
             
@@ -133,12 +179,12 @@ const GamePlay = () => {
             setOpponetIsPlaying(false);
             setIsLoading(false);
 
-            //playerTwoActions.push(...response)
+            dispatch(updatePlayerTwoActions(...response));
     
         }).catch((error) =>{
 
             //undo last move
-            undoMove(gameState, card, dispatch);
+            undoMove(gameState, card, playerOneStates, playerOneActions, dispatch);
 
             //remove loader and transfer game control back to player
             setIsLoading(false);
@@ -156,12 +202,13 @@ const GamePlay = () => {
 
         card.push(cardIndex(availableMoves, card[0]))
 
-        //playerOneActions.push(card)
+        dispatch(updatePlayerOneActions(card));
 
-        //playerOneStates.push(createState(gameState, availableMoves, true, playerOneData))
+        const state = createState(gameState, availableMoves, true, playerOneData);
+
+        dispatch(updatePlayerOneStates(state));
 
         setIsLoading(true);
-
 
         if(card[0] === "z:goMarket"){
 
@@ -187,12 +234,12 @@ const GamePlay = () => {
 
                 checkPlayResponse(response, gameState, playerTwoStates, playerTwoData, dispatch, setOpponetIsPlaying);
 
-                //playerTwoActions.push(...response)
+                dispatch(updatePlayerTwoActions(...response));
                 
             }).catch((error) =>{
 
                 //undo last move
-                undoMove(gameState, card, dispatch);
+                undoMove(gameState, card, playerOneStates, playerOneActions, dispatch);
 
                 //remove loader and transfer game control back to player
                 setIsLoading(false);
@@ -216,10 +263,10 @@ const GamePlay = () => {
                     setIsLoading(false);
 
                     //remove last state
-                    //playerOneStates.pop()
-                    //playerOneActions.pop()
+                    dispatch(removeLast(playerOneStates));
+                    dispatch(removeLast(playerOneActions));
 
-                }else{
+                }   else    {
                     
                     const sendMove = referee(gameState, card, "Guest", dispatch);
                    
@@ -238,12 +285,12 @@ const GamePlay = () => {
                             //handle response gotten from server 
                             checkPlayResponse(response, gameState, playerTwoStates, playerTwoData, dispatch, setOpponetIsPlaying);
      
-                            //playerTwoActions.push(...response)
+                            dispatch(updatePlayerTwoActions(...response));
 
                         }).catch((error) => {
 
                             //undo last move
-                            undoMove(gameState, card, dispatch);
+                            undoMove(gameState, card, playerOneStates, playerOneActions, dispatch);
 
                             //remove loader and transfer game control back to player
                             setIsLoading(false);
@@ -287,27 +334,29 @@ const GamePlay = () => {
     }, [gameState]);
 
     useEffect(() => {
-        checkGameState(gameState, dispatch);
-    }, [gameState, dispatch])
+        checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
+    }, [gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch])
 
-    if (isLoading) return(<center id="game-table"  className="game-table"><Loader /> </center>)
+
+    if (isLoading) return(<center  style={gameArea} className="game-table"><Loader /> </center>)
 
     return(
-        <div>
+        <div style={style}>
         {
         //    <Modal text={"Network Error"} close={close} visibility={visibility} />
         }
-            <center id="game-table"  className="game-table">
+            <center style={gameArea} className="game-table">
 
-                <div>
-                    
-                    <Player top={0.2} angle={180} cards={opponetCard} action={playCard} playable={false} index={playerTwoCardIndex} />
-                    <Player top={0.8} angle={0} cards={playerCard} action={playCard} playable={!opponetIsPlaying} index={playerOneCardIndex}/>
-                    
-                    { inPlay && <InPlay className="center" cards={inPlay} cardNumber={cardPlayed?.length} />  }
+                <div style={gameArea}>
 
-                    <Market action={playCard} playable={!opponetIsPlaying} cardNumber={gameState.market.length} />
+                    <Player top={0.2} isLandscape={isLandscape} angle={180} height={height} width={width} cards={opponetCard} action={playCard} playable={false} index={playerTwoCardIndex} />
 
+                    <Player top={0.8} isLandscape={isLandscape}  angle={0} height={height} width={width} cards={playerCard} action={playCard} playable={!opponetIsPlaying} index={playerOneCardIndex}/>
+        
+                    { inPlay && <InPlay isLandscape={isLandscape} height={height} width={width} className="center" cards={inPlay} cardNumber={cardPlayed?.length} />  }
+
+                    <Market action={playCard} isLandscape={isLandscape} height={height} width={width} playable={!opponetIsPlaying} cardNumber={gameState.market.length} />
+                
                 </div>
 
             </center>
@@ -321,4 +370,4 @@ const GamePlay = () => {
 }
 
 
-export default GamePlay
+export default GamePlay;

@@ -7,14 +7,12 @@ import Settings from "./Routes/Settings";
 import GamePlay from "./Routes/GamePlay";
 import CreateAgent from "./Routes/CreateAgent";
 
-
 const home =  () => <Home />
 const rules =  () => <Rules />
 const leaderboard = () => <Leaderboard />
 const settings = () => <Settings />
 const game = () => <GamePlay />
 const createAgent = () => <CreateAgent />
-
 
 
 const App = () => {
