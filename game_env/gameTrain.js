@@ -23,24 +23,27 @@ class GameTrain extends GameEngine{
         //class variables to hold players Names
         this.playerOneName = playerOneName
         this.playerTwoName = playerTwoName
+
+        this.agentOne = agents[0]
+        this.agentTwo = agents[1]
         
         this.currentPlayerName = this.playerOneName
 
-        super.on("playerOne", () => {
-            this.checkGame()
+        super.on("playerOne", async () => {
+            await this.checkGame()
             if(this.player1.length > 0 && this.player2.length > 0)
                 this.play(this.player1, this.player2, this.playerOneName, this.playerTwoName)
         })
 
-        super.on("playerTwo", () => {
-            this.checkGame()
+        super.on("playerTwo", async () => {
+            await this.checkGame()
             if(this.player1.length > 0 && this.player2.length > 0)
                 this.play(this.player2, this.player1, this.playerTwoName, this.playerOneName)
         })
 
-        super.on("received", ()=>{
+        super.on("received", async () =>{
             let action = super.getAction
-            this.referee(action, this.rules, this.availableMove, this.cardAtHand.sort(), this.playerName, this.opponent)
+            await this.referee(action, this.rules, this.availableMove, this.cardAtHand.sort(), this.playerName, this.opponent)
         })
 
     }
@@ -74,7 +77,7 @@ class GameTrain extends GameEngine{
 
             let whot = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
 
-            this.inPlay[0] = whot[Math.random() * whot.length]
+            this.inPlay[0] = whot[Math.floor(Math.random() * whot.length)]
         }
 
         this.referee(this.inPlay, this.rules, "avialableMove", this.player2, this.playerTwoName, this.player1, true, true)
@@ -108,8 +111,29 @@ class GameTrain extends GameEngine{
 
             card = this.chooseAction(action, avialableMove)
 
+            console.log(action, avialableMove)
+            console.log(card)
+
             index = card[0].indexOf(":") + 1
             number = card[0].slice(index, card[0].length)
+
+            if(playerName == this.playerOneName){
+
+                if(action[0])
+                    this.actionOneNew.push(card)
+                else
+                    this.actionOneOld.push(card)
+                
+            }else{
+                
+                if(action[0])
+                    this.actionTwoNew.push(card)
+                else
+                    this.actionTwoOld.push(card)
+    
+            }
+    
+            this.playGame(playerCardAtHand, card)
 
         }else{
 
@@ -128,24 +152,6 @@ class GameTrain extends GameEngine{
 
         }
 
-
-        if(playerName == this.playerOneName){
-
-            if(action[0])
-                this.actionOneNew.push(card)
-            else
-                this.actionOneOld.push(card)
-            
-        }else{
-            
-            if(action[0])
-                this.actionTwoNew.push(card)
-            else
-                this.actionTwoOld.push(card)
-
-        }
-
-        this.playGame(playerCardAtHand, card)
 
         if(rules.holdOn.active && number == rules.holdOn.card){
 
@@ -235,18 +241,75 @@ class GameTrain extends GameEngine{
     }
 
     /**
+     * This method deals with available moves when Whot:20 card is involved
+     * @param {*} agent current agent property object
+     * @param {*} playerCard current player cards at hand
+     * @returns array of available moves for whot
+     */
+    whotAvailableMoves(agent, playerCard){
+
+            let availableMove = []
+    
+            if(!agent.canNeedAnyCard && playerCard.length > 1) {
+        
+                for(let i = 0; i < playerCard.length; i++){
+    
+                    let index = playerCard[i].indexOf(":") + 1
+                    let shape = playerCard[i].slice(0, index)
+    
+                    if(playerCard[i] !== "whot:20") {
+    
+                        console.log("__________________________________")
+    
+                        for(let i = 0; i < availableMove.length; i++) {
+    
+                            if(availableMove[i] === shape + "20") break
+    
+                            if(i + 1 === availableMove.length) availableMove.push(shape + "20")
+    
+                        }
+    
+                        if(availableMove.length === 0){
+                            availableMove.push(shape + "20")
+                        }
+    
+                    }
+    
+                }
+    
+            } else {
+                
+                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+    
+            }
+    
+            return availableMove.sort()
+    }
+
+    /**
      * This method search for valid moves           
      * @param {*} playerCard cards of the player that is to make a move
      * @param {*} inPlayCard last card played
      * @returns an array all valid moves that can be mades
      */
-    availableMoves(playerCard, inPlayCard){
+    availableMoves(playerCard, inPlayCard, playerName){
 
         let index_in = inPlayCard.indexOf(":") + 1
         let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
         let shape_in = inPlayCard.slice(0, index_in)
     
         let availableMove = ["z:goMarket"]
+
+        //determines the agent that is playing and if the agent can always go to market
+        if(playerName === this.agentOne.agentName){
+
+            if(!this.agentOne.canGoMarket) availableMove = []
+
+        }else{
+
+            if(!this.agentTwo.canGoMarket) availableMove = []
+       
+        }
     
         for(let i = 0; i < playerCard.length; i++){
              
@@ -257,9 +320,18 @@ class GameTrain extends GameEngine{
             if(number === 20){
             
                 availableMove.sort()
+
+                //determines the agent that is playing and if the agent can need any card
+                if(playerName === this.agentOne.agentName){
+
+                    availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
+
+                }else{
+
+                    availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
             
-                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
-                
+                }
+               
                 return availableMove
             
             }if(number === number_in){
@@ -273,6 +345,8 @@ class GameTrain extends GameEngine{
             }
     
         }
+
+        if(availableMove.length === 0) availableMove = ["z:goMarket"]
     
         return availableMove.sort()
     
@@ -298,7 +372,7 @@ class GameTrain extends GameEngine{
 
         this.currentPlayerName = playerName
 
-        this.availableMove = this.availableMoves(this.cardAtHand, inPlayCard)
+        this.availableMove = this.availableMoves(this.cardAtHand, inPlayCard, playerName)
 
         if(this.availableMove.length === 1){
 
@@ -327,9 +401,10 @@ class GameTrain extends GameEngine{
     */
     chooseAction(action, availableMove){
 
-        console.log(...action[1])
-
         let maxAction = Math.max(...action[1])
+
+        console.log("ACTION", action[1])
+        console.log(maxAction)
 
         let actionPicked = []
         let pickedAction = []
@@ -361,6 +436,8 @@ class GameTrain extends GameEngine{
      */
     playGame(player, move){
 
+        console.log(this.market.length + this.inPlay.length + this.player1.length + this.player2.length)
+
         console.log("game move " + move[0])
         
         let index = move[0].indexOf(":") + 1
@@ -385,12 +462,12 @@ class GameTrain extends GameEngine{
 
         }else{
 
-            this.inPlay.push(move[0])
             
             for(let i = 0; i < player.length; i++){
 
                 if(player[i] == move[0]){
 
+                    this.inPlay.push(move[0])
                     player.splice(i, 1)
                     break
 
@@ -400,14 +477,14 @@ class GameTrain extends GameEngine{
 
         }
 
+        
+
+        console.log("Market ", this.market)
+        console.log("InPlay ", this.inPlay)
+        console.log("Player 1 ", this.player1)
+        console.log("Player 2 ", this.player2)
+
         console.log(this.market.length + this.inPlay.length + this.player1.length + this.player2.length)
-
-        //console.log("Market ", this.market)
-        //console.log("InPlay ", this.inPlay)
-        //console.log("Player 1 ", this.player1)
-        //console.log("Player 2 ", this.player2)
-
-        //if(this.market.length + this.inPlay.length + this.player1.length + this.player2.length !== 56) 
 
     }
 
@@ -442,20 +519,20 @@ class GameTrain extends GameEngine{
      * finished, it adds all cards from card Played to market and shuffle them 
      * while calling the reward method in GameEngine, but the game continues  
      */
-    checkGame(){
+    async checkGame() {
 
         if(this.player1.length < 1 || this.player2.length < 1){
 
-            super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            await super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
             this.actionOneNew = []
             this.actionOneOld = []
             this.actionTwoNew = []
             this.actionTwoOld = []
             
-        }else if(this.market.length < 1){
+        } else if(this.market.length < 1){
    
-            super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            await super.rewards(this.playerOneName, this.playerTwoName, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
             //santize the card
             let inPlay = sanitizeCardPlayed(this.inPlay)

@@ -11,20 +11,24 @@ const { EventEmitter } = require("events")
 const prompt = require("prompt-sync")()
 const {GameTraining}  = require("./gameStart")
 const agents = require("../models/agents")
-const { exitCode } = require("process")
+
+require("../configs/dbConnections")
+
+
 
 let rules = {"holdOn":{"active":true, "card":1, "defend":false},
                      "pickTwo":{"active":true, "card":2, "defend":false},
                      "pickThree":{"active":true, "card":5, "defend":false}, 
                      "suspension":{"active":true, "card":8, "defend":false},
-                     "generalMarket":{"active":true, "card":14, "defend":false}
+                     "generalMarket":{"active":true, "card":14, "defend":false},
+                     "marketFinishGameEnd" : false
                     } 
 
 const rounds = prompt('Numbers of Tournament    ');
 
                     
 
-agents.find().select("agentName").exec((err, data)=>{
+agents.find().exec((err, data)=>{
 
     if(err){
         console.log("Failed to retrieve data " + err)
@@ -56,7 +60,7 @@ agents.find().select("agentName").exec((err, data)=>{
             console.log(currentOpponent)
 
             if(currentOpponent <= totalPlayers)
-                new GameTraining(data[currentPlayer].agentName, data[currentOpponent].agentName, rules, data, 0, 1, gameEmitter).startGame()
+                new GameTraining(data[currentPlayer].agentName, data[currentOpponent].agentName, rules, [data[currentPlayer], data[currentOpponent]], 0, 1, gameEmitter).startGame()
             else{
 
                 if(currentTournament <= rounds){
@@ -68,7 +72,7 @@ agents.find().select("agentName").exec((err, data)=>{
                     gameEmitter.emit("new")
                     currentTournament++
                 }else{
-                    exitCode()
+                    process.exit(1)
                 }
                 
             } 

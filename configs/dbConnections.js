@@ -6,18 +6,24 @@
  * @license MIT This program is distributed under the MIT license
  */
 
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
 
-const mongoose = require("mongoose")
+ dotenv.config({ path: './.env' });
 
-const config = require("./index")
-
-//set up default mongoose connection
-mongoose.connect(config.DataBaseURI, {useNewUrlParser:true, useUnifiedTopology:true})
-
-//Get the connection
-const db = mongoose.connection
-
-//Bind connection to error event (to get notification of connection errors)
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
-
+ console.log(process.env.DATABASE)
+ 
+ const DB = process.env.DATABASE.replace(
+   '<PASSWORD>',
+   process.env.DATABASE_PASSWORD
+ );
+ 
+ mongoose
+   .connect(DB, {
+     useNewUrlParser: true,
+     useCreateIndex: true,
+     useFindAndModify: false
+   })
+   .then(() => console.log("DB connection successful!"));
+ 

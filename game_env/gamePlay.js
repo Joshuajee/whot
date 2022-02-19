@@ -6,6 +6,13 @@
  * @license MIT This program is distributed under the MIT license
  */
 
+const guest = require("../cards/user.json")
+
+const Agents = require("../models/agents")
+const states = require("../models/states")
+
+
+ 
 const GameEngine = require("./gameEngine")
 
 const cards = require("../cards").cards
@@ -14,13 +21,16 @@ const inGameCards = [...cards]
 
 class GamePlay extends GameEngine{
     
-    constructor(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman){
+    constructor(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents){
 
-        super(playerOneName, playerTwoName, rules, isPlayerOneHuman, isPlayerTwoHuman)
+        super(playerOneName, playerTwoName, rules, agents, currentPlayerIndex, currentOpponentIndex, gameEvents)
 
         this.playerOneName = playerOneName
         this.playerTwoName = playerTwoName
         this.rules = rules
+
+        this.agentOne = agents[0]
+        this.agentTwo = agents[1]
 
         super.on("need", ()=>{
 
@@ -40,10 +50,11 @@ class GamePlay extends GameEngine{
 
         })
 
-        super.on("received", ()=>{
+        super.on("received", async() => {
 
+            console.log(super.getAction)
 
-            this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, false, false)
+            await this.referee(super.getAction, this.gameRules, this.availableMove, this.playerTwoCard.sort(), this.playerTwoName, false, false)
         
         })  
 
@@ -59,7 +70,9 @@ class GamePlay extends GameEngine{
     /**
     * This method starts the game and set all the class variables
     */
-    startGame(rules, res){
+    async startGame(rules, res, start){
+
+        console.log("START GAME")
 
         this.firstGameState = {}
 
@@ -70,8 +83,8 @@ class GamePlay extends GameEngine{
         this.res = res
 
         //class variables to hold game variables
-        this.player1 = []
-        this.player2 = []
+        this.playerOneCard = []
+        this.playerTwoCard = []
         this.inPlay = []
         this.availableMove = []
         this.need = false
@@ -84,9 +97,9 @@ class GamePlay extends GameEngine{
 
         this.market = [...shuffle(inGameCards)]
 
-        this.goMarket(this.player1, 3)
+        this.goMarket(this.playerOneCard, start)
 
-        this.goMarket(this.player2, 3)
+        this.goMarket(this.playerTwoCard, start)
 
         this.goMarket(this.inPlay)
 
@@ -94,17 +107,17 @@ class GamePlay extends GameEngine{
 
             let whot = ["circle:20", "cross:20", "square:20", "star:20", "triangle:20"]
 
-            this.inPlay[0] = whot[Math.random() * whot.length]
+            this.inPlay[0] = whot[Math.floor(Math.random() * whot.length)]
         }
 
-        console.log(this.inPlay[0])
+        this.moves.push([this.inPlay[0], -2])
 
         this.state = {gameState: {"playerOne":{
-                            "cardAtHand":this.player1,
+                            "cardAtHand":this.playerOneCard,
                             "name":this.playerOneName
                             },
                         "playerTwo":{
-                            "cardAtHand":this.player2,
+                            "cardAtHand":this.playerTwoCard,
                             "name":this.playerTwoName
                             },
                         "market":this.market,
@@ -113,14 +126,14 @@ class GamePlay extends GameEngine{
                         }}
 
 
+        console.log("player 1 " + this.playerOneCard)
 
-        this.referee(this.inPlay, rules, "avialableMove", this.player2, this.playerTwoName, true, true)
-        
-        console.log("player 1 " + this.player1)
-
-        console.log("player 2 " + this.player2)
+        console.log("player 2 " + this.playerTwoCard)
         
         console.log("in play " + this.inPlay)
+
+        await this.referee(this.inPlay, rules, "avialableMove", this.playerTwoCard, this.playerTwoName, true, true)
+    
 
     }
     
@@ -130,7 +143,7 @@ class GamePlay extends GameEngine{
      * @param {*} res response object to be sent to client
      * @returns state gotten from client
      */
-    humanPlay(state, res){
+    async humanPlay(state, res){
 
         this.start = false
 
@@ -139,13 +152,179 @@ class GamePlay extends GameEngine{
         this.moves = []
 
         this.res = res
-
-        console.log(state)
         
-        this.play(state)
+        await this.play(state, this.agentOne.agentName)
 
         return state
     }
+
+    async separateStates(state, index, max, agentName, newOrOldArray = []){
+
+        let currentState = state[index]
+        let newOrOld = newOrOldArray
+
+        const playerStates = states(agentName)
+
+        try{
+
+            await playerStates.find({currentState}).then( async (data, err) => {
+
+                if(err === undefined){
+
+                    if(data.length > 0){
+                        newOrOld.push(data[0])
+                    }else{
+                        newOrOld.push(null)
+                    }
+
+                }else{
+                    await this.separateStates(state, index, max, agentName, newOrOld)
+                }
+
+                if(index + 1 < max){
+                    await this.separateStates(state, index + 1, max, agentName, newOrOld)
+                }else{
+                    console.log("DONE")
+                }
+
+            })
+
+            return newOrOld
+
+        }catch{
+            console.log("eRrorrrrrrrr")
+        }
+    }
+
+    async save(requestBody, res){
+
+        let playerOneCardAtHand = requestBody.gameState.playerOne.cardAtHand
+        let playerTwoCardAtHand = requestBody.gameState.playerTwo.cardAtHand
+
+        let playerOneStates = requestBody.playerOneStatesAndActions[0]
+        let playerOneActions = requestBody.playerOneStatesAndActions[1]
+
+        let playerTwoStates = requestBody.playerTwoStatesAndActions[0]
+        let playerTwoActions = requestBody.playerTwoStatesAndActions[1]
+
+        console.log(playerOneStates)
+        console.log(playerOneActions)
+
+        res.status(200).json({status: 'received'})
+
+        try{
+
+            const playerOneSeparated = await this.separateStates(playerOneStates, 0, playerOneStates.length, this.playerOneName)
+            const playerTwoSeparated = await this.separateStates(playerTwoStates, 0, playerTwoStates.length, this.playerTwoName)
+
+            let playerOneNewOldSA = this.separateToNewOldSA(playerOneSeparated, playerOneStates, playerOneActions)
+
+            let playerTwoNewOldSA = this.separateToNewOldSA(playerTwoSeparated, playerTwoStates, playerTwoActions)
+
+            this.addActionsToNewState(playerOneNewOldSA[0], playerTwoNewOldSA[0])
+            console.log("ONE")
+            console.log(playerOneNewOldSA[0])
+
+            console.log("NEW")
+            console.log(playerTwoNewOldSA[0])
+
+
+            let human = {}
+
+            human.playerOneStateNew = playerOneNewOldSA[0]
+            human.playerOneStateOld = playerOneNewOldSA[2]
+            human.playerTwoStateNew = playerTwoNewOldSA[0]
+            human.playerTwoStateOld = playerTwoNewOldSA[2]
+
+            console.log(playerOneNewOldSA[2])
+    
+            
+            super.rewards(
+                this.agentOne.agentName, 
+                this.agentTwo.agentName, 
+                playerOneCardAtHand,        
+                playerTwoCardAtHand, 
+                playerOneNewOldSA[1], 
+                playerOneNewOldSA[3], 
+                playerTwoNewOldSA[1], 
+                playerTwoNewOldSA[3], 
+                human) 
+
+        } catch(err) {
+
+            console.log(err)
+
+        }
+        
+
+        
+
+    }
+
+    separateToNewOldSA(filteredPlayerState, playerStates, playerActions){
+
+        let newStates = []
+        let oldStates = []
+        let newActions = []
+        let oldActions = []
+
+        for (let i = 0; i < filteredPlayerState.length; i++){
+
+            if(filteredPlayerState[i] === null){
+
+                newStates.push(playerStates[i])
+                newActions.push(playerActions[i])
+
+            }else{
+
+                oldStates.push(filteredPlayerState[i])
+                oldActions.push(playerActions[i])
+
+            }
+
+        }
+
+        return [newStates, newActions, oldStates, oldActions]
+    }
+
+    addActionsToNewState (playerOneStates, playerTwoStates){
+
+        for(let i = 0; i < playerOneStates.length; i++){
+
+            let output = []
+            
+            //set inital values of zeros for output
+            for(let x = 0; x < playerOneStates[i].availableMove.length; x++){
+
+                output.push(0)
+
+            }
+
+            playerOneStates[i].actions = output
+
+        }
+ 
+
+
+        for(let i = 0; i < playerTwoStates.length; i++){
+
+            let output = []
+            
+            //set inital values of zeros for output
+            for(let x = 0; x < playerTwoStates[i].availableMove.length; x++){
+
+                output.push(0)
+
+            }
+
+            playerTwoStates[i].actions = output
+
+        }
+
+
+    }
+
+
 
 
     /**
@@ -158,7 +337,7 @@ class GamePlay extends GameEngine{
      * @param {*} playerName current agent name
      * @param {*} opponentsCardAtHand arrays of cards with opponent
      */
-    referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false, firstMove = false){
+    async referee(action, rules, avialableMove, playerTwoCard, playerName, startGame = false, firstMove = false){
     
         console.log(playerName) 
         console.log(playerTwoCard)
@@ -198,29 +377,29 @@ class GamePlay extends GameEngine{
 
             console.log("hold On")
 
-            this.play(this.state)
+            await this.play(this.state)
           
-        }else if(rules.pickTwo.active && number == rules.pickTwo.card){
+        } else if(rules.pickTwo.active && number == rules.pickTwo.card){
 
             console.log("pick 2")
 
             this.goMarket(this.playerOneCard, 2) 
 
-            this.play(this.state)
+            await this.play(this.state)
 
-        }else if(rules.pickThree.active && number == rules.pickThree.card){
+        } else if(rules.pickThree.active && number == rules.pickThree.card){
 
             console.log("pick 3")
 
             this.goMarket(this.playerOneCard, 3) 
 
-            this.play(this.state)
+            await this.play(this.state)
 
         }else if(rules.suspension.active && number == rules.suspension.card){
 
             console.log("suspension")
 
-            this.play(this.state)
+            await this.play(this.state)
 
         }else if(rules.generalMarket.active && number == rules.generalMarket.card){
 
@@ -228,7 +407,7 @@ class GamePlay extends GameEngine{
 
             this.goMarket(this.playerOneCard, 1) 
 
-            this.play(this.state)
+            await this.play(this.state)
 
         }else{
 
@@ -237,7 +416,16 @@ class GamePlay extends GameEngine{
                 this.res.send(this.moves)
             }else{
 
-                this.res.send({gameState: this.firstGameState, moves: this.moves})
+                const agent = await Agents.findOne({agentName: this.playerTwoName})//.then((data, err)=>{
+
+                this.res.send(
+                    {
+                        gameState: this.firstGameState, 
+                        moves: this.moves, 
+                        agentInfo: agent,
+                        playerInfo: guest
+                    })
+                
             }
 
         }
@@ -252,18 +440,73 @@ class GamePlay extends GameEngine{
     }
 
     /**
+     * This method deals with available moves when Whot:20 card is involved
+     * @param {*} agent current agent property object
+     * @param {*} playerCard current player cards at hand
+     * @returns array of available moves for whot
+     */
+
+    whotAvailableMoves(agent, playerCard){
+
+        let availableMove = []
+
+        if(!agent.canNeedAnyCard && playerCard.length > 1) {
+    
+            for(let i = 0; i < playerCard.length; i++){
+
+                let index = playerCard[i].indexOf(":") + 1
+                let shape = playerCard[i].slice(0, index)
+
+                if(playerCard[i] !== "whot:20") {
+
+                    for(let i = 0; i < availableMove.length; i++) {
+
+                        if(availableMove[i] === shape + "20") break
+
+                        if(i + 1 === availableMove.length) availableMove.push(shape + "20")
+
+                    }
+
+                    if(availableMove.length === 0){
+                        availableMove.push(shape + "20")
+                    }
+
+                }
+
+            }
+
+        } else {
+            
+            availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+
+        }
+
+        return availableMove.sort()
+    }
+
+    /**
      * This method search for valid moves           
      * @param {*} playerCard cards of the player that is to make a move
      * @param {*} inPlayCard last card played
      * @returns an array all valid moves that can be mades
      */    
-    availableMoves(playerCard, inPlayCard){
+    availableMoves(playerCard, inPlayCard, playerName){
 
         let index_in = inPlayCard.indexOf(":") + 1
         let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
         let shape_in = inPlayCard.slice(0, index_in)
     
         let availableMove = ["z:goMarket"]
+
+        if(playerName === this.agentOne.agentName){
+
+            if(!this.agentOne.canGoMarket) availableMove = []
+
+        }else{
+
+            if(!this.agentTwo.canGoMarket) availableMove = []
+       
+        } 
     
         for(let i = 0; i < playerCard.length; i++){
              
@@ -275,7 +518,17 @@ class GamePlay extends GameEngine{
     
                 availableMove.sort()
     
-                availableMove.push("circle:20", "cross:20", "square:20", "star:20", "triangle:20")
+                    //determines the agent that is playing and if the agent can need any card
+                    if(playerName === this.agentOne.agentName){
+
+                        availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
+    
+                    }else{
+    
+                        availableMove.push(...this.whotAvailableMoves(this.agentOne, playerCard))
+                
+                    }
+
                 
                 return availableMove
     
@@ -300,7 +553,9 @@ class GamePlay extends GameEngine{
      * method from the GameEngine class
      * @param {*} state current game state gotten from the client
      */
-    play(state){
+    async play(state, playerName = this.agentTwo.agentName){
+
+        console.log(" __________________ " + playerName)
         
         let gameState = state.gameState
 
@@ -318,13 +573,13 @@ class GamePlay extends GameEngine{
         this.playerTwoName = this.playerTwo.name
         this.playerTwoCard = this.playerTwo.cardAtHand
 
-        this.availableMove = this.availableMoves(this.playerTwoCard, this.cardPlayed[this.cardPlayed.length - 1])
+        this.availableMove = this.availableMoves(this.playerTwoCard, this.cardPlayed[this.cardPlayed.length - 1], playerName)
 
         this.noOfCardsWithPlayerOne = gameState.playerOne.cardAtHand.length
         
         this.gameRules = gameState.rules
 
-        if(this.availableMove.length === 1){
+        if(this.availableMove.length === 0){
        
             this.goMarket(this.playerTwoCard, 1) 
 
@@ -333,12 +588,16 @@ class GamePlay extends GameEngine{
             if(!this.start){
                 //send the move made to the client
                 this.res.send(this.moves)
-            }else{
 
-                this.res.send({gameState: this.firstGameState, moves: this.moves})
+            } else {
+
+                const agent = await Agents.findOne({agentName: this.playerTwoName});
+
+                this.res.send({gameState: this.firstGameState, moves: this.moves, agentInfo: agent});
+   
             }
             
-        }else{
+        } else {
             //search for states
             super.stateFinder(this.playerTwoName, this.cardPlayed, this.playerTwoCard, this.noOfCardsWithPlayerOne, this.availableMove, this.playerMove, this.market.length, this.gameRules)
         }
@@ -440,7 +699,6 @@ class GamePlay extends GameEngine{
 
         for(let i = 0; i < times; i ++){
 
-
             if(this.market.length > 0){
 
                 player.push(this.market[this.market.length - 1])
@@ -462,13 +720,13 @@ class GamePlay extends GameEngine{
      */
     checkGame(){
 
-        if(this.player1.length < 1 || this.player2.length < 1){
+        if(this.playerOneCard.length < 1 || this.playerTwoCard.length < 1){
 
-            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            super.rewards(this.agentOne, this.agentTwo, this.playerOneCard, this.playerTwoCard, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
 
         }else if(this.market.length < 1){
    
-            super.rewards(this.agentOne, this.agentTwo, this.player1, this.player2, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
+            super.rewards(this.agentOne, this.agentTwo, this.playerOneCard, this.playerTwoCard, this.actionOneNew, this.actionOneOld, this.actionTwoNew, this.actionTwoOld)
             
             //
             let inPlay = copyArray(this.inPlay)

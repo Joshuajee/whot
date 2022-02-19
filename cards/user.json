@@ -1,0 +1,15 @@
+{
+    "agentName": "Guest",
+    "createdBy": "Guest",
+    "canGoMarket": true,
+    "canNeedAnyCard": true,
+    "useCardAtHand": true,
+    "useCardInPlay": true,
+    "useCardPlayed": true,
+    "useNoOfCardAtHand": true,
+    "useNoOfCardPlayed": true,
+    "useNoOfCardsInMarket": true,
+    "useNoOfCardsWithOpponent": true,
+    "useAvailableMove": true,
+    "useRules": true
+  }
