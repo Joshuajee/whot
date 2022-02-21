@@ -1,6 +1,6 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
@@ -10,7 +10,6 @@
 
 import Start from "../Componets/Background/Start";
 import Button from "../Componets/Button";
-import Modal from "../Componets/Modal";
 
 
 const Home = () => {
@@ -19,7 +18,7 @@ const Home = () => {
     let height = window.innerHeight * 0.25
 
     const style = {
-        marginTop:height
+        marginTop:  height
     }
 
     return(
@@ -38,8 +37,6 @@ const Home = () => {
                 <Button text={"Create Agent"} link={"/create-agent"} class={"btn-create"}/>
 
                 <Button text={"Settings"} link={"/settings"} class={"btn-settings"}/>
-
-                <Modal/>
                 
             </div>
             

@@ -42,14 +42,14 @@ const Player = (props) => {
             
         } else {
 
-            setCardSize(width / (4 * 1.5));
+            setCardSize(width / (4 * 1.4));
             setTop(props.top * width - cardSize);
             setMargin(height * 0.1408);
             setCardSpaceAvailable((height  - margin * 2));
 
         }
 
-    }, [props.top, width, height, cardSize, isLandscape]);
+    }, [props.top, width, height, cardSize, isLandscape, margin]);
 
     useEffect(() => {
 
@@ -110,8 +110,7 @@ const Player = (props) => {
         }
 
         return cardArray;
-
-   }
+    }
 
     return(
         <div style={style}>

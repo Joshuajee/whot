@@ -29,7 +29,7 @@ const Market = (props) =>  {
         } else {
             setCardSize(width / (4 * 1.5));
             style.top = (width / 2) - cardSize;
-            style.left = height * 0.05;
+            style.left = height * 0.15;
         }
 
         setStyle(style);

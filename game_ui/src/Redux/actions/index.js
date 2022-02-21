@@ -1,4 +1,4 @@
-import { GAME_STATE, PLAYER_ONE_ACTION, PLAYER_ONE_STATE, PLAYER_TWO_ACTION, PLAYER_TWO_STATE, REMOVE_LAST } from "../constants/action-types";
+import { EMPTY, GAME_STATE, PLAYER_ONE_ACTION, PLAYER_ONE_STATE, PLAYER_TWO_ACTION, PLAYER_TWO_STATE, REMOVE_LAST } from "../constants/action-types";
 
 
 export function updateGameState(payload) {
@@ -30,3 +30,9 @@ export function removeLast(payload) {
   console.log("Remove Last", payload)
   return { type: REMOVE_LAST, payload };
 }
+
+export function empty() {
+  console.log("Empty ");
+  return { type: EMPTY };
+}
+

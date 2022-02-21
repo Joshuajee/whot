@@ -79,15 +79,16 @@ app.use("/api/v1/", apiRoutes);
 //serve static asset
 app.use(express.static(path.join(__dirname, 'game_ui/build')));
 
-//app.use(express.static("game_ui/build"))
-
-
 //handle any route that is missing from the Server
-app.get('*', (req, res) =>{  
+app.get('/', (req, res) =>{  
   res.sendFile(path.resolve(__dirname, "game_ui", "build", "index.html"))
   console.log(path.resolve(__dirname, "game_ui", "build", "index.html"))
 })
 
+app.get('/*', (req, res) =>{  
+  res.sendFile(path.resolve(__dirname, "game_ui", "build", "index.html"))
+  console.log(path.resolve(__dirname, "game_ui", "build", "index.html"))
+})
 
 
 

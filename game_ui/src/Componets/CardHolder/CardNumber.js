@@ -7,13 +7,6 @@
  */
 
 
-const CardNumber = (props) => {
+const CardNumber = (props) => <div className="card-number">{props.cardNumber}</div>;
 
-    return(
-        <div className="card-number">
-            {props.cardNumber}
-        </div>
-    )
-}
-
-export default CardNumber
+export default CardNumber;

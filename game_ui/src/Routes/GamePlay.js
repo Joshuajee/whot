@@ -19,7 +19,7 @@ import Market from "../Componets/CardHolder/Market";
 import Player from "../Componets/CardHolder/Player";
 import Need from "../Componets/CardHolder/Need";
 import Loader from "../Componets/Loader";
-//import Modal from "../Componets/Modal";
+import Modal from "../Componets/Modal";
 
 import { useSelector, useDispatch } from "react-redux";
 import { removeLast, updateGameState, updatePlayerOneActions, updatePlayerOneStates, updatePlayerTwoActions } from "../Redux/actions";
@@ -47,7 +47,7 @@ const GamePlay = () => {
     const [width, setWidth] = useState(window.innerWidth);
     const [playerOneData, setPlayerOneData] = useState({});
     const [playerTwoData, setPlayerTwoData] = useState({});
-    //const [error, setError] = useState(null)
+    const [modal, setModal] = useState(null)
     const [isNeeded, setIsNeeded] =  useState(false);
     const [playerCard, setPlayerCard] = useState([]);
     const [opponetCard, setOpponetCard] = useState([]);
@@ -111,11 +111,11 @@ const GamePlay = () => {
 
             setOpponetMoves(data.moves);
 
-        }).catch(error => {
+        },err => {
 
-            console.log(error)
-    
-            alert(error)
+            console.log(err);
+
+            setModal({ type: 'Network Error',  text: err});
         })
 
     }, [dispatch, user]);
@@ -181,7 +181,7 @@ const GamePlay = () => {
 
             dispatch(updatePlayerTwoActions(...response));
     
-        }).catch((error) =>{
+        }, err =>{
 
             //undo last move
             undoMove(gameState, card, playerOneStates, playerOneActions, dispatch);
@@ -189,8 +189,8 @@ const GamePlay = () => {
             //remove loader and transfer game control back to player
             setIsLoading(false);
             setOpponetIsPlaying(false);
-
-            alert(error)
+    
+            setModal({ type: 'Network Error',  text: err});   
             
         });
 
@@ -236,7 +236,7 @@ const GamePlay = () => {
 
                 dispatch(updatePlayerTwoActions(...response));
                 
-            }).catch((error) =>{
+            }, err =>{
 
                 //undo last move
                 undoMove(gameState, card, playerOneStates, playerOneActions, dispatch);
@@ -245,7 +245,7 @@ const GamePlay = () => {
                 setIsLoading(false);
                 setOpponetIsPlaying(false);
 
-                alert(error);
+                setModal({ type: 'Network Error',  text: err});
 
             });
 
@@ -287,7 +287,7 @@ const GamePlay = () => {
      
                             dispatch(updatePlayerTwoActions(...response));
 
-                        }).catch((error) => {
+                        }, err => {
 
                             //undo last move
                             undoMove(gameState, card, playerOneStates, playerOneActions, dispatch);
@@ -296,7 +296,7 @@ const GamePlay = () => {
                             setIsLoading(false);
                             setOpponetIsPlaying(false);
 
-                            alert(error)
+                            setModal({ type: 'Network Error',  text: err});
 
                         })
 
@@ -312,7 +312,9 @@ const GamePlay = () => {
 
                 setIsLoading(false);
 
-                alert("illegal move")
+                setModal("illegal move");
+
+                setModal({ type: 'Error',  text: "illegal move"});
     
             }
 
@@ -334,34 +336,41 @@ const GamePlay = () => {
     }, [gameState]);
 
     useEffect(() => {
-        checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
+        checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch, setModal);
     }, [gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch])
 
 
-    if (isLoading) return(<center  style={gameArea} className="game-table"><Loader /> </center>)
-
     return(
         <div style={style}>
-        {
-        //    <Modal text={"Network Error"} close={close} visibility={visibility} />
-        }
-            <center style={gameArea} className="game-table">
 
-                <div style={gameArea}>
+            {
+                isLoading ? 
 
-                    <Player top={0.2} isLandscape={isLandscape} angle={180} height={height} width={width} cards={opponetCard} action={playCard} playable={false} index={playerTwoCardIndex} />
+                    (<center style={gameArea} className="game-table">
+                        <Loader height={height} width={width} isLandscape={isLandscape} />
+                    </center>) :
 
-                    <Player top={0.8} isLandscape={isLandscape}  angle={0} height={height} width={width} cards={playerCard} action={playCard} playable={!opponetIsPlaying} index={playerOneCardIndex}/>
-        
-                    { inPlay && <InPlay isLandscape={isLandscape} height={height} width={width} className="center" cards={inPlay} cardNumber={cardPlayed?.length} />  }
+                    (<center style={gameArea} className="game-table">
 
-                    <Market action={playCard} isLandscape={isLandscape} height={height} width={width} playable={!opponetIsPlaying} cardNumber={gameState.market.length} />
+                        <div style={gameArea}>
+
+                            <Player top={0.2} isLandscape={isLandscape} angle={180} height={height} width={width} cards={opponetCard} action={playCard} playable={false} index={playerTwoCardIndex} />
+
+                            <Player top={0.8} isLandscape={isLandscape}  angle={0} height={height} width={width} cards={playerCard} action={playCard} playable={!opponetIsPlaying} index={playerOneCardIndex}/>
                 
-                </div>
+                            { inPlay && <InPlay isLandscape={isLandscape} height={height} width={width} className="center" cards={inPlay} cardNumber={cardPlayed?.length} />  }
 
-            </center>
+                            <Market action={playCard} isLandscape={isLandscape} height={height} width={width} playable={!opponetIsPlaying} cardNumber={gameState.market.length} />
+                        
+                        </div>
+                    
+                    </center>)
 
-            { isNeeded && <Need need={needed}/> }
+            }
+
+            { isNeeded && <Need need={needed} isLandscape={isLandscape} height={height} width={width} /> }
+
+            { modal && <Modal height={height} width={width} text={"Error"} close={setModal} content={modal} /> }
 
         </div>
 
