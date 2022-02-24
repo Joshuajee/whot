@@ -13,13 +13,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import chooseCard from "../../GameLogic/chooseCard";
 import CardNumber from "./CardNumber";
+import { useDispatch, useSelector } from "react-redux";
+import { updatePlayerOneCardIndex, updatePlayerTwoCardIndex } from "../../Redux/actions";
+
+const CARD_PADDING = 1.1;
 
 
 const Player = (props) => {
 
-    const { cards, action, playable, index, isLandscape, width, height } = props;
+    const { cards, action, playable, isPlayerOne, angle } = props;
 
-    const [start, setStart] = useState(index);
+    const { height, width, isLandscape, playerOneCardIndex, playerTwoCardIndex, gameState } = useSelector((state) => state);
+
+    const [start, setStart] = useState(0);
     const [margin, setMargin] =  useState(0);
     const [cardSpaceAvailable, setCardSpaceAvailable] = useState(0);
     const [style, setStyle] = useState({});
@@ -29,54 +35,114 @@ const Player = (props) => {
     const [top, setTop] =  useState(0);
     const [noOfCardsThatCanBeDisplayed, setNoOfCardsThatCanBeDisplayed] =  useState(0);
     const [navStyle, setNavStyle] = useState({});
-    
-    
+    const [noOfVisibelCards, setNoOfVisibleCards] = useState(0);
+    const [playerCards, setPlayerCard] = useState([]);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+
+        if (isPlayerOne) {
+            setStart(playerOneCardIndex);
+        } else {
+            setStart(playerTwoCardIndex);
+        }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isPlayerOne]);
+
+    useEffect(() => {
+
+        if (isPlayerOne) {
+            dispatch(updatePlayerOneCardIndex(start));
+        } else {
+            dispatch(updatePlayerTwoCardIndex(start));
+        }
+
+    }, [start, isPlayerOne, dispatch]);
+
+    useEffect(() => {
+
+        if (isLandscape) {
+            setCardSize(height / (4 * 1.5));
+        } else {
+            setCardSize(width / (4 * 1.4));
+        }
+
+    }, [width, height, isLandscape, gameState]);
+
     useEffect(() => {
 
         if (isLandscape) {
 
-            setCardSize(height / (4 * 1.5));
             setTop(props.top * height - cardSize);
-            setMargin(width * 0.05);
-            setCardSpaceAvailable((width  - margin * 2));
+            setCardSpaceAvailable((width * 0.8));
             
         } else {
 
-            setCardSize(width / (4 * 1.4));
             setTop(props.top * width - cardSize);
-            setMargin(height * 0.1408);
-            setCardSpaceAvailable((height  - margin * 2));
+            setCardSpaceAvailable((height * 0.8));
 
         }
 
-    }, [props.top, width, height, cardSize, isLandscape, margin]);
+    }, [props.top, width, height, cardSize, isLandscape]);
 
     useEffect(() => {
 
-        setNoOfCardsThatCanBeDisplayed(cardSpaceAvailable / (cardSize * 1.1))
+        setNoOfCardsThatCanBeDisplayed(Math.floor(cardSpaceAvailable / (cardSize * CARD_PADDING)));
         setNavStyle({height: cardSize * 1.5});
 
-    }, [cardSize, cardSpaceAvailable, width, margin]);
+    }, [cardSize, cardSpaceAvailable]);
 
     useEffect(() => {
-        
+        setNoOfVisibleCards(Math.floor(noOfCardsThatCanBeDisplayed > cards.length) ? cards.length : noOfCardsThatCanBeDisplayed);
+    }, [noOfCardsThatCanBeDisplayed, cards.length]);
+
+    useEffect(() => {
+
+        if (isLandscape) {
+
+            setMargin((width - (cardSize * CARD_PADDING * noOfVisibelCards)) / 2);
+            
+        } else {
+
+            setMargin((height - (cardSize * CARD_PADDING * noOfVisibelCards)) / 2);
+
+        }
+
+
+    }, [cardSize, isLandscape, noOfVisibelCards, width, height]);
+    
+
+    console.log(angle, " available ", cardSpaceAvailable)
+
+    console.log(angle, " margin ", margin)
+
+    console.log(angle, " cards ", cards.length)
+
+    console.log(angle, " No of cards Displayed ", noOfCardsThatCanBeDisplayed)
+
+    console.log(angle, " No of v cards ", noOfVisibelCards)
+
+    useEffect(() => {
+
         const style = {
             position: "absolute",
             top: top,
             left: margin,
-            width: cardSpaceAvailable,  
+            width: (cardSize * CARD_PADDING * noOfVisibelCards),  
             height: cardSize
         };
 
         setStyle(style);
 
-    }, [cardSize, cardSpaceAvailable, margin, top, height, width, isLandscape]);
+    }, [cardSize, margin, top, isLandscape, noOfVisibelCards, cards.length]);
 
     useEffect(() => {
 
-        if(start < cards.length - noOfCardsThatCanBeDisplayed) {
+        if(start < cards.length - noOfVisibelCards) {
 
-            setRight(<span style={{top:100}} onClick={() => { if(start < cards.length - noOfCardsThatCanBeDisplayed) { setStart(start + 1) } } } >
+            setRight(<span style={{top:100}} onClick={() =>  setStart(start + 1)  } >
                         <FontAwesomeIcon style={navStyle} color={"blue"} icon={faArrowRight} /> 
                     </span>);
         
@@ -93,15 +159,17 @@ const Player = (props) => {
             setLeft(null);
         }
 
-    }, [navStyle, start, cards, noOfCardsThatCanBeDisplayed]);
+    }, [navStyle, start, cards.length, noOfVisibelCards]);
 
-    const displayCards = (cards, cardSize, action, start=0) => {
-    
+    useEffect(() => {
+
         const cardArray = [];
+
+        cards.sort();
     
         for(let i = start; i < cards.length; i++){
            
-            if((i + 1 - start) * 1.1 * cardSize >= cardSpaceAvailable) break
+            if((i + 1 - start) * CARD_PADDING* cardSize >= cardSpaceAvailable) break
             
             if(playable)
                 cardArray.push(<span  key={i} onClick = {() => action([cards[i]])}> { chooseCard(cards[i], cardSize) } </span>)
@@ -109,18 +177,23 @@ const Player = (props) => {
                 cardArray.push(<span key={i} > { chooseCard(cards[i], cardSize) } </span>)
         }
 
-        return cardArray;
-    }
+        setPlayerCard(cardArray)
+
+    }, [start, cards, cardSpaceAvailable, action, cardSize, playable]);
+
+    console.log(angle, cardSpaceAvailable, ' --- ', start)
 
     return(
         <div style={style}>
 
             {left}
-            {displayCards(cards.sort(), cardSize, action, start)}  
+
+            {   playerCards }
+
             {right}
 
-            <CardNumber cardNumber={cards.length} />
-            
+            <CardNumber style={{}} cardNumber={cards.length} />
+
         </div>)
     
 }

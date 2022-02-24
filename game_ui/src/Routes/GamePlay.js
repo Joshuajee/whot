@@ -23,7 +23,7 @@ import Modal from "../Componets/Modal";
 
 import { useSelector, useDispatch } from "react-redux";
 import { removeLast, updateGameState, updatePlayerOneActions, updatePlayerOneStates, updatePlayerTwoActions } from "../Redux/actions";
-import { useParams } from "react-router";
+import { Redirect, useParams } from "react-router";
 
 const rules = {"holdOn":{"active":true, "card":1, "defend":false},
             "pickTwo":{"active":true, "card":2, "defend":false},
@@ -38,13 +38,10 @@ const GamePlay = () => {
     const { user } = useParams();
 
     const { gameState, playerOneStates, playerOneActions, playerTwoStates, 
-        playerTwoActions, playerOneCardIndex, playerTwoCardIndex
-        } = useSelector((state) => state);
+        playerTwoActions, height, width, isLandscape   } = useSelector((state) => state);
 
     const dispatch = useDispatch();
 
-    const [height, setHeight] = useState(window.innerHeight);
-    const [width, setWidth] = useState(window.innerWidth);
     const [playerOneData, setPlayerOneData] = useState({});
     const [playerTwoData, setPlayerTwoData] = useState({});
     const [modal, setModal] = useState(null)
@@ -56,69 +53,57 @@ const GamePlay = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [opponetIsPlaying, setOpponetIsPlaying] = useState(false);
     const [opponetMoves, setOpponetMoves] = useState([]);
-    const [isLandscape, setIsLandscape] = useState(true);
     const [style, setStyle] = useState({});
     const [gameArea, setGameArea] = useState({});
+    const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
 
-        window.onresize = () => {
-            setHeight(window.innerHeight);
-            setWidth(window.innerWidth);
-        }
+        if(isLandscape) {
 
-        window.onorientationchange = () => {
-            setHeight(window.innerHeight);
-            setWidth(window.innerWidth);
-        }
-
-    }, []);
-
-    useEffect(() => {
-
-        if(height > width) {
-
-            setIsLandscape(false);
-            setStyle({transform: 'rotate(90deg)'});
-            setGameArea({height: width * 0.98, width: height * 0.96 });
-
-        } else {
-
-            setIsLandscape(true);
             setStyle({});
             setGameArea({height: height * 0.97, width: width * 0.98 });
 
+        } else {
+
+            setStyle({transform: 'rotate(90deg)'});
+            setGameArea({height: width * 0.98, width: height * 0.96 });
+
         }
 
-    }, [height, width]);
-
+    }, [isLandscape, height, width]);
 
     useEffect(() => {
 
-        axios.post("/api/v1/start", {agentName: user, user: "Guest", rules: rules, start: 5}).then((res)=>{  
+        //alert((gameState?.playerTwo?.name !== user))
 
-            const data = res.data;
+        if (!gameState) {
+            setIsLoading(true);
+            axios.post("/api/v1/start", {agentName: user, user: "Guest", rules: rules, start: 5}).then((res)=>{  
 
-            dispatch(updateGameState(data.gameState));
+                const data = res.data;
 
-            setPlayerOneData(data.playerInfo);
+                dispatch(updateGameState(data.gameState));
 
-            setPlayerTwoData(data.agentInfo);
+                setPlayerOneData(data.playerInfo);
 
-            setIsLoading(false);
+                setPlayerTwoData(data.agentInfo);
 
-            setOpponetIsPlaying(false);
+                setIsLoading(false);
 
-            setOpponetMoves(data.moves);
+                setOpponetIsPlaying(false);
 
-        },err => {
+                setOpponetMoves(data.moves);
 
-            console.log(err);
+            },err => {
 
-            setModal({ type: 'Network Error',  text: err});
-        })
+                console.log(err);
 
-    }, [dispatch, user]);
+                setModal({ type: 'Network Error',  text: err});
+            });
+        }
+
+    }, [dispatch, gameState, user]);
 
     useEffect(() => {
 
@@ -312,65 +297,76 @@ const GamePlay = () => {
 
                 setIsLoading(false);
 
-                setModal("illegal move");
-
                 setModal({ type: 'Error',  text: "illegal move"});
     
             }
 
-        }
-        
+        }        
       
     }
 
     useEffect(() => {
 
-        setPlayerCard(gameState.playerOne.cardAtHand);
+        if(gameState) {
 
-        setOpponetCard(gameState.playerTwo.cardAtHand);
+            setPlayerCard(gameState.playerOne.cardAtHand);
 
-        setInplay(gameState.cardPlayed[gameState.cardPlayed.length - 1]);
+            setOpponetCard(gameState.playerTwo.cardAtHand);
 
-        setCardPlayed(gameState.cardPlayed);
+            setInplay(gameState.cardPlayed[gameState.cardPlayed.length - 1]);
+
+            setCardPlayed(gameState.cardPlayed);
+
+        }
 
     }, [gameState]);
 
     useEffect(() => {
-        checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch, setModal);
-    }, [gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch])
+        if(gameState) {
+            checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch, setModal);
+        }
+    }, [gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch]);
+
+    useEffect(() => {
+
+        if (gameState) {
+            if (gameState?.playerTwo?.name !== user) {
+                setRedirect(gameState?.playerTwo?.name);
+            }
+        }
+
+    }, [redirect, gameState, user]);
 
 
     return(
         <div style={style}>
 
+            { redirect && <Redirect to={`/game/${redirect}`}/> }
+
             {
                 isLoading ? 
 
-                    (<center style={gameArea} className="game-table">
+                    (<div style={gameArea} className="game-table">
                         <Loader height={height} width={width} isLandscape={isLandscape} />
-                    </center>) :
+                    </div>) :
 
-                    (<center style={gameArea} className="game-table">
+                    (<div style={gameArea} className="game-table">
 
-                        <div style={gameArea}>
+                        <Player top={0.2} angle={180} cards={opponetCard} action={playCard} playable={false} />
 
-                            <Player top={0.2} isLandscape={isLandscape} angle={180} height={height} width={width} cards={opponetCard} action={playCard} playable={false} index={playerTwoCardIndex} />
+                        <Player top={0.8} angle={0} cards={playerCard} action={playCard} playable={!opponetIsPlaying} isPlayerOne />
+            
+                        { inPlay && <InPlay  className="center" card={inPlay} cardNumber={cardPlayed?.length} />  }
 
-                            <Player top={0.8} isLandscape={isLandscape}  angle={0} height={height} width={width} cards={playerCard} action={playCard} playable={!opponetIsPlaying} index={playerOneCardIndex}/>
-                
-                            { inPlay && <InPlay isLandscape={isLandscape} height={height} width={width} className="center" cards={inPlay} cardNumber={cardPlayed?.length} />  }
-
-                            <Market action={playCard} isLandscape={isLandscape} height={height} width={width} playable={!opponetIsPlaying} cardNumber={gameState.market.length} />
-                        
-                        </div>
+                        <Market action={playCard} playable={!opponetIsPlaying} cardNumber={gameState?.market?.length} />
                     
-                    </center>)
+                    </div>)
 
             }
 
-            { isNeeded && <Need need={needed} isLandscape={isLandscape} height={height} width={width} /> }
+            { isNeeded && <Need need={needed} /> }
 
-            { modal && <Modal height={height} width={width} text={"Error"} close={setModal} content={modal} /> }
+            { modal && <Modal close={setModal} content={modal} /> }
 
         </div>
 

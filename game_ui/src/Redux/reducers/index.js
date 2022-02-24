@@ -1,4 +1,4 @@
-import {    EMPTY, GAME_STATE, PLAYER_ONE_ACTION, PLAYER_ONE_INDEX, PLAYER_ONE_STATE, PLAYER_TWO_ACTION, PLAYER_TWO_INDEX, PLAYER_TWO_STATE, REMOVE_LAST,   } from "../constants/action-types";
+import {    EMPTY, GAME_STATE, HEIGHT, IS_LANDSCAPE, PLAYER_ONE_ACTION, PLAYER_ONE_INDEX, PLAYER_ONE_STATE, PLAYER_TWO_ACTION, PLAYER_TWO_INDEX, PLAYER_TWO_STATE, REMOVE_LAST, WIDTH,   } from "../constants/action-types";
 import defaults from "./../../GameEnv/cards/defaults";
 
 const initials = defaults();
@@ -11,9 +11,11 @@ const initialState = {
     playerTwoActions: initials.playerTwoActions,
     playerOneCardIndex: initials.playerOneCardIndex,
     playerTwoCardIndex: initials.playerTwoCardIndex,
+    height: window.innerHeight,
+    width: window.innerWidth,
+    isLandscape: true
 };
   
-console.log(initialState)
 function rootReducer(state = initialState, action) {
 
     console.log("Action Type", action.type)
@@ -32,7 +34,7 @@ function rootReducer(state = initialState, action) {
         case PLAYER_TWO_ACTION:
             return { ...state, playerTwoActions: [...state.playerTwoActions, payload] }
         case PLAYER_ONE_INDEX:
-            return { ...state, playerOneIndex: payload }
+            return { ...state, playerOneCardIndex: payload }
         case PLAYER_TWO_INDEX:
             return { ...state, playerTwoIndex: payload }
         case REMOVE_LAST:
@@ -46,6 +48,12 @@ function rootReducer(state = initialState, action) {
             state.playerTwoStates = [];
 
             return state
+        case HEIGHT:
+            return { ...state, height: payload }
+        case WIDTH:
+            return { ...state, width: payload }
+        case IS_LANDSCAPE:
+            return { ...state, isLandscape: payload }
         default:
             return state
     }

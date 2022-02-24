@@ -10,11 +10,15 @@
 import React from 'react';
 import chooseCard from "../../GameLogic/chooseCard";
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 
 const Need = (props) =>{
 
-    const { need, isLandscape, height, width } = props;
+    const { need } = props;
+
+    const { height, width, isLandscape } = useSelector((state) => state);
+
 
     const [area, setArea] = useState(0);
     const [size, setSize] = useState(0)

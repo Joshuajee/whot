@@ -7,3 +7,6 @@ export const PLAYER_ONE_INDEX = "PLAYER_ONE_INDEX";
 export const PLAYER_TWO_INDEX = "PLAYER_TWO_INDEX";
 export const REMOVE_LAST = "REMOVE_LAST";
 export const EMPTY = "EMPTY";
+export const HEIGHT = "HEIGHT";
+export const WIDTH = "WIDTH";
+export const IS_LANDSCAPE = "IS_LANDSCAPE";

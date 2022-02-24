@@ -7,14 +7,19 @@
  */
 
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import chooseCard from "../../GameLogic/chooseCard";
 import CardNumber from "./CardNumber"
 
 const Market = (props) =>  {
 
-    const { height, width, playable, action, cardNumber, isLandscape } = props;
+    const { playable, action, cardNumber } = props;
+
+    const { height, width, isLandscape } = useSelector((state) => state);
+
     const [style, setStyle] = useState({});
-    const [cardSize, setCardSize] = useState(0)
+    const [cardSize, setCardSize] = useState(0);
+
 
     useEffect(() => {
 

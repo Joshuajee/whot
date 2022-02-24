@@ -8,6 +8,7 @@
 
 
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import chooseCard from "../../GameLogic/chooseCard";
 import CardNumber from "./CardNumber";
 
@@ -16,14 +17,16 @@ import CardNumber from "./CardNumber";
 
 const InPlay = (props) => {
 
-    const { height, width, isLandscape } = props;
+    const { card, cardNumber } = props;
+
+    const { height, width, isLandscape } = useSelector((state) => state);
 
     const [cardSize, setCardSize] = useState(0);
     const [style, setStyle] = useState({});
+    const [need, setNeed] = useState(null);
 
     useEffect(() => {
 
-        
         const style = {
             position: "absolute",
             top: (height / 2) - cardSize,
@@ -42,13 +45,31 @@ const InPlay = (props) => {
 
     }, [height, width, cardSize, isLandscape]);
 
+    useEffect(() => {
+
+        const index = card.indexOf(":") + 1;
+        const cardNumber = parseInt(card.slice(index, card.length));
+
+        if (cardNumber === 20)
+            setNeed(card.slice(0, index - 1));
+        else 
+            setNeed(null);
+
+    }, [card]);
+
     return(
         <div style={style}>
-            { chooseCard(props.cards, cardSize) }
-            <CardNumber cardNumber={props.cardNumber} />
+            { need && 
+                <div className="needed-card" 
+                    style={{top: cardSize / 1.6, width: cardSize}}>
+                    {need} 
+                </div>
+            }
+
+            { chooseCard(card, cardSize) }
+            <CardNumber cardNumber={cardNumber} />
         </div>
         )
-
 }
 
 export default InPlay

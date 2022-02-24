@@ -27,30 +27,31 @@ input[type=submit]:hover {
 }
 
 .container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.container form {
   border-radius: 5px;
-  background-color: #f2f2f2;
   padding: 20px;
-  width: 90%;
-  margin-top: 15vh;
+  background-color: whitesmoke;
+  border: 5px solid whitesmoke;
+  height:  80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .col-25 {
-  float: left;
   width: 25%;
   margin-top: 6px;
+  display: inline-block;
 }
 
 .col-75 {
-  float: left;
+  display: inline-block;
   width: 75%;
   margin-top: 6px;
-}
-
-/* Clear floats after the columns */
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
 }
 
 /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */

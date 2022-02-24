@@ -10,13 +10,14 @@
 import { useState, useEffect } from "react";
 import chooseCard from "../GameLogic/chooseCard";
 import Cards from "../GameEnv/cards/index.json";
+import { useSelector } from "react-redux";
 
 const cards = [...Cards.cards];
 
 
 const Loader = (props)  => {
 
-    const { width, height, isLandscape } = props;
+    const { height, width, isLandscape } = useSelector((state) => state);
     const [cardSize, setCardSize] = useState(0);
     const [style, setStyle] = useState({});
     const cardIndex = Math.floor(Math.random() * cards.length);

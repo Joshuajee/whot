@@ -1,11 +1,14 @@
 import {BrowserRouter, Route} from 'react-router-dom';
-
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from 'react';
 import Home from "./Routes/Home";
 import Rules from "./Routes/Rules";
 import Leaderboard from "./Routes/Leaderboard";
 import Settings from "./Routes/Settings";
 import GamePlay from "./Routes/GamePlay";
 import CreateAgent from "./Routes/CreateAgent";
+import { setHeight, setIsLandscape, setWidth } from './Redux/actions';
+
 
 const home =  () => <Home />
 const rules =  () => <Rules />
@@ -16,6 +19,34 @@ const createAgent = () => <CreateAgent />
 
 
 const App = () => {
+
+    const { height, width } = useSelector((state) => state);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+
+        window.onresize = () => {
+            dispatch(setHeight(window.innerHeight));
+            dispatch(setWidth(window.innerWidth));
+        }
+
+        window.onorientationchange = () => {
+            dispatch(setHeight(window.innerHeight));
+            dispatch(setWidth(window.innerWidth));
+        }
+
+    }, [dispatch]);
+
+    useEffect(() => {
+
+        if(height > width) {
+            dispatch(setIsLandscape(false));
+        } else {
+            dispatch(setIsLandscape(true));
+        }
+
+    }, [height, width, dispatch]);
 
     return(
         <BrowserRouter>

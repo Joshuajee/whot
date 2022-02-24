@@ -1,5 +1,5 @@
 /**
- * @author Joshua Emmanuel Evuetapha
+ * @author Joshua Evuetapha
  * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
@@ -73,7 +73,7 @@ const CreateAgent = () => {
     if(isLoading) return (<Loader />);
     
     return(
-        <center>
+        <>
  
             <Start />
             
@@ -147,7 +147,7 @@ const CreateAgent = () => {
 
             </div>
             
-        </center>
+        </>
      )
  
  }

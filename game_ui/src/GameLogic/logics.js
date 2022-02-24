@@ -285,12 +285,12 @@ export function checkGameState(gameState, playerOneStates, playerOneActions, pla
 
         if(gameState.playerOne.cardAtHand < 1){
 
-            setModal({ type: 'Game End',  text: gameState.playerOne.name + " Wins "});
+            setModal({ type: 'Game End',  text: gameState.playerOne.name + " Wins ", endGame: true});
         } 
     
         if(gameState.playerTwo.cardAtHand < 1){
 
-            setModal({ type: 'Game End',  text: gameState.playerTwo.name + " Wins "});
+            setModal({ type: 'Game End',  text: gameState.playerTwo.name + " Wins ", endGame: true});
         } 
     
     }else if(market.length < 1) {
