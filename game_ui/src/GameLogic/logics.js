@@ -7,7 +7,7 @@
  */
 
 import axios from "axios";
-import { removeLast, updateGameState, updatePlayerTwoStates } from "../Redux/actions";
+import { empty, removeLast, updateGameState, updatePlayerTwoStates } from "../Redux/actions";
 
 
 var MOVE_WAITING_PERIOD = 1500
@@ -262,7 +262,7 @@ function handleResponse(index, response, gameState, playerTwoState, agent, dispa
  * @param {*} gameState object of the current game state
  */
 
-export function checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch){
+export function checkGameState(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch, setModal){
 
     const newGameState = {...gameState};
 
@@ -273,29 +273,29 @@ export function checkGameState(gameState, playerOneStates, playerOneActions, pla
     const market = newGameState.market;
 
     const cardPlayed = newGameState.cardPlayed;
-
+/*
     console.log(" state 1", playerOneStates);
     console.log(" state 2", playerTwoStates);
     console.log(" action 1", playerOneActions);
     console.log(" action 2", playerTwoActions);
-
+*/
     if(playerOneCards.length < 1 || playerTwoCards.length < 1)  {
 
-        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
+        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch, setModal);
 
         if(gameState.playerOne.cardAtHand < 1){
 
-            alert(gameState.playerOne.name + " Wins ")
+            setModal({ type: 'Game End',  text: gameState.playerOne.name + " Wins ", endGame: true});
         } 
     
         if(gameState.playerTwo.cardAtHand < 1){
-    
-            alert(gameState.playerTwo.name + " Wins ")
+
+            setModal({ type: 'Game End',  text: gameState.playerTwo.name + " Wins ", endGame: true});
         } 
     
     }else if(market.length < 1) {
 
-        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch);
+        rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch, setModal);
 
         const inPlay = sanitizeCardPlayed(cardPlayed);
 
@@ -381,15 +381,11 @@ export function undoMove(gameState, card, playerOneStates, playerOneActions, dis
 }
 
 
-export function rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch) {
+export function rewards(gameState, playerOneStates, playerOneActions, playerTwoStates, playerTwoActions, dispatch, setModal) {
 
-    let playerOneStateAndAction = separateStateAndAction(playerOneStates, playerOneActions)
-    let playerTwoStateAndAction = separateStateAndAction(playerTwoStates, playerTwoActions)
+    let playerOneStateAndAction = separateStateAndAction(playerOneStates, playerOneActions);
+    let playerTwoStateAndAction = separateStateAndAction(playerTwoStates, playerTwoActions);
 
-
-    console.log("PPPPPPPPPPPPPPPPPPPP")
-    console.log(playerOneStates)
-    console.log(playerOneActions)
 
     axios.post("/api/v1/save", 
         {
@@ -402,12 +398,16 @@ export function rewards(gameState, playerOneStates, playerOneActions, playerTwoS
         ).then((res)=>{  
 
         console.log(res)
+        //empty state array
+        dispatch(empty());
         
-    }).catch(error => {
+        
+    }, err => {
 
-        console.log(error)
+        console.log(err)
 
-        alert(error)
+        setModal({ type: 'Network Error',  text: err});
+        
     })
 
 }

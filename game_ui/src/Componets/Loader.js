@@ -1,37 +1,52 @@
 /**
- * @author Joshua Emmanuel Evuetapha
- * @copyright (C) 2021 Joshua Evuetapha
+ * @author Joshua Evuetapha
+ * @copyright (C) 2022 Joshua Evuetapha
  * @twitter  evuetaphajoshua
  * @github   Joshuajee
  * @license MIT This program is distributed under the MIT license
  */
 
 
+import { useState, useEffect } from "react";
+import chooseCard from "../GameLogic/chooseCard";
+import Cards from "../GameEnv/cards/index.json";
+import { useSelector } from "react-redux";
 
-import chooseCard from "../GameLogic/chooseCard"
-import Cards from "../GameEnv/cards/index.json"
+const cards = [...Cards.cards];
 
-var cards = [...Cards.cards]
 
-function Loader(props) {
+const Loader = (props)  => {
 
-    let width = window.innerWidth
-    let height = window.innerHeight
-    let cardSize = height/5
+    const { height, width, isLandscape } = useSelector((state) => state);
+    const [cardSize, setCardSize] = useState(0);
+    const [style, setStyle] = useState({});
+    const cardIndex = Math.floor(Math.random() * cards.length);
 
-    let cardIndex = Math.floor(Math.random() * cards.length)
+    useEffect(() => {
 
-    const style = {
-        position:"absolute",
-        top:height/2 - cardSize,
-        left:width/2 - cardSize * 0.6666666667
-    }
+        if (isLandscape) {
+            setCardSize(height / 5);
+            setStyle({
+                position:"absolute",
+                top: (height / 2) - cardSize,
+                left: (width / 2) - cardSize * 0.6666666667
+            });
+        } else {
+            setCardSize(width / 5);
+            setStyle({
+                position:"absolute",
+                top: (width / 2) - cardSize,
+                left: (height / 2) - cardSize * 0.6666666667
+            });
+        }
+
+    }, [height, width, cardSize, isLandscape]);
 
     return(
         <div style={style} className="loader">
             {chooseCard(cards[cardIndex], cardSize)}
         </div>
-        )
+    );
 }
 
-export default Loader
+export default Loader;

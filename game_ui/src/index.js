@@ -11,6 +11,7 @@ import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import  "./Styles/styles.css";
 import "./Styles/need.css";
+import  "./Styles/modal.css"
 import reportWebVitals from './reportWebVitals';
 import store from './Redux/store';
 import App from './App';

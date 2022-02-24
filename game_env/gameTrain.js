@@ -41,11 +41,25 @@ class GameTrain extends GameEngine{
                 this.play(this.player2, this.player1, this.playerTwoName, this.playerOneName)
         })
 
-        super.on("received", async () =>{
+        super.on("received", async () =>    {
             let action = super.getAction
             await this.referee(action, this.rules, this.availableMove, this.cardAtHand.sort(), this.playerName, this.opponent)
         })
 
+    }
+
+    async overFlowCheck()   {
+        console.log(this.market)
+        console.log(this.inPlay)
+        console.log(this.player1)
+        console.log(this.player2)
+
+        if(this.market === 0 && this.inPlay <= 1) {
+            
+            console.log("End Game");
+
+            f
+        }
     }
 
     /**
@@ -259,8 +273,6 @@ class GameTrain extends GameEngine{
     
                     if(playerCard[i] !== "whot:20") {
     
-                        console.log("__________________________________")
-    
                         for(let i = 0; i < availableMove.length; i++) {
     
                             if(availableMove[i] === shape + "20") break
@@ -294,20 +306,20 @@ class GameTrain extends GameEngine{
      */
     availableMoves(playerCard, inPlayCard, playerName){
 
-        let index_in = inPlayCard.indexOf(":") + 1
-        let number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length))
-        let shape_in = inPlayCard.slice(0, index_in)
+        const index_in = inPlayCard.indexOf(":") + 1;
+        const number_in = parseInt(inPlayCard.slice(index_in, inPlayCard.length));
+        const shape_in = inPlayCard.slice(0, index_in);
     
-        let availableMove = ["z:goMarket"]
+        let availableMove = ["z:goMarket"];
 
         //determines the agent that is playing and if the agent can always go to market
-        if(playerName === this.agentOne.agentName){
+        if(playerName === this.agentOne.agentName)  {
 
-            if(!this.agentOne.canGoMarket) availableMove = []
+            if(!this.agentOne.canGoMarket) availableMove = [];
 
         }else{
 
-            if(!this.agentTwo.canGoMarket) availableMove = []
+            if(!this.agentTwo.canGoMarket) availableMove = [];
        
         }
     
@@ -439,6 +451,10 @@ class GameTrain extends GameEngine{
         console.log(this.market.length + this.inPlay.length + this.player1.length + this.player2.length)
 
         console.log("game move " + move[0])
+
+        console.log(this.market)
+
+        if (this.market.length + this.inPlay.length + this.player1.length + this.player2.length > 56)  ggt
         
         let index = move[0].indexOf(":") + 1
         let number = move[0].slice(index, move[0].length)
