@@ -10,7 +10,7 @@
 debug.log
 .eslintcache
 # production
-/build
+
 
 # misc
 .DS_Store
